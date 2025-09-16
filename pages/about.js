@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion'
 import { Users, Target, Lightbulb, Award } from 'lucide-react'
 import Link from 'next/link'
+import Navigation from '../components/Navigation'
+import Footer from '../components/Footer'
 
 export default function About() {
   const team = [
-    { name: 'Alex Rodriguez', role: 'CEO & Founder', image: '/api/placeholder/300/300' },
-    { name: 'Sarah Chen', role: 'CTO', image: '/api/placeholder/300/300' },
-    { name: 'Marcus Johnson', role: 'Design Director', image: '/api/placeholder/300/300' },
-    { name: 'Emily Davis', role: 'Marketing Lead', image: '/api/placeholder/300/300' },
+    { name: 'Alex Rodriguez', role: 'CEO & Founder' },
+    { name: 'Sarah Chen', role: 'CTO' },
+    { name: 'Marcus Johnson', role: 'Design Director' },
+    { name: 'Emily Davis', role: 'Marketing Lead' },
   ]
 
   const values = [
@@ -19,23 +21,7 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Codastra
-            </Link>
-            <div className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-300 hover:text-blue-400 transition">Home</Link>
-              <Link href="/about" className="text-white hover:text-blue-400 transition">About</Link>
-              <Link href="/services" className="text-gray-300 hover:text-blue-400 transition">Services</Link>
-              <Link href="/portfolio" className="text-gray-300 hover:text-blue-400 transition">Portfolio</Link>
-              <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 text-center">
@@ -86,12 +72,15 @@ export default function About() {
             </div>
           </motion.div>
           <motion.div
-            className="h-96 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl"
+            className="h-96 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Placeholder for image */}
+            <div className="text-white text-center">
+              <Users className="w-24 h-24 mx-auto mb-4" />
+              <p className="text-xl font-semibold">Building the Future</p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -149,7 +138,9 @@ export default function About() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
               >
-                <div className="w-48 h-48 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full"></div>
+                <div className="w-48 h-48 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <Users className="w-16 h-16 text-white" />
+                </div>
                 <h3 className="text-xl font-semibold text-white mb-1">{name}</h3>
                 <p className="text-gray-400">{role}</p>
               </motion.div>
@@ -157,6 +148,39 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            className="p-12 rounded-3xl border border-gray-700"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Ready to Work With Us?
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Let's create something amazing together
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/contact">
+                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg">
+                  Get In Touch
+                </button>
+              </Link>
+              <Link href="/services">
+                <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
+                  Our Services
+                </button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   )
 }
