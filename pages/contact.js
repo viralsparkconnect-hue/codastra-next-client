@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
+import Navigation from '../components/Navigation'
+import Footer from '../components/Footer'
 import ContactForm from '../components/ContactForm'
 
 export default function Contact() {
@@ -10,28 +12,24 @@ export default function Contact() {
       title: 'Email Us',
       info: 'hello@codastra.com',
       desc: 'Send us an email anytime!',
-      action: () => window.location.href = 'mailto:hello@codastra.com'
     },
     {
       icon: Phone,
       title: 'Call Us',
       info: '+1 (555) 123-4567',
       desc: 'Mon-Fri from 8am to 5pm',
-      action: () => window.location.href = 'tel:+15551234567'
     },
     {
       icon: MapPin,
       title: 'Visit Us',
       info: '123 Business Ave, NY 10001',
       desc: 'Come say hello at our office',
-      action: () => window.open('https://maps.google.com/?q=123+Business+Ave+NY+10001', '_blank')
     },
     {
       icon: Clock,
       title: 'Working Hours',
       info: 'Mon - Fri: 9am - 6pm',
       desc: 'Weekend support available',
-      action: null
     }
   ]
 
@@ -49,29 +47,12 @@ export default function Contact() {
   }
 
   const handleScheduleConsultation = () => {
-    // You can integrate with Calendly or similar
     alert('Scheduling feature coming soon! Please call us or send an email for now.')
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Codastra
-            </Link>
-            <div className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-300 hover:text-blue-400 transition">Home</Link>
-              <Link href="/about" className="text-gray-300 hover:text-blue-400 transition">About</Link>
-              <Link href="/services" className="text-gray-300 hover:text-blue-400 transition">Services</Link>
-              <Link href="/portfolio" className="text-gray-300 hover:text-blue-400 transition">Portfolio</Link>
-              <Link href="/contact" className="text-white hover:text-blue-400 transition">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 text-center">
@@ -99,16 +80,13 @@ export default function Contact() {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-            {contactInfo.map(({ icon: Icon, title, info, desc, action }, i) => (
+            {contactInfo.map(({ icon: Icon, title, info, desc }, i) => (
               <motion.div
                 key={i}
-                className={`text-center p-6 bg-gray-800/50 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 ${
-                  action ? 'cursor-pointer' : ''
-                }`}
+                className="text-center p-6 bg-gray-800/50 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                onClick={action}
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Icon className="w-8 h-8 text-white" />
@@ -229,71 +207,3 @@ export default function Contact() {
           >
             <h2 className="text-4xl font-bold text-white mb-4">Find Us</h2>
             <p className="text-xl text-gray-300">Located in the heart of the city</p>
-          </motion.div>
-
-          <motion.div
-            className="h-96 bg-gray-700 rounded-3xl flex items-center justify-center border border-gray-600 cursor-pointer hover:bg-gray-600 transition"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            onClick={() => window.open('https://maps.google.com/?q=123+Business+Ave+NY+10001', '_blank')}
-          >
-            <div className="text-center">
-              <MapPin className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-white mb-2">Interactive Map</h3>
-              <p className="text-gray-300">123 Business Avenue, New York, NY 10001</p>
-              <p className="text-blue-400 text-sm mt-2">Click to open in Google Maps</p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            className="p-12 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-3xl border border-gray-700"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Let's Build Something Amazing
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Your next big project starts with a simple conversation
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={handleGetQuote}
-                className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
-              >
-                <Send className="w-5 h-5" />
-                Get Free Quote
-              </button>
-              <button 
-                onClick={handleScheduleConsultation}
-                className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300"
-              >
-                Schedule Consultation
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-gray-700 bg-gray-900">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
-            Codastra
-          </div>
-          <p className="text-gray-400 mb-8">Where Code Meets Creativity</p>
-          <div className="border-t border-gray-700 pt-8 text-gray-400">
-            © {new Date().getFullYear()} Codastra. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
-}
