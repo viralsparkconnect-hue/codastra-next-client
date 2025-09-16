@@ -1,29 +1,195 @@
 import { motion } from 'framer-motion'
+import { ArrowRight, Star, Users, Trophy, Zap } from 'lucide-react'
+import Link from 'next/link'
 import Services from '../components/Services'
 import ContactForm from '../components/ContactForm'
 
 export default function Home() {
+  const stats = [
+    { icon: Users, number: '500+', label: 'Happy Clients' },
+    { icon: Trophy, number: '250+', label: 'Projects Done' },
+    { icon: Star, number: '4.9', label: 'Client Rating' },
+    { icon: Zap, number: '99%', label: 'Success Rate' },
+  ]
+
   return (
-    <div className="min-h-screen flex flex-col items-center text-center px-4">
-      <motion.h1
-        className="text-5xl font-bold mt-20 mb-4 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        Codastra
-      </motion.h1>
-      <p className="text-xl mb-12">Where Code Meets Creativity</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+            >
+              Codastra
+            </motion.div>
+            <div className="hidden md:flex space-x-8">
+              <Link href="/" className="text-white hover:text-blue-400 transition">Home</Link>
+              <Link href="/about" className="text-gray-300 hover:text-blue-400 transition">About</Link>
+              <Link href="/services" className="text-gray-300 hover:text-blue-400 transition">Services</Link>
+              <Link href="/portfolio" className="text-gray-300 hover:text-blue-400 transition">Portfolio</Link>
+              <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition">Contact</Link>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      <Services />
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 text-center">
+        <div className="max-w-6xl mx-auto">
+          <motion.h1
+            className="text-6xl md:text-8xl font-bold mb-6"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              Digital Innovation
+            </span>
+            <br />
+            <span className="text-white">Redefined</span>
+          </motion.h1>
+          
+          <motion.p
+            className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            We craft extraordinary digital experiences that transform businesses and captivate audiences through cutting-edge technology and creative brilliance.
+          </motion.p>
 
-      <section className="mt-20 w-full max-w-2xl">
-        <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
-        <ContactForm />
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
+              Start Your Project
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
+              View Our Work
+            </button>
+          </motion.div>
+        </div>
+
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl animate-pulse delay-2000"></div>
       </section>
 
-      <footer className="mt-20 py-6 border-t border-gray-700 w-full text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Codastra. All rights reserved.
+      {/* Stats Section */}
+      <section className="py-20 px-4 bg-gray-800/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map(({ icon: Icon, number, label }, i) => (
+              <motion.div
+                key={i}
+                className="text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+              >
+                <Icon className="w-8 h-8 mx-auto mb-4 text-blue-400" />
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">{number}</div>
+                <div className="text-gray-400">{label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              What We Do Best
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              From concept to launch, we deliver comprehensive digital solutions that drive results
+            </p>
+          </motion.div>
+          <Services />
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.h2
+            className="text-4xl md:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            Ready to Transform Your Business?
+          </motion.h2>
+          <motion.p
+            className="text-xl text-gray-300 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
+            Let's discuss how we can bring your vision to life with our expertise
+          </motion.p>
+          <ContactForm />
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t border-gray-700 bg-gray-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+                Codastra
+              </h3>
+              <p className="text-gray-400">
+                Where Code Meets Creativity. Building digital experiences that matter.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Services</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Web Development</li>
+                <li>Mobile Apps</li>
+                <li>Digital Marketing</li>
+                <li>Branding</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>About Us</li>
+                <li>Portfolio</li>
+                <li>Careers</li>
+                <li>Blog</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>hello@codastra.com</li>
+                <li>+1 (555) 123-4567</li>
+                <li>New York, NY</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
+            © {new Date().getFullYear()} Codastra. All rights reserved.
+          </div>
+        </div>
       </footer>
     </div>
   )
