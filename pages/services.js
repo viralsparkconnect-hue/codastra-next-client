@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Code, Smartphone, Megaphone, Search, Brush, Globe, ArrowRight, Check } from 'lucide-react'
 import Link from 'next/link'
+import Navigation from '../components/Navigation'
+import Footer from '../components/Footer'
 
 export default function Services() {
   const services = [
@@ -56,23 +58,7 @@ export default function Services() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Codastra
-            </Link>
-            <div className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-300 hover:text-blue-400 transition">Home</Link>
-              <Link href="/about" className="text-gray-300 hover:text-blue-400 transition">About</Link>
-              <Link href="/services" className="text-white hover:text-blue-400 transition">Services</Link>
-              <Link href="/portfolio" className="text-gray-300 hover:text-blue-400 transition">Portfolio</Link>
-              <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 text-center">
@@ -140,14 +126,16 @@ export default function Services() {
                   ))}
                 </div>
 
-                <button className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                  popular
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
-                }`}>
-                  Get Started
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                <Link href="/contact">
+                  <button className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                    popular
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
+                      : 'bg-gray-700 text-white hover:bg-gray-600'
+                  }`}>
+                    Get Started
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -213,13 +201,17 @@ export default function Services() {
                   Start Your Project
                 </button>
               </Link>
-              <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
-                Schedule a Call
-              </button>
+              <Link href="/portfolio">
+                <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
+                  View Our Work
+                </button>
+              </Link>
             </div>
           </motion.div>
         </div>
       </section>
+
+      <Footer />
     </div>
   )
 }
