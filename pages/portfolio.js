@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { ExternalLink, Github, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import Navigation from '../components/Navigation'
+import Footer from '../components/Footer'
 
 export default function Portfolio() {
   const projects = [
@@ -9,54 +11,36 @@ export default function Portfolio() {
       category: 'Web Development',
       desc: 'A modern e-commerce platform with advanced features and seamless user experience.',
       tech: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     },
     {
       title: 'FinTech Mobile App',
       category: 'Mobile Development',
       desc: 'Secure financial management app with real-time transactions and analytics.',
       tech: ['React Native', 'Firebase', 'Plaid API', 'Redux'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     },
     {
       title: 'Healthcare Dashboard',
       category: 'Web Application',
       desc: 'Comprehensive healthcare management system for medical professionals.',
       tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Chart.js'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     },
     {
       title: 'AI-Powered Chatbot',
       category: 'AI/ML',
       desc: 'Intelligent customer service chatbot with natural language processing.',
       tech: ['Python', 'TensorFlow', 'Flask', 'OpenAI API'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     },
     {
       title: 'Real Estate Platform',
       category: 'Full Stack',
       desc: 'Complete real estate marketplace with property listings and virtual tours.',
       tech: ['Vue.js', 'Laravel', 'MySQL', 'AWS S3'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     },
     {
       title: 'Social Media App',
       category: 'Mobile Development',
       desc: 'Social networking app with photo sharing and real-time messaging.',
       tech: ['Flutter', 'Dart', 'Firebase', 'Cloud Functions'],
-      image: '/api/placeholder/600/400',
-      link: '#',
-      github: '#'
     }
   ]
 
@@ -64,23 +48,7 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Codastra
-            </Link>
-            <div className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-300 hover:text-blue-400 transition">Home</Link>
-              <Link href="/about" className="text-gray-300 hover:text-blue-400 transition">About</Link>
-              <Link href="/services" className="text-gray-300 hover:text-blue-400 transition">Services</Link>
-              <Link href="/portfolio" className="text-white hover:text-blue-400 transition">Portfolio</Link>
-              <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 text-center">
@@ -131,7 +99,7 @@ export default function Portfolio() {
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map(({ title, category, desc, tech, link, github }, i) => (
+            {projects.map(({ title, category, desc, tech }, i) => (
               <motion.div
                 key={i}
                 className="group bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700 hover:border-blue-500/50 transition-all duration-300"
@@ -149,12 +117,12 @@ export default function Portfolio() {
                     </span>
                   </div>
                   <div className="absolute top-4 right-4 flex gap-2">
-                    <a href={link} className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition">
+                    <div className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition cursor-pointer">
                       <ExternalLink className="w-4 h-4" />
-                    </a>
-                    <a href={github} className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition">
+                    </div>
+                    <div className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition cursor-pointer">
                       <Github className="w-4 h-4" />
-                    </a>
+                    </div>
                   </div>
                 </div>
 
@@ -245,13 +213,17 @@ export default function Portfolio() {
                   Start Your Project
                 </button>
               </Link>
-              <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
-                View More Work
-              </button>
+              <Link href="/services">
+                <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
+                  View Our Services
+                </button>
+              </Link>
             </div>
           </motion.div>
         </div>
       </section>
+
+      <Footer />
     </div>
   )
 }
