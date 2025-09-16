@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react'
-import Link from 'next/link'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
 import ContactForm from '../components/ContactForm'
@@ -42,7 +41,6 @@ export default function Contact() {
   }
 
   const handleGetQuote = () => {
-    // Scroll to contact form
     document.querySelector('#contact-form')?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -207,3 +205,60 @@ export default function Contact() {
           >
             <h2 className="text-4xl font-bold text-white mb-4">Find Us</h2>
             <p className="text-xl text-gray-300">Located in the heart of the city</p>
+          </motion.div>
+
+          <motion.div
+            className="h-96 bg-gray-700 rounded-3xl flex items-center justify-center border border-gray-600 cursor-pointer hover:bg-gray-600 transition"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            onClick={() => window.open('https://maps.google.com/?q=123+Business+Ave+NY+10001', '_blank')}
+          >
+            <div className="text-center">
+              <MapPin className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-2">Interactive Map</h3>
+              <p className="text-gray-300">123 Business Avenue, New York, NY 10001</p>
+              <p className="text-blue-400 text-sm mt-2">Click to open in Google Maps</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            className="p-12 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-3xl border border-gray-700"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Let's Build Something Amazing
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Your next big project starts with a simple conversation
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={handleGetQuote}
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
+              >
+                <Send className="w-5 h-5" />
+                Get Free Quote
+              </button>
+              <button 
+                onClick={handleScheduleConsultation}
+                className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300"
+              >
+                Schedule Consultation
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  )
+}
