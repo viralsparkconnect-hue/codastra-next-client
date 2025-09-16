@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { Code, Megaphone, LineChart, Brush, Smartphone, Globe, Search, Palette } from 'lucide-react'
 
 const services = [
@@ -90,9 +91,11 @@ export default function Services() {
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-700">
-                  <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 group-hover:shadow-lg">
-                    Learn More
-                  </button>
+                  <Link href="/services">
+                    <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 group-hover:shadow-lg">
+                      Learn More
+                    </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -112,9 +115,11 @@ export default function Services() {
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             We specialize in creating tailored solutions that perfectly fit your unique business needs
           </p>
-          <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl">
-            Discuss Your Project
-          </button>
+          <Link href="/contact">
+            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+              Discuss Your Project
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>
