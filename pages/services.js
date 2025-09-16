@@ -126,15 +126,16 @@ export default function Services() {
                   ))}
                 </div>
 
-                <Link href="/contact">
-                  <button className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                <Link 
+                  href="/contact"
+                  className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                     popular
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg'
                       : 'bg-gray-700 text-white hover:bg-gray-600'
-                  }`}>
-                    Get Started
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
+                  }`}
+                >
+                  Get Started
+                  <ArrowRight className="w-5 h-5" />
                 </Link>
               </motion.div>
             ))}
@@ -156,7 +157,7 @@ export default function Services() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
+            {[ 
               { step: '01', title: 'Discovery', desc: 'We understand your needs and goals' },
               { step: '02', title: 'Planning', desc: 'Create a detailed project roadmap' },
               { step: '03', title: 'Development', desc: 'Build your solution with precision' },
@@ -196,15 +197,17 @@ export default function Services() {
               Let's discuss your project and create something amazing together
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg">
-                  Start Your Project
-                </button>
+              <Link 
+                href="/contact"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
+              >
+                Start Your Project
               </Link>
-              <Link href="/portfolio">
-                <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300">
-                  View Our Work
-                </button>
+              <Link 
+                href="/portfolio"
+                className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300"
+              >
+                View Our Work
               </Link>
             </div>
           </motion.div>
