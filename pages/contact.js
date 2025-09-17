@@ -362,11 +362,11 @@ export default function Contact() {
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="text-center p-3 bg-green-900/20 rounded-lg">
-                    <div className="text-green-400 font-bold">< 2 hrs</div>
+                    <div className="text-green-400 font-bold">&lt; 2 hrs</div>
                     <div className="text-gray-300">Initial Response</div>
                   </div>
                   <div className="text-center p-3 bg-green-900/20 rounded-lg">
-                    <div className="text-green-400 font-bold">< 24 hrs</div>
+                    <div className="text-green-400 font-bold">&lt; 24 hrs</div>
                     <div className="text-gray-300">Detailed Proposal</div>
                   </div>
                 </div>
