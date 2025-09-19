@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.3.3",
     "@formspree/react": "^3.0.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.263.1",
