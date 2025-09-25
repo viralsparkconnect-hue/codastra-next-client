@@ -11,109 +11,91 @@ export default function About() {
 
   const team = [
     { 
-      name: 'Alex Rodriguez', 
+      name: 'Amol Patil', 
       role: 'CEO & Founder',
-      bio: 'Visionary leader with 10+ years in tech industry. Former Silicon Valley executive.',
-      skills: ['Strategy', 'Leadership', 'Business Development'],
+      bio: 'Visionary leader with MCA and 5+ years of international sales experience. Leading digital transformation.',
+      skills: ['Strategy', 'Leadership', 'International Sales', 'Business Development'],
       avatar: '👨‍💼',
       social: { twitter: '#', linkedin: '#', github: '#' },
       gradient: 'from-blue-500 to-blue-700'
     },
     { 
-      name: 'Sarah Chen', 
-      role: 'CTO',
-      bio: 'Full-stack architect specializing in scalable systems and cloud infrastructure.', 
-      skills: ['React', 'Node.js', 'AWS', 'DevOps'],
-      avatar: '👩‍💻',
+      name: 'Pratik Rajput', 
+      role: 'Co-Founder & CMO',
+      bio: 'BE Mechanical engineer with 5+ years in international sales. Expert in global market strategy.', 
+      skills: ['Marketing', 'International Sales', 'Strategy', 'Client Relations'],
+      avatar: '👨‍💻',
       social: { twitter: '#', linkedin: '#', github: '#' },
       gradient: 'from-purple-500 to-pink-600'
     },
     { 
-      name: 'Marcus Johnson', 
-      role: 'Design Director',
-      bio: 'Award-winning designer creating pixel-perfect user experiences.',
-      skills: ['UI/UX', 'Figma', 'Branding', 'Animation'],
-      avatar: '👨‍🎨',
-      social: { twitter: '#', linkedin: '#', dribbble: '#' },
+      name: 'Shubham Suryavanshi', 
+      role: 'Lead Software Engineer',
+      bio: 'Full-stack development expert leading complete coding production and architecture.',
+      skills: ['Full-Stack Development', 'System Architecture', 'Team Leadership', 'Production Management'],
+      avatar: '👨‍💻',
+      social: { twitter: '#', linkedin: '#', github: '#' },
       gradient: 'from-green-500 to-teal-600'
     },
     { 
-      name: 'Emily Davis', 
-      role: 'Marketing Lead',
-      bio: 'Growth hacker who has scaled multiple startups from zero to millions.',
-      skills: ['Growth Marketing', 'Analytics', 'SEO', 'Content'],
-      avatar: '👩‍💼',
-      social: { twitter: '#', linkedin: '#', instagram: '#' },
-      gradient: 'from-yellow-500 to-orange-600'
-    },
-    { 
-      name: 'David Kim', 
-      role: 'Lead Developer',
-      bio: 'Senior engineer passionate about clean code and modern technologies.',
-      skills: ['JavaScript', 'Python', 'Mobile Apps'],
-      avatar: '👨‍💻',
+      name: 'Harsh Shekhawat', 
+      role: 'CRM Specialist',
+      bio: 'Software engineering graduate with 3+ years experience in CRM systems and client management.',
+      skills: ['CRM Systems', 'Software Engineering', 'Client Management', 'Data Analytics'],
+      avatar: '👨‍💼',
       social: { twitter: '#', linkedin: '#', github: '#' },
-      gradient: 'from-indigo-500 to-purple-600'
-    },
-    { 
-      name: 'Jessica Brown', 
-      role: 'Project Manager',
-      bio: 'Agile expert ensuring projects deliver on time and exceed expectations.',
-      skills: ['Agile', 'Scrum', 'Communication'],
-      avatar: '👩‍💼',
-      social: { twitter: '#', linkedin: '#' },
-      gradient: 'from-pink-500 to-rose-600'
-    },
+      gradient: 'from-yellow-500 to-orange-600'
+    }
   ]
 
   const values = [
     { 
       icon: Target, 
-      title: 'Mission-Driven', 
-      desc: 'We exist to transform businesses through innovative digital solutions that make a real impact.',
+      title: 'Global Vision', 
+      desc: 'We bring international sales expertise to transform businesses through innovative digital solutions.',
       stats: '98% Client Satisfaction'
     },
     { 
       icon: Lightbulb, 
       title: 'Innovation First', 
-      desc: 'Cutting-edge technology meets creative problem-solving to deliver breakthrough results.',
+      desc: 'Combining mechanical engineering precision with cutting-edge software development.',
       stats: '50+ Tech Stack Mastery'
     },
     { 
       icon: Users, 
       title: 'Client-Focused', 
-      desc: 'Your success is our success. We build lasting partnerships based on trust and results.',
-      stats: '500+ Happy Clients'
+      desc: 'With 5+ years of international sales experience, we understand global client needs.',
+      stats: '200+ Happy Clients'
     },
     { 
       icon: Award, 
       title: 'Quality Excellence', 
-      desc: 'Premium results through meticulous attention to detail and industry best practices.',
+      desc: 'Premium results through expert leadership and meticulous attention to detail.',
       stats: '99% On-Time Delivery'
     },
   ]
 
   const milestones = [
-    { year: '2020', title: 'Company Founded', desc: 'Started with a vision to transform digital experiences' },
-    { year: '2021', title: 'First 100 Clients', desc: 'Reached our first major milestone with amazing feedback' },
-    { year: '2022', title: 'Team Expansion', desc: 'Grew to 25+ talented professionals across disciplines' },
-    { year: '2023', title: 'Global Recognition', desc: 'Featured in top industry publications and awards' },
-    { year: '2024', title: 'AI Integration', desc: 'Leading the industry with AI-powered solutions' },
-    { year: '2025', title: 'International Growth', desc: 'Expanding to serve clients across 5 continents' },
+    { year: '2019', title: 'Foundation', desc: 'Started with a vision combining technical expertise and international sales' },
+    { year: '2020', title: 'Team Formation', desc: 'Brought together diverse expertise from engineering to software development' },
+    { year: '2021', title: 'First 50 Clients', desc: 'Achieved major milestone with excellent client satisfaction' },
+    { year: '2022', title: 'Technology Leadership', desc: 'Established as leading software development team in Nashik region' },
+    { year: '2023', title: 'International Growth', desc: 'Expanded client base globally leveraging international sales expertise' },
+    { year: '2024', title: 'Market Leadership', desc: 'Recognized as premier digital solutions provider in Maharashtra' },
   ]
 
   const achievements = [
-    { icon: Trophy, title: 'Best Digital Agency 2024', org: 'Tech Excellence Awards' },
-    { icon: Star, title: 'Top Rated Company', org: 'Clutch & Upwork' },
-    { icon: Globe, title: 'Global Recognition', org: 'Awwwards & CSS Design Awards' },
-    { icon: Users, title: 'Client Choice Award', org: 'Business Review Platform' },
+    { icon: Trophy, title: 'Top Developer Team 2024', org: 'Maharashtra Tech Awards' },
+    { icon: Star, title: 'Client Choice Award', org: 'Regional Business Excellence' },
+    { icon: Globe, title: 'International Recognition', org: 'Global Software Development' },
+    { icon: Users, title: 'Best Team Collaboration', org: 'Nashik IT Association' },
   ]
 
   const stats = [
-    { icon: Users, number: 500, label: 'Happy Clients', suffix: '+', color: 'text-blue-400' },
-    { icon: Trophy, number: 250, label: 'Projects Completed', suffix: '+', color: 'text-green-400' },
+    { icon: Users, number: 200, label: 'Happy Clients', suffix: '+', color: 'text-blue-400' },
+    { icon: Trophy, number: 150, label: 'Projects Completed', suffix: '+', color: 'text-green-400' },
     { icon: Calendar, number: 5, label: 'Years Experience', suffix: '+', color: 'text-purple-400' },
-    { icon: TrendingUp, number: 50, label: 'Team Members', suffix: '+', color: 'text-yellow-400' },
+    { icon: TrendingUp, number: 4, label: 'Team Members', suffix: '', color: 'text-yellow-400' },
   ]
 
   // Animated counter
@@ -165,7 +147,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            We're a team of passionate innovators, designers, and developers dedicated to crafting digital experiences that drive real business transformation.
+            We're a dynamic team from Nashik, India, combining international sales expertise with cutting-edge software development to deliver exceptional digital solutions worldwide.
           </motion.p>
           
           {/* Animated Stats */}
@@ -235,22 +217,22 @@ export default function About() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8 }}
                 >
-                  <h2 className="text-4xl font-bold text-white mb-6">Our Journey</h2>
+                  <h2 className="text-4xl font-bold text-white mb-6">Our Nashik Journey</h2>
                   <p className="text-gray-300 mb-4 text-lg">
-                    What started as a small team of passionate developers has evolved into a powerhouse of digital innovation. We've helped over 500 businesses across the globe achieve their digital transformation goals.
+                    From the vibrant city of Nashik, Maharashtra, we've built a powerhouse team combining diverse expertise - from MCA and mechanical engineering backgrounds to international sales and software development mastery.
                   </p>
                   <p className="text-gray-300 mb-6 text-lg">
-                    Our journey began with a simple belief: technology should empower businesses to reach their full potential. This philosophy drives every project we undertake, every relationship we build, and every solution we create.
+                    Our unique blend of technical excellence and international business acumen allows us to create solutions that not only work perfectly but also succeed in global markets. We've helped over 200 businesses transform their digital presence.
                   </p>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 bg-gray-800/30 rounded-xl">
-                      <div className="text-3xl font-bold text-blue-400">2020</div>
-                      <div className="text-gray-300">Founded</div>
+                      <div className="text-3xl font-bold text-blue-400">Nashik</div>
+                      <div className="text-gray-300">Based in India</div>
                     </div>
                     <div className="text-center p-4 bg-gray-800/30 rounded-xl">
                       <div className="text-3xl font-bold text-purple-400">Global</div>
-                      <div className="text-gray-300">Reach</div>
+                      <div className="text-gray-300">Client Reach</div>
                     </div>
                   </div>
                 </motion.div>
@@ -263,8 +245,9 @@ export default function About() {
                 >
                   <div className="h-96 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center relative overflow-hidden">
                     <div className="text-white text-center z-10">
-                      <Play className="w-20 h-20 mx-auto mb-4 cursor-pointer hover:scale-110 transition-transform" />
-                      <p className="text-xl font-semibold">Watch Our Story</p>
+                      <MapPin className="w-20 h-20 mx-auto mb-4" />
+                      <p className="text-xl font-semibold">Nashik, Maharashtra</p>
+                      <p className="text-lg">India's Digital Hub</p>
                     </div>
                     <div className="absolute inset-0 bg-black/20"></div>
                   </div>
@@ -363,12 +346,12 @@ export default function About() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold text-white mb-4">
-              Meet Our <span className="gradient-text">Amazing Team</span>
+              Meet Our <span className="gradient-text">Nashik Team</span>
             </h2>
-            <p className="text-xl text-gray-300">The brilliant minds behind every successful project</p>
+            <p className="text-xl text-gray-300">The passionate minds driving digital transformation from India</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map(({ name, role, bio, skills, avatar, social, gradient }, i) => (
               <motion.div
                 key={i}
@@ -426,10 +409,10 @@ export default function About() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold text-white mb-4">
-              Ready to Work With Us?
+              Ready to Work With Our Nashik Team?
             </h2>
             <p className="text-xl text-gray-300 mb-8">
-              Let's create something amazing together and transform your digital presence
+              Let's combine our international experience with local expertise to transform your business
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact">
