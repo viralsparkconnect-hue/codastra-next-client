@@ -331,7 +331,128 @@ export default function Contact() {
                 <p className="text-gray-300 mb-8">
                   Tell us about your project and our Nashik team will get back to you with a detailed proposal and timeline.
                 </p>
-                <ContactForm />
+                
+                {/* Contact Form */}
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-white text-sm font-semibold mb-2">Full Name *</label>
+                      <input 
+                        type="text" 
+                        required
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white text-sm font-semibold mb-2">Email Address *</label>
+                      <input 
+                        type="email" 
+                        required
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-white text-sm font-semibold mb-2">Phone Number</label>
+                      <input 
+                        type="tel"
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white text-sm font-semibold mb-2">Company</label>
+                      <input 
+                        type="text"
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                        placeholder="Your company name"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white text-sm font-semibold mb-2">Project Type</label>
+                    <select className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300">
+                      <option value="">Select project type</option>
+                      <option value="web-development">Web Development</option>
+                      <option value="mobile-app">Mobile App Development</option>
+                      <option value="ecommerce">E-commerce Solution</option>
+                      <option value="crm">CRM System</option>
+                      <option value="custom-software">Custom Software</option>
+                      <option value="consulting">Consulting</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white text-sm font-semibold mb-2">Budget Range</label>
+                    <select className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300">
+                      <option value="">Select budget range</option>
+                      <option value="5k-10k">$5,000 - $10,000</option>
+                      <option value="10k-25k">$10,000 - $25,000</option>
+                      <option value="25k-50k">$25,000 - $50,000</option>
+                      <option value="50k-100k">$50,000 - $100,000</option>
+                      <option value="100k+">$100,000+</option>
+                      <option value="discuss">Let's Discuss</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white text-sm font-semibold mb-2">Project Details *</label>
+                    <textarea 
+                      required
+                      rows="5"
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 resize-vertical"
+                      placeholder="Tell us about your project requirements, timeline, and any specific features you need..."
+                    ></textarea>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="privacy" 
+                      required
+                      className="mt-1 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <label htmlFor="privacy" className="text-gray-300 text-sm">
+                      I agree to the <span className="text-blue-400 hover:underline cursor-pointer">Privacy Policy</span> and consent to being contacted by the Codastra team regarding my project inquiry.
+                    </label>
+                  </div>
+                  
+                  <button 
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                  >
+                    <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    Send Message
+                  </button>
+                  
+                  <div className="text-center pt-4 border-t border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-3">Or connect with us directly:</p>
+                    <div className="flex justify-center gap-4">
+                      <button 
+                        type="button"
+                        onClick={() => window.open('https://wa.me/919834683297', '_blank')}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 text-sm"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        WhatsApp
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => window.location.href = 'tel:+919834683297'}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 text-sm"
+                      >
+                        <Phone className="w-4 h-4" />
+                        Call India
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </motion.div>
 
