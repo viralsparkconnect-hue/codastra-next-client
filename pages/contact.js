@@ -21,23 +21,23 @@ export default function Contact() {
     {
       icon: Phone,
       title: 'Call Us',
-      info: '+1 (555) 123-4567',
-      desc: 'Mon-Fri from 8am to 5pm',
+      info: '+91 9876543210',
+      desc: 'Mon-Fri from 9am to 6pm IST',
       color: 'from-green-500 to-green-700',
-      action: () => window.location.href = 'tel:+15551234567'
+      action: () => window.location.href = 'tel:+919876543210'
     },
     {
       icon: MapPin,
       title: 'Visit Us',
-      info: '123 Business Ave, NY 10001',
+      info: 'Nashik, Maharashtra, India',
       desc: 'Come say hello at our office',
       color: 'from-purple-500 to-purple-700',
-      action: () => window.open('https://maps.google.com/?q=123+Business+Ave+NY+10001', '_blank')
+      action: () => window.open('https://maps.google.com/?q=Nashik+Maharashtra+India', '_blank')
     },
     {
       icon: Clock,
       title: 'Working Hours',
-      info: 'Mon - Fri: 9am - 6pm',
+      info: 'Mon - Fri: 9am - 6pm IST',
       desc: 'Weekend support available',
       color: 'from-orange-500 to-orange-700',
       action: () => {}
@@ -47,33 +47,33 @@ export default function Contact() {
   const offices = [
     {
       id: 'main',
-      city: 'New York',
-      address: '123 Business Avenue, NY 10001',
-      phone: '+1 (555) 123-4567',
-      email: 'ny@codastra.com',
-      timezone: 'EST',
-      team: 25,
-      specialties: ['Web Development', 'Mobile Apps', 'AI/ML']
+      city: 'Nashik',
+      address: 'Maharashtra, India',
+      phone: '+91 9876543210',
+      email: 'nashik@codastra.com',
+      timezone: 'IST (GMT+5:30)',
+      team: 4,
+      specialties: ['Web Development', 'Mobile Apps', 'International Sales']
     },
     {
-      id: 'west',
-      city: 'San Francisco',
-      address: '456 Tech Street, SF 94105',
-      phone: '+1 (555) 987-6543',
-      email: 'sf@codastra.com',
-      timezone: 'PST',
-      team: 18,
-      specialties: ['Cloud Solutions', 'DevOps', 'Blockchain']
+      id: 'remote',
+      city: 'Remote Services',
+      address: 'Global Remote Support',
+      phone: '+91 9876543210',
+      email: 'remote@codastra.com',
+      timezone: 'Multiple Timezones',
+      team: 4,
+      specialties: ['Cloud Solutions', 'DevOps', 'Digital Marketing']
     },
     {
-      id: 'europe',
-      city: 'London',
-      address: '789 Innovation Lane, London EC2A',
-      phone: '+44 20 1234 5678',
-      email: 'london@codastra.com',
-      timezone: 'GMT',
-      team: 12,
-      specialties: ['Digital Marketing', 'Branding', 'E-commerce']
+      id: 'international',
+      city: 'International',
+      address: 'Global Client Services',
+      phone: '+91 9876543210',
+      email: 'international@codastra.com',
+      timezone: 'IST/Client TZ',
+      team: 4,
+      specialties: ['International Sales', 'Global Support', 'Consulting']
     }
   ]
 
@@ -82,82 +82,82 @@ export default function Contact() {
       icon: Star, 
       title: '4.9/5 Rating', 
       desc: 'Consistently high client satisfaction across all projects',
-      stat: '500+ Reviews'
+      stat: '200+ Reviews'
     },
     { 
       icon: Users, 
       title: 'Expert Team', 
-      desc: 'Seasoned professionals with 5+ years average experience',
-      stat: '50+ Experts'
+      desc: 'Specialized team with international sales and technical expertise',
+      stat: '4 Core Members'
     },
     { 
       icon: CheckCircle, 
       title: '99% On-Time', 
       desc: 'Reliable delivery with rigorous project management',
-      stat: '250+ Projects'
+      stat: '150+ Projects'
     },
     { 
       icon: Globe, 
       title: 'Global Reach', 
-      desc: 'Serving clients across 5 continents with 24/7 support',
-      stat: '30+ Countries'
+      desc: 'Serving international clients with 24/7 support from Nashik',
+      stat: '15+ Countries'
     },
   ]
 
   const faqs = [
     {
-      q: "How long does a typical project take?",
-      a: "Project timelines vary based on complexity and scope. Simple websites take 2-4 weeks, while complex applications can take 8-16 weeks. We provide detailed timelines during our initial consultation."
+      q: "How do you handle international clients from Nashik?",
+      a: "Our team has 5+ years of international sales experience. We work across multiple time zones and provide 24/7 support for global clients. Our English communication is excellent and we understand international business practices."
+    },
+    {
+      q: "What makes your Nashik team special?",
+      a: "We combine the best of both worlds - cost-effective Indian talent with international business expertise. Our team includes MCA graduates, engineers, and international sales specialists who understand global market needs."
     },
     {
       q: "Do you offer ongoing support and maintenance?",
-      a: "Yes! We provide comprehensive support packages including 24/7 monitoring, security updates, performance optimization, and feature enhancements."
+      a: "Yes! We provide comprehensive support packages including 24/7 monitoring, security updates, performance optimization, and feature enhancements. Our team works around the clock to ensure your systems run smoothly."
     },
     {
       q: "What's your development process like?",
-      a: "We follow an agile methodology with weekly sprints, regular client check-ins, and transparent progress tracking. You'll have full visibility into your project's development."
+      a: "We follow agile methodology with regular client updates. Despite being in India, we maintain constant communication through video calls, project management tools, and daily progress reports to keep you informed."
     },
     {
-      q: "Can you work with our existing systems?",
-      a: "Absolutely! We specialize in integrating with existing systems, APIs, and databases. Our team can assess your current infrastructure and recommend the best approach."
+      q: "How do you ensure quality from a remote location?",
+      a: "Quality is our top priority. Our lead engineer Shubham oversees all coding production, while our founders with international experience ensure projects meet global standards. We use industry best practices and rigorous testing."
     },
     {
-      q: "What if I need changes during development?",
-      a: "We welcome feedback and changes! Our agile process accommodates revisions, and we'll discuss any timeline or budget implications transparently."
-    },
-    {
-      q: "Do you sign NDAs for confidential projects?",
-      a: "Yes, we routinely sign NDAs and take data security seriously. All client information is treated with the highest level of confidentiality."
+      q: "What are your payment terms for international projects?",
+      a: "We offer flexible payment terms suitable for international clients including milestone-based payments, bank transfers, and secure online payment gateways. We work with clients to find mutually beneficial arrangements."
     }
   ]
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      company: 'TechStartup Inc.',
+      name: 'John Peterson',
+      company: 'TechStart USA',
       role: 'CEO',
-      text: 'Codastra transformed our outdated website into a modern, high-converting platform. The team was professional, responsive, and delivered beyond our expectations.',
+      text: 'Working with the Codastra team in Nashik has been exceptional. Their international sales experience combined with technical expertise delivered exactly what we needed.',
       rating: 5,
-      avatar: '👩‍💼',
+      avatar: '👨‍💼',
       project: 'E-commerce Platform'
     },
     {
-      name: 'Michael Chen',
-      company: 'RetailCorp',
+      name: 'Maria González',
+      company: 'Digital Solutions EU',
       role: 'CTO',
-      text: 'Their mobile app development expertise is outstanding. Our user engagement increased by 200% after launching the app they built for us.',
+      text: 'Despite the distance, communication was seamless. Amol and Pratik\'s international background made working across time zones effortless. Outstanding results!',
       rating: 5,
-      avatar: '👨‍💻',
+      avatar: '👩‍💻',
       project: 'Mobile Application'
     },
     {
-      name: 'Lisa Rodriguez',
-      company: 'GrowthCo',
-      role: 'Marketing Director',
-      text: 'The digital marketing campaign they created generated 5x more leads than our previous efforts. ROI exceeded all expectations!',
+      name: 'David Kim',
+      company: 'StartupCorp',
+      role: 'Founder',
+      text: 'The Nashik team delivered a world-class solution at competitive pricing. Shubham\'s coding expertise and the team\'s project management were impressive.',
       rating: 5,
-      avatar: '👩‍🎨',
-      project: 'Digital Marketing'
+      avatar: '👨‍🎨',
+      project: 'Web Development'
     }
   ]
 
@@ -181,8 +181,8 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Let's Create Something <br />
-            <span className="gradient-text">Amazing Together</span>
+            Connect With Our <br />
+            <span className="gradient-text">Nashik Team</span>
           </motion.h1>
           <motion.p
             className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8"
@@ -190,7 +190,7 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            Ready to transform your digital presence? We're here to help you succeed with cutting-edge solutions and exceptional service.
+            Ready to work with India's premier digital team? We bring international expertise and local value to transform your business globally.
           </motion.p>
           
           {/* Quick Action Buttons */}
@@ -209,11 +209,11 @@ export default function Contact() {
               <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
             </button>
             <button 
-              onClick={() => window.location.href = 'tel:+15551234567'}
+              onClick={() => window.location.href = 'tel:+919876543210'}
               className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2"
             >
               <Phone className="w-5 h-5" />
-              Call Now
+              Call India +91
             </button>
           </motion.div>
 
@@ -253,7 +253,7 @@ export default function Contact() {
             <h2 className="text-4xl font-bold text-white mb-4">
               Multiple Ways to <span className="gradient-text">Connect</span>
             </h2>
-            <p className="text-xl text-gray-300">Choose the method that works best for you</p>
+            <p className="text-xl text-gray-300">Reach our Nashik team through your preferred method</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
@@ -299,11 +299,11 @@ export default function Contact() {
                   </div>
                   <div>
                     <h2 className="text-3xl font-bold text-white">Send us a Message</h2>
-                    <p className="text-blue-400 text-sm">We'll respond within 2 hours</p>
+                    <p className="text-blue-400 text-sm">We'll respond within 2 hours (IST)</p>
                   </div>
                 </div>
                 <p className="text-gray-300 mb-8">
-                  Tell us about your project and we'll get back to you with a detailed proposal and timeline.
+                  Tell us about your project and our Nashik team will get back to you with a detailed proposal and timeline.
                 </p>
                 <ContactForm />
               </div>
@@ -320,7 +320,7 @@ export default function Contact() {
               <div className="bg-gray-800/30 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <Globe className="w-6 h-6 text-blue-400" />
-                  Our Offices
+                  Our Services
                 </h3>
                 <div className="space-y-4">
                   {offices.map((office, i) => (
@@ -357,7 +357,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">Fast Response</h3>
-                    <p className="text-green-400 text-sm">Guaranteed within 2 hours</p>
+                    <p className="text-green-400 text-sm">From Nashik to Global</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -372,22 +372,25 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Emergency Contact */}
-              <div className="bg-gradient-to-r from-red-900/20 to-orange-900/20 rounded-3xl p-8 border border-red-700/30">
+              {/* International Support */}
+              <div className="bg-gradient-to-r from-purple-900/20 to-indigo-900/20 rounded-3xl p-8 border border-purple-700/30">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                  <Heart className="w-6 h-6 text-red-400" />
-                  Need Urgent Help?
+                  <Globe className="w-6 h-6 text-purple-400" />
+                  International Clients
                 </h3>
                 <p className="text-gray-300 mb-4 text-sm">
-                  For existing clients with critical issues, we offer 24/7 emergency support.
+                  Our team has 5+ years of international sales experience. We understand global markets and work seamlessly across time zones.
                 </p>
-                <button 
-                  onClick={() => window.location.href = 'tel:+15551234567'}
-                  className="w-full py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-semibold hover:from-red-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-5 h-5" />
-                  Emergency Hotline
-                </button>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="bg-purple-900/20 p-2 rounded text-center">
+                    <div className="text-purple-400 font-bold">USA/EU</div>
+                    <div className="text-gray-300">Friendly</div>
+                  </div>
+                  <div className="bg-purple-900/20 p-2 rounded text-center">
+                    <div className="text-purple-400 font-bold">24/7</div>
+                    <div className="text-gray-300">Support</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -407,7 +410,7 @@ export default function Contact() {
             <h2 className="text-4xl font-bold text-white mb-4">
               Frequently Asked <span className="gradient-text">Questions</span>
             </h2>
-            <p className="text-xl text-gray-300">Everything you need to know about working with us</p>
+            <p className="text-xl text-gray-300">Everything you need to know about working with our Nashik team</p>
           </motion.div>
 
           <div className="space-y-6">
@@ -442,9 +445,9 @@ export default function Contact() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold text-white mb-4">
-              What Our <span className="gradient-text">Clients Say</span>
+              What Our <span className="gradient-text">Global Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-300">Real testimonials from real projects</p>
+            <p className="text-xl text-gray-300">Real testimonials from international projects</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -493,8 +496,8 @@ export default function Contact() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-white mb-4">Visit Our Office</h2>
-            <p className="text-xl text-gray-300">Located in the heart of Manhattan's tech district</p>
+            <h2 className="text-4xl font-bold text-white mb-4">Visit Our Nashik Office</h2>
+            <p className="text-xl text-gray-300">Located in Maharashtra's growing tech hub</p>
           </motion.div>
 
           <motion.div
@@ -503,14 +506,14 @@ export default function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             viewport={{ once: true }}
-            onClick={() => window.open('https://maps.google.com/?q=123+Business+Ave+NY+10001', '_blank')}
+            onClick={() => window.open('https://maps.google.com/?q=Nashik+Maharashtra+India', '_blank')}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 group-hover:from-blue-900/30 group-hover:to-purple-900/30 transition-all duration-300"></div>
             <div className="text-center relative z-10">
               <MapPin className="w-20 h-20 text-blue-400 mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
               <h3 className="text-3xl font-bold text-white mb-4">Interactive Map</h3>
-              <p className="text-gray-300 mb-2 text-lg">123 Business Avenue</p>
-              <p className="text-gray-300 mb-4">New York, NY 10001</p>
+              <p className="text-gray-300 mb-2 text-lg">Nashik, Maharashtra</p>
+              <p className="text-gray-300 mb-4">India 🇮🇳</p>
               <div className="flex items-center justify-center gap-2 text-blue-400 font-medium">
                 <span>Click to open in Google Maps</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -521,8 +524,8 @@ export default function Contact() {
           {/* Office Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
             {[
-              { icon: MapPin, title: 'Address', info: '123 Business Avenue, NY 10001' },
-              { icon: Phone, title: 'Phone', info: '+1 (555) 123-4567' },
+              { icon: MapPin, title: 'Location', info: 'Nashik, Maharashtra, India' },
+              { icon: Phone, title: 'Phone', info: '+91 9876543210' },
               { icon: Mail, title: 'Email', info: 'hello@codastra.com' },
             ].map(({ icon: Icon, title, info }, i) => (
               <div key={i} className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
@@ -548,11 +551,11 @@ export default function Contact() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
             <div className="relative z-10">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Ready to Start Your <br />
-                <span className="gradient-text">Digital Journey?</span>
+                Ready to Work With <br />
+                <span className="gradient-text">India's Best Team?</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Join 500+ satisfied clients who have transformed their businesses with our innovative solutions
+                Join 200+ satisfied international clients who have transformed their businesses with our Nashik-based expertise
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
@@ -565,12 +568,13 @@ export default function Contact() {
                   </span>
                   <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
-                <Link href="/portfolio">
-                  <button className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    Schedule Call
-                  </button>
-                </Link>
+                <button 
+                  onClick={() => window.location.href = 'tel:+919876543210'}
+                  className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <Phone className="w-5 h-5" />
+                  Call India Now
+                </button>
               </div>
               
               {/* Trust Badges */}
@@ -581,11 +585,11 @@ export default function Contact() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-400">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>No Commitment Required</span>
+                  <span>International Experience</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>2 Hour Response Time</span>
+                  <span>24/7 Global Support</span>
                 </div>
               </div>
             </div>
