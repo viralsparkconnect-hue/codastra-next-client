@@ -16,7 +16,7 @@ export default function About() {
       bio: 'Visionary leader with MCA and 5+ years of international sales experience. Leading digital transformation.',
       skills: ['Strategy', 'Leadership', 'International Sales', 'Business Development'],
       avatar: '👨‍💼',
-      social: { twitter: '#', linkedin: '#', github: '#' },
+      social: {},
       gradient: 'from-blue-500 to-blue-700'
     },
     { 
@@ -25,16 +25,16 @@ export default function About() {
       bio: 'BE Mechanical engineer with 5+ years in international sales. Expert in global market strategy.', 
       skills: ['Marketing', 'International Sales', 'Strategy', 'Client Relations'],
       avatar: '👨‍💻',
-      social: { twitter: '#', linkedin: '#', github: '#' },
+      social: {},
       gradient: 'from-purple-500 to-pink-600'
     },
     { 
       name: 'Shubham Suryavanshi', 
-      role: 'Lead Software Engineer',
+      role: 'CTO',
       bio: 'Full-stack development expert leading complete coding production and architecture.',
       skills: ['Full-Stack Development', 'System Architecture', 'Team Leadership', 'Production Management'],
       avatar: '👨‍💻',
-      social: { twitter: '#', linkedin: '#', github: '#' },
+      social: {},
       gradient: 'from-green-500 to-teal-600'
     },
     { 
@@ -43,7 +43,7 @@ export default function About() {
       bio: 'Software engineering graduate with 3+ years experience in CRM systems and client management.',
       skills: ['CRM Systems', 'Software Engineering', 'Client Management', 'Data Analytics'],
       avatar: '👨‍💼',
-      social: { twitter: '#', linkedin: '#', github: '#' },
+      social: {},
       gradient: 'from-yellow-500 to-orange-600'
     }
   ]
@@ -95,7 +95,7 @@ export default function About() {
     { icon: Users, number: 200, label: 'Happy Clients', suffix: '+', color: 'text-blue-400' },
     { icon: Trophy, number: 150, label: 'Projects Completed', suffix: '+', color: 'text-green-400' },
     { icon: Calendar, number: 5, label: 'Years Experience', suffix: '+', color: 'text-purple-400' },
-    { icon: TrendingUp, number: 4, label: 'Team Members', suffix: '', color: 'text-yellow-400' },
+    { icon: TrendingUp, number: 50, label: 'Team Members', suffix: '+', color: 'text-yellow-400' },
   ]
 
   // Animated counter
@@ -219,10 +219,10 @@ export default function About() {
                 >
                   <h2 className="text-4xl font-bold text-white mb-6">Our Nashik Journey</h2>
                   <p className="text-gray-300 mb-4 text-lg">
-                    From the vibrant city of Nashik, Maharashtra, we've built a powerhouse team combining diverse expertise - from MCA and mechanical engineering backgrounds to international sales and software development mastery.
+                    From the vibrant city of Nashik, Maharashtra, we've built a powerhouse team of 50+ professionals combining diverse expertise - from MCA and mechanical engineering backgrounds to international sales and software development mastery.
                   </p>
                   <p className="text-gray-300 mb-6 text-lg">
-                    Our unique blend of technical excellence and international business acumen allows us to create solutions that not only work perfectly but also succeed in global markets. We've helped over 200 businesses transform their digital presence.
+                    Our unique blend of technical excellence and international business acumen allows us to create solutions that not only work perfectly but also succeed in global markets. With our team of 50+ professionals, we've helped over 200 businesses transform their digital presence worldwide.
                   </p>
                   
                   <div className="grid grid-cols-2 gap-4">
@@ -346,9 +346,9 @@ export default function About() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold text-white mb-4">
-              Meet Our <span className="gradient-text">Nashik Team</span>
+              Meet Our <span className="gradient-text">Core Leadership</span>
             </h2>
-            <p className="text-xl text-gray-300">The passionate minds driving digital transformation from India</p>
+            <p className="text-xl text-gray-300">Top 4 leaders from our 50+ member team driving digital transformation from Nashik, India</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -381,17 +381,19 @@ export default function About() {
                 </div>
 
                 {/* Social Links */}
-                <div className="flex justify-center gap-4">
-                  {Object.entries(social).map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url}
-                      className="w-10 h-10 bg-gray-700/50 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-blue-600 transition-all duration-300"
-                    >
-                      <div className="w-5 h-5">🔗</div>
-                    </a>
-                  ))}
-                </div>
+                {Object.keys(social).length > 0 && (
+                  <div className="flex justify-center gap-4">
+                    {Object.entries(social).map(([platform, url]) => (
+                      <a
+                        key={platform}
+                        href={url}
+                        className="w-10 h-10 bg-gray-700/50 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-blue-600 transition-all duration-300"
+                      >
+                        <div className="w-5 h-5">🔗</div>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
