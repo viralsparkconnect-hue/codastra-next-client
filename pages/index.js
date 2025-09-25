@@ -12,8 +12,8 @@ export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
 
   const stats = [
-    { icon: Users, number: 1200, label: 'Happy Clients' },
-    { icon: Trophy, number: 850, label: 'Projects Completed' },
+    { icon: Users, number: 300, label: 'Happy Clients', suffix: '+' },
+    { icon: Trophy, number: 200, label: 'Projects Completed', suffix: '+' },
     { icon: Star, number: 4.9, label: 'Client Rating', isDecimal: true },
     { icon: Zap, number: 99, label: 'Success Rate', isPercentage: true },
   ]
@@ -165,7 +165,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            From the vibrant city of <span className="text-blue-400 font-medium">Nashik, Maharashtra</span>, we've built a powerhouse team of 50+ professionals combining diverse expertise to create <span className="text-purple-400 font-medium">extraordinary digital experiences</span> that transform businesses worldwide.
+            We create <span className="text-blue-400 font-medium">extraordinary digital experiences</span> that transform businesses and captivate audiences through cutting-edge technology and creative brilliance.
           </motion.p>
 
           <motion.div
@@ -199,13 +199,19 @@ export default function Home() {
             animate={{ opacity: 0.6 }}
             transition={{ delay: 1, duration: 0.8 }}
           >
-            <div className="text-sm text-gray-400 font-medium">Trusted by industry leaders</div>
-            {achievements.map(({ icon: Icon, label, value }, i) => (
-              <div key={i} className="flex items-center gap-2 text-gray-400">
-                <Icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{value} {label}</span>
-              </div>
-            ))}
+            <div className="text-sm text-gray-400 font-medium">Trusted by businesses worldwide</div>
+            <div className="flex items-center gap-2 text-gray-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium">Nashik, Maharashtra Based</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-400">
+              <Users className="w-4 h-4" />
+              <span className="text-sm font-medium">50+ Expert Team</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-400">
+              <Trophy className="w-4 h-4" />
+              <span className="text-sm font-medium">200+ Global Projects</span>
+            </div>
           </motion.div>
 
           {/* Enhanced Stats with Glass Morphism */}
@@ -215,7 +221,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.8 }}
           >
-            {stats.map(({ icon: Icon, number, label, isDecimal, isPercentage }, i) => {
+            {stats.map(({ icon: Icon, number, label, isDecimal, isPercentage, suffix }, i) => {
               const animatedNumber = useCounter(number, 2500)
               
               return (
@@ -236,7 +242,7 @@ export default function Home() {
                         ? animatedNumber.toFixed(1)
                         : isPercentage 
                           ? `${Math.ceil(animatedNumber)}%`
-                          : `${Math.ceil(animatedNumber)}+`
+                          : `${Math.ceil(animatedNumber)}${suffix || '+'}`
                       }
                     </div>
                     <div className="text-gray-400 font-medium">{label}</div>
@@ -335,20 +341,6 @@ export default function Home() {
       <section className="py-32 px-4 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-purple-900/10"></div>
         <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Our <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Expertise</span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Comprehensive digital solutions tailored to elevate your business to new heights
-            </p>
-          </motion.div>
           <Services />
         </div>
       </section>
