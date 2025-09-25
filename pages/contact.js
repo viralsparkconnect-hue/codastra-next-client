@@ -360,101 +360,7 @@ export default function Contact() {
                       onClick={() => setSelectedOffice(office.id)}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-white font-semibold mb-2">{title}</h4>
-                <p className="text-gray-300">{info}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            className="p-12 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-3xl border border-gray-700/50 backdrop-blur-sm relative overflow-hidden"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Ready to Work With <br />
-                <span className="gradient-text">India's Best Team?</span>
-              </h2>
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Join 200+ satisfied international clients who have transformed their businesses with our Nashik-based expertise
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
-                  onClick={() => document.querySelector('#contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    <Send className="w-5 h-5" />
-                    Get Free Consultation
-                  </span>
-                  <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                </button>
-                <button 
-                  onClick={() => window.open('https://wa.me/919834683297', '_blank')}
-                  className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-5 h-5" />
-                  WhatsApp Now
-                </button>
-                <button 
-                  onClick={() => window.location.href = 'tel:+15551234567'}
-                  className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-5 h-5" />
-                  Call USA
-                </button>
-              </div>
-              
-              {/* Trust Badges */}
-              <div className="flex flex-wrap justify-center items-center gap-8 mt-8 pt-8 border-t border-gray-700/50">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>Free Consultation</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>International Experience</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>24/7 Global Support</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>WhatsApp Support</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <Footer />
-
-      <style jsx>{`
-        .floating-orb {
-          border-radius: 50%;
-          filter: blur(40px);
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(180deg); }
-        }
-      `}</style>
-    </div>
-  )
-} font-semibold">{office.city}</h4>
+                        <h4 className="text-white font-semibold">{office.city}</h4>
                         <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded-full">
                           {office.timezone}
                         </span>
@@ -650,12 +556,114 @@ export default function Contact() {
 
           {/* Office Details */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
-            {[
-              { icon: MapPin, title: 'Location', info: 'Nashik, Maharashtra, India' },
-              { icon: Phone, title: 'Phone', info: '+91 98346 83297' },
-              { icon: MessageSquare, title: 'WhatsApp', info: '+91 98346 83297' },
-              { icon: Mail, title: 'Email', info: 'hello@codastra.com' },
-            ].map(({ icon: Icon, title, info }, i) => (
-              <div key={i} className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
-                <Icon className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                <h4 className="text-white
+            <div className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+              <MapPin className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+              <h4 className="text-white font-semibold mb-2">Location</h4>
+              <p className="text-gray-300">Nashik, Maharashtra, India</p>
+            </div>
+            <div className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+              <Phone className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+              <h4 className="text-white font-semibold mb-2">Phone</h4>
+              <p className="text-gray-300">+91 98346 83297</p>
+            </div>
+            <div className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+              <MessageSquare className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+              <h4 className="text-white font-semibold mb-2">WhatsApp</h4>
+              <p className="text-gray-300">+91 98346 83297</p>
+            </div>
+            <div className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
+              <Mail className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+              <h4 className="text-white font-semibold mb-2">Email</h4>
+              <p className="text-gray-300">hello@codastra.com</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Enhanced CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            className="p-12 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-3xl border border-gray-700/50 backdrop-blur-sm relative overflow-hidden"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Ready to Work With <br />
+                <span className="gradient-text">India's Best Team?</span>
+              </h2>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Join 200+ satisfied international clients who have transformed their businesses with our Nashik-based expertise
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button 
+                  onClick={() => document.querySelector('#contact-form')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <Send className="w-5 h-5" />
+                    Get Free Consultation
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                </button>
+                <button 
+                  onClick={() => window.open('https://wa.me/919834683297', '_blank')}
+                  className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  WhatsApp Now
+                </button>
+                <button 
+                  onClick={() => window.location.href = 'tel:+15551234567'}
+                  className="px-8 py-4 border-2 border-gray-600 text-white rounded-full font-semibold hover:border-blue-500 hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <Phone className="w-5 h-5" />
+                  Call USA
+                </button>
+              </div>
+              
+              {/* Trust Badges */}
+              <div className="flex flex-wrap justify-center items-center gap-8 mt-8 pt-8 border-t border-gray-700/50">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>Free Consultation</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>International Experience</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>24/7 Global Support</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span>WhatsApp Support</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
+
+      <style jsx>{`
+        .floating-orb {
+          border-radius: 50%;
+          filter: blur(40px);
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+      `}</style>
+    </div>
+  )
+}
