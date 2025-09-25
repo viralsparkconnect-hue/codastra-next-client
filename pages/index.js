@@ -39,6 +39,27 @@ export default function Home() {
     }
   ]
 
+  const companyHighlights = [
+    {
+      title: "Nashik, Maharashtra",
+      subtitle: "Based in India",
+      description: "From the vibrant city of Nashik, we've built a powerhouse team",
+      image: "https://images.unsplash.com/photo-1582905100131-81908ad98dfa?w=400&h=300&fit=crop"
+    },
+    {
+      title: "50+ Professionals",
+      subtitle: "Diverse Expertise",
+      description: "MCA, Engineering, International Sales & Development mastery",
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop"
+    },
+    {
+      title: "Global Reach",
+      subtitle: "200+ Businesses",
+      description: "Helping businesses transform their digital presence worldwide",
+      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop"
+    }
+  ]
+
   const achievements = [
     { icon: Award, label: "Industry Awards", value: "15+" },
     { icon: Shield, label: "Years Experience", value: "10+" },
@@ -144,7 +165,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            We create <span className="text-blue-400 font-medium">extraordinary digital experiences</span> that transform businesses and captivate audiences through cutting-edge technology and creative brilliance.
+            From the vibrant city of <span className="text-blue-400 font-medium">Nashik, Maharashtra</span>, we've built a powerhouse team of 50+ professionals combining diverse expertise to create <span className="text-purple-400 font-medium">extraordinary digital experiences</span> that transform businesses worldwide.
           </motion.p>
 
           <motion.div
@@ -224,6 +245,88 @@ export default function Home() {
                 </motion.div>
               )
             })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Company Highlights Section */}
+      <section className="py-32 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-800/50"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Our <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Foundation</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Our unique blend of technical excellence and international business acumen allows us to create solutions that not only work perfectly but also succeed in global markets.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {companyHighlights.map((highlight, i) => (
+              <motion.div
+                key={i}
+                className="group relative overflow-hidden rounded-2xl"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.2 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -10 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={highlight.image}
+                      alt={highlight.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-xl font-bold text-white mb-1">{highlight.title}</h3>
+                      <p className="text-blue-400 text-sm font-medium">{highlight.subtitle}</p>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <p className="text-gray-300 leading-relaxed">{highlight.description}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Stats Integration */}
+          <motion.div
+            className="mt-20 text-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center gap-8 flex-wrap justify-center">
+              <div className="flex items-center gap-3 text-gray-300">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="font-semibold">50+ Team Members</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-300">
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="font-semibold">200+ Global Projects</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-300">
+                <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
+                <span className="font-semibold">Nashik Based</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-300">
+                <div className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"></div>
+                <span className="font-semibold">Global Reach</span>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
