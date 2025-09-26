@@ -21,11 +21,11 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     setIsLoaded(true)
     
-    // Online/offline status detection
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-    
+    // Online/offline status detection (browser only)
     if (typeof window !== 'undefined') {
+      const handleOnline = () => setIsOnline(true)
+      const handleOffline = () => setIsOnline(false)
+      
       setIsOnline(navigator.onLine)
       window.addEventListener('online', handleOnline)
       window.addEventListener('offline', handleOffline)
@@ -64,21 +64,15 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="theme-color" content="#1e293b" />
-        <meta name="description" content="Professional digital agency delivering cutting-edge web solutions" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="robots" content="index, follow" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </Head>
 
       {/* Page loading indicator */}
       {isPageLoading && (
         <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
-          <div 
-            className="h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ease-out animate-pulse"
-            style={{ width: '100%' }}
-          />
+          <div className="h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ease-out animate-pulse w-full" />
         </div>
       )}
 
@@ -95,7 +89,9 @@ function MyApp({ Component, pageProps }) {
       <div className={`min-h-screen transition-opacity duration-200 ${
         isPageLoading ? 'opacity-90' : 'opacity-100'
       } ${!isOnline ? 'mt-10' : ''}`}>
-        <Component {...pageProps} />
+        <main id="main-content">
+          <Component {...pageProps} />
+        </main>
       </div>
       
       {/* AI Chat Widget - Only render client-side */}
