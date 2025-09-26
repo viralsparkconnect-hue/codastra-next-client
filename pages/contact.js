@@ -1,13 +1,26 @@
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin, Clock, Send, MessageCircle, ArrowRight, Star, Users, CheckCircle, Globe, Calendar, Heart, MessageSquare } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, ArrowRight, Star, Users, CheckCircle, Globe, Calendar, Heart, MessageSquare, AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
-import ContactForm from '../components/ContactForm'
 
 export default function Contact() {
   const [selectedOffice, setSelectedOffice] = useState('main')
+  
+  // Form state
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    projectType: '',
+    budget: '',
+    message: ''
+  })
+  const [status, setStatus] = useState('idle') // idle, loading, success, error
+  const [errors, setErrors] = useState({})
+  const [errorMessage, setErrorMessage] = useState('')
 
   const contactInfo = [
     {
@@ -180,6 +193,124 @@ export default function Contact() {
     }
   ]
 
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {}
+    
+    if (!form.name.trim()) {
+      newErrors.name = 'Name is required'
+    } else if (form.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters'
+    }
+    
+    if (!form.email.trim()) {
+      newErrors.email = 'Email is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Please enter a valid email'
+    }
+    
+    if (!form.message.trim()) {
+      newErrors.message = 'Project details are required'
+    } else if (form.message.trim().length < 10) {
+      newErrors.message = 'Please provide at least 10 characters'
+    } else if (form.message.trim().length > 1000) {
+      newErrors.message = 'Message must be less than 1000 characters'
+    }
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm({ ...form, [name]: value })
+    
+    // Clear errors as user types
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' })
+    }
+    if (errorMessage) {
+      setErrorMessage('')
+    }
+  }
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!validateForm()) return
+    
+    setStatus('loading')
+    setErrorMessage('')
+
+    // Create enhanced message for API
+    const enhancedMessage = `
+PROJECT DETAILS:
+${form.message}
+
+ADDITIONAL INFORMATION:
+${form.phone ? `Phone: ${form.phone}` : ''}
+${form.company ? `Company: ${form.company}` : ''}
+${form.projectType ? `Project Type: ${form.projectType}` : ''}
+${form.budget ? `Budget Range: ${form.budget}` : ''}
+
+CONTACT SOURCE: Contact Page Form
+    `.trim()
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: enhancedMessage,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setStatus('success')
+        setForm({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          projectType: '',
+          budget: '',
+          message: ''
+        })
+        
+        // Reset to idle after 8 seconds
+        setTimeout(() => setStatus('idle'), 8000)
+      } else {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
+    } catch (error) {
+      console.error('Contact form error:', error)
+      setStatus('error')
+      setErrorMessage(error.message || 'Failed to send message. Please try again.')
+      
+      // Reset to idle after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000)
+    }
+  }
+
+  const inputClasses = (fieldName) => `
+    w-full px-4 py-3 rounded-xl border transition-all duration-300 
+    ${errors[fieldName] 
+      ? 'bg-red-900/20 border-red-500 text-white placeholder-red-300 focus:ring-red-500' 
+      : 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400 focus:ring-blue-500'
+    }
+    focus:outline-none focus:ring-2 focus:border-transparent
+    hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed
+  `
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <Navigation />
@@ -319,131 +450,29 @@ export default function Contact() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-purple-900/10 rounded-3xl"></div>
               <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-bold text-white">Send us a Message</h2>
-                    <p className="text-blue-400 text-sm">We'll respond within 2 hours (IST)</p>
-                  </div>
-                </div>
-                <p className="text-gray-300 mb-8">
-                  Tell us about your project and our Nashik team will get back to you with a detailed proposal and timeline.
-                </p>
-                
-                {/* Contact Form */}
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-white text-sm font-semibold mb-2">Full Name *</label>
-                      <input 
-                        type="text" 
-                        required
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
-                        placeholder="Enter your full name"
-                      />
+                {status === 'success' ? (
+                  // Success State
+                  <div className="text-center p-8 bg-green-900/20 border border-green-600/30 rounded-2xl backdrop-blur-sm">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500/20 rounded-full mb-6">
+                      <CheckCircle className="w-10 h-10 text-green-400" />
                     </div>
-                    <div>
-                      <label className="block text-white text-sm font-semibold mb-2">Email Address *</label>
-                      <input 
-                        type="email" 
-                        required
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
-                        placeholder="Enter your email"
-                      />
+                    <h3 className="text-3xl font-bold text-green-400 mb-4">Message Sent Successfully!</h3>
+                    <p className="text-green-300 text-lg mb-4">
+                      Thank you for reaching out to our Nashik team. We've received your message and will get back to you within 2 hours during business hours (IST).
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-green-400 text-sm mb-6">
+                      <Mail className="w-4 h-4" />
+                      <span>Check your email for a confirmation</span>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-white text-sm font-semibold mb-2">Phone Number</label>
-                      <input 
-                        type="tel"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
-                        placeholder="+1 (555) 123-4567"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-white text-sm font-semibold mb-2">Company</label>
-                      <input 
-                        type="text"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
-                        placeholder="Your company name"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-white text-sm font-semibold mb-2">Project Type</label>
-                    <select className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300">
-                      <option value="">Select project type</option>
-                      <option value="web-development">Web Development</option>
-                      <option value="mobile-app">Mobile App Development</option>
-                      <option value="ecommerce">E-commerce Solution</option>
-                      <option value="crm">CRM System</option>
-                      <option value="custom-software">Custom Software</option>
-                      <option value="consulting">Consulting</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-white text-sm font-semibold mb-2">Budget Range</label>
-                    <select className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300">
-                      <option value="">Select budget range</option>
-                      <option value="5k-10k">$5,000 - $10,000</option>
-                      <option value="10k-25k">$10,000 - $25,000</option>
-                      <option value="25k-50k">$25,000 - $50,000</option>
-                      <option value="50k-100k">$50,000 - $100,000</option>
-                      <option value="100k+">$100,000+</option>
-                      <option value="discuss">Let's Discuss</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-white text-sm font-semibold mb-2">Project Details *</label>
-                    <textarea 
-                      required
-                      rows="5"
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 resize-vertical"
-                      placeholder="Tell us about your project requirements, timeline, and any specific features you need..."
-                    ></textarea>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <input 
-                      type="checkbox" 
-                      id="privacy" 
-                      required
-                      className="mt-1 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                    />
-                    <label htmlFor="privacy" className="text-gray-300 text-sm">
-                      I agree to the <span className="text-blue-400 hover:underline cursor-pointer">Privacy Policy</span> and consent to being contacted by the Codastra team regarding my project inquiry.
-                    </label>
-                  </div>
-                  
-                  <button 
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
-                  >
-                    <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    Send Message
-                  </button>
-                  
-                  <div className="text-center pt-4 border-t border-gray-700/50">
-                    <p className="text-gray-400 text-sm mb-3">Or connect with us directly:</p>
-                    <div className="flex justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       <button 
-                        type="button"
                         onClick={() => window.open('https://wa.me/919834683297', '_blank')}
                         className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 text-sm"
                       >
                         <MessageSquare className="w-4 h-4" />
-                        WhatsApp
+                        WhatsApp Us
                       </button>
                       <button 
-                        type="button"
                         onClick={() => window.location.href = 'tel:+919834683297'}
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 text-sm"
                       >
@@ -452,7 +481,241 @@ export default function Contact() {
                       </button>
                     </div>
                   </div>
-                </form>
+                ) : (
+                  // Form State
+                  <>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <MessageCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold text-white">Send us a Message</h2>
+                        <p className="text-blue-400 text-sm">We'll respond within 2 hours (IST)</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-300 mb-8">
+                      Tell us about your project and our Nashik team will get back to you with a detailed proposal and timeline.
+                    </p>
+                    
+                    {/* Contact Form */}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-white text-sm font-semibold mb-2">Full Name *</label>
+                          <input 
+                            type="text" 
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            required
+                            disabled={status === 'loading'}
+                            className={inputClasses('name')}
+                            placeholder="Enter your full name"
+                            maxLength={100}
+                          />
+                          {errors.name && (
+                            <p className="mt-2 text-red-400 text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                              {errors.name}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-white text-sm font-semibold mb-2">Email Address *</label>
+                          <input 
+                            type="email" 
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                            disabled={status === 'loading'}
+                            className={inputClasses('email')}
+                            placeholder="Enter your email"
+                            maxLength={200}
+                          />
+                          {errors.email && (
+                            <p className="mt-2 text-red-400 text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                              {errors.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-white text-sm font-semibold mb-2">Phone Number</label>
+                          <input 
+                            type="tel"
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            disabled={status === 'loading'}
+                            className={inputClasses('phone')}
+                            placeholder="+1 (555) 123-4567"
+                            maxLength={20}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white text-sm font-semibold mb-2">Company</label>
+                          <input 
+                            type="text"
+                            name="company"
+                            value={form.company}
+                            onChange={handleChange}
+                            disabled={status === 'loading'}
+                            className={inputClasses('company')}
+                            placeholder="Your company name"
+                            maxLength={100}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-white text-sm font-semibold mb-2">Project Type</label>
+                        <select 
+                          name="projectType"
+                          value={form.projectType}
+                          onChange={handleChange}
+                          disabled={status === 'loading'}
+                          className={inputClasses('projectType')}
+                        >
+                          <option value="">Select project type</option>
+                          <option value="web-development">Web Development</option>
+                          <option value="mobile-app">Mobile App Development</option>
+                          <option value="ecommerce">E-commerce Solution</option>
+                          <option value="crm">CRM System</option>
+                          <option value="custom-software">Custom Software</option>
+                          <option value="consulting">Consulting</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-white text-sm font-semibold mb-2">Budget Range</label>
+                        <select 
+                          name="budget"
+                          value={form.budget}
+                          onChange={handleChange}
+                          disabled={status === 'loading'}
+                          className={inputClasses('budget')}
+                        >
+                          <option value="">Select budget range</option>
+                          <option value="5k-10k">$5,000 - $10,000</option>
+                          <option value="10k-25k">$10,000 - $25,000</option>
+                          <option value="25k-50k">$25,000 - $50,000</option>
+                          <option value="50k-100k">$50,000 - $100,000</option>
+                          <option value="100k+">$100,000+</option>
+                          <option value="discuss">Let's Discuss</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-white text-sm font-semibold mb-2">Project Details *</label>
+                        <textarea 
+                          name="message"
+                          value={form.message}
+                          onChange={handleChange}
+                          required
+                          rows="5"
+                          disabled={status === 'loading'}
+                          className={inputClasses('message') + ' resize-vertical'}
+                          placeholder="Tell us about your project requirements, timeline, and any specific features you need..."
+                          maxLength={1000}
+                        />
+                        <div className="flex justify-between items-center mt-2">
+                          {errors.message ? (
+                            <p className="text-red-400 text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                              {errors.message}
+                            </p>
+                          ) : (
+                            <div />
+                          )}
+                          <span className="text-gray-500 text-xs">
+                            {form.message.length}/1000
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <input 
+                          type="checkbox" 
+                          id="privacy" 
+                          required
+                          disabled={status === 'loading'}
+                          className="mt-1 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <label htmlFor="privacy" className="text-gray-300 text-sm">
+                          I agree to the <span className="text-blue-400 hover:underline cursor-pointer">Privacy Policy</span> and consent to being contacted by the Codastra team regarding my project inquiry.
+                        </label>
+                      </div>
+                      
+                      <button 
+                        type="submit"
+                        disabled={status === 'loading'}
+                        className={`
+                          w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 
+                          flex items-center justify-center gap-2 group relative overflow-hidden
+                          ${status === 'loading'
+                            ? 'bg-gray-600 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/25'
+                          }
+                          text-white shadow-lg
+                        `}
+                      >
+                        {status === 'loading' ? (
+                          <>
+                            <Loader className="w-5 h-5 animate-spin" />
+                            <span>Sending Message...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <span>Send Message</span>
+                          </>
+                        )}
+                        
+                        {/* Button shine effect */}
+                        {status !== 'loading' && (
+                          <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                        )}
+                      </button>
+
+                      {/* Error Message */}
+                      {status === 'error' && errorMessage && (
+                        <div className="text-center p-4 bg-red-900/20 border border-red-600/30 rounded-xl backdrop-blur-sm">
+                          <div className="flex items-center justify-center gap-2 text-red-300">
+                            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                            <p className="font-medium">{errorMessage}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-center pt-4 border-t border-gray-700/50">
+                        <p className="text-gray-400 text-sm mb-3">Or connect with us directly:</p>
+                        <div className="flex justify-center gap-4">
+                          <button 
+                            type="button"
+                            onClick={() => window.open('https://wa.me/919834683297', '_blank')}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 text-sm"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                            WhatsApp
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={() => window.location.href = 'tel:+919834683297'}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 text-sm"
+                          >
+                            <Phone className="w-4 h-4" />
+                            Call India
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </>
+                )}
               </div>
             </motion.div>
 
@@ -783,6 +1046,13 @@ export default function Contact() {
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .gradient-text {
+          background: linear-gradient(135deg, #60A5FA, #A855F7, #EC4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
       `}</style>
     </div>
