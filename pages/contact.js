@@ -1,15 +1,17 @@
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle, ArrowRight, Star, Users, CheckCircle, Globe, Calendar, Heart, MessageSquare, AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import emailjs from '@emailjs/browser'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
 
 export default function Contact() {
+  const form = useRef()
   const [selectedOffice, setSelectedOffice] = useState('main')
   
   // Form state
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
@@ -21,6 +23,13 @@ export default function Contact() {
   const [status, setStatus] = useState('idle') // idle, loading, success, error
   const [errors, setErrors] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
+
+  // EmailJS Configuration
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: 'service_5dpu0tn',
+    TEMPLATE_ID: 'template_mfgh2kn',
+    PUBLIC_KEY: 'AlryU3umMzVGedPYh'
+  }
 
   const contactInfo = [
     {
@@ -197,23 +206,23 @@ export default function Contact() {
   const validateForm = () => {
     const newErrors = {}
     
-    if (!form.name.trim()) {
+    if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
-    } else if (form.name.trim().length < 2) {
+    } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters'
     }
     
-    if (!form.email.trim()) {
+    if (!formData.email.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email'
     }
     
-    if (!form.message.trim()) {
+    if (!formData.message.trim()) {
       newErrors.message = 'Project details are required'
-    } else if (form.message.trim().length < 10) {
+    } else if (formData.message.trim().length < 10) {
       newErrors.message = 'Please provide at least 10 characters'
-    } else if (form.message.trim().length > 1000) {
+    } else if (formData.message.trim().length > 1000) {
       newErrors.message = 'Message must be less than 1000 characters'
     }
     
@@ -224,7 +233,7 @@ export default function Contact() {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target
-    setForm({ ...form, [name]: value })
+    setFormData({ ...formData, [name]: value })
     
     // Clear errors as user types
     if (errors[name]) {
@@ -235,7 +244,7 @@ export default function Contact() {
     }
   }
 
-  // Handle form submission
+  // Handle form submission with EmailJS
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -244,57 +253,58 @@ export default function Contact() {
     setStatus('loading')
     setErrorMessage('')
 
-    // Create enhanced message for API
-    const enhancedMessage = `
-PROJECT DETAILS:
-${form.message}
-
-ADDITIONAL INFORMATION:
-${form.phone ? `Phone: ${form.phone}` : ''}
-${form.company ? `Company: ${form.company}` : ''}
-${form.projectType ? `Project Type: ${form.projectType}` : ''}
-${form.budget ? `Budget Range: ${form.budget}` : ''}
-
-CONTACT SOURCE: Contact Page Form
-    `.trim()
-
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          message: enhancedMessage,
-        }),
-      })
+      // Initialize EmailJS (if not already done)
+      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
 
-      const data = await response.json()
-
-      if (response.ok) {
-        setStatus('success')
-        setForm({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          projectType: '',
-          budget: '',
-          message: ''
+      // Prepare template parameters
+      const templateParams = {
+        to_name: 'Codastra Team',
+        from_name: formData.name,
+        from_email: formData.email,
+        phone: formData.phone || 'Not provided',
+        company: formData.company || 'Not provided',
+        project_type: formData.projectType || 'Not specified',
+        budget: formData.budget || 'Not specified',
+        message: formData.message,
+        reply_to: formData.email,
+        // Additional fields for better email context
+        contact_source: 'Website Contact Form',
+        timestamp: new Date().toLocaleString('en-US', {
+          timeZone: 'Asia/Kolkata',
+          timeZoneName: 'short'
         })
-        
-        // Reset to idle after 8 seconds
-        setTimeout(() => setStatus('idle'), 8000)
-      } else {
-        throw new Error(data.error || 'Failed to send message')
       }
 
+      // Send email using EmailJS
+      const result = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      )
+
+      console.log('Email sent successfully:', result.text)
+      setStatus('success')
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        projectType: '',
+        budget: '',
+        message: ''
+      })
+      
+      // Reset to idle after 8 seconds
+      setTimeout(() => setStatus('idle'), 8000)
+
     } catch (error) {
-      console.error('Contact form error:', error)
+      console.error('EmailJS error:', error)
       setStatus('error')
-      setErrorMessage(error.message || 'Failed to send message. Please try again.')
+      setErrorMessage('Failed to send message. Please try again or contact us directly via WhatsApp.')
       
       // Reset to idle after 5 seconds
       setTimeout(() => setStatus('idle'), 5000)
@@ -498,14 +508,18 @@ CONTACT SOURCE: Contact Page Form
                     </p>
                     
                     {/* Contact Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+                      {/* Hidden fields for EmailJS template */}
+                      <input type="hidden" name="to_name" value="Codastra Team" />
+                      <input type="hidden" name="contact_source" value="Website Contact Form" />
+                      
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-white text-sm font-semibold mb-2">Full Name *</label>
                           <input 
                             type="text" 
                             name="name"
-                            value={form.name}
+                            value={formData.name}
                             onChange={handleChange}
                             required
                             disabled={status === 'loading'}
@@ -525,7 +539,7 @@ CONTACT SOURCE: Contact Page Form
                           <input 
                             type="email" 
                             name="email"
-                            value={form.email}
+                            value={formData.email}
                             onChange={handleChange}
                             required
                             disabled={status === 'loading'}
@@ -548,7 +562,7 @@ CONTACT SOURCE: Contact Page Form
                           <input 
                             type="tel"
                             name="phone"
-                            value={form.phone}
+                            value={formData.phone}
                             onChange={handleChange}
                             disabled={status === 'loading'}
                             className={inputClasses('phone')}
@@ -561,7 +575,7 @@ CONTACT SOURCE: Contact Page Form
                           <input 
                             type="text"
                             name="company"
-                            value={form.company}
+                            value={formData.company}
                             onChange={handleChange}
                             disabled={status === 'loading'}
                             className={inputClasses('company')}
@@ -575,7 +589,7 @@ CONTACT SOURCE: Contact Page Form
                         <label className="block text-white text-sm font-semibold mb-2">Project Type</label>
                         <select 
                           name="projectType"
-                          value={form.projectType}
+                          value={formData.projectType}
                           onChange={handleChange}
                           disabled={status === 'loading'}
                           className={inputClasses('projectType')}
@@ -595,7 +609,7 @@ CONTACT SOURCE: Contact Page Form
                         <label className="block text-white text-sm font-semibold mb-2">Budget Range</label>
                         <select 
                           name="budget"
-                          value={form.budget}
+                          value={formData.budget}
                           onChange={handleChange}
                           disabled={status === 'loading'}
                           className={inputClasses('budget')}
@@ -614,7 +628,7 @@ CONTACT SOURCE: Contact Page Form
                         <label className="block text-white text-sm font-semibold mb-2">Project Details *</label>
                         <textarea 
                           name="message"
-                          value={form.message}
+                          value={formData.message}
                           onChange={handleChange}
                           required
                           rows="5"
@@ -633,7 +647,7 @@ CONTACT SOURCE: Contact Page Form
                             <div />
                           )}
                           <span className="text-gray-500 text-xs">
-                            {form.message.length}/1000
+                            {formData.message.length}/1000
                           </span>
                         </div>
                       </div>
@@ -958,7 +972,7 @@ CONTACT SOURCE: Contact Page Form
             <div className="text-center p-6 bg-gray-800/50 rounded-2xl backdrop-blur-sm">
               <Mail className="w-8 h-8 text-blue-400 mx-auto mb-3" />
               <h4 className="text-white font-semibold mb-2">Email</h4>
-              <p className="text-gray-300">hello@codastra.com</p>
+              <p className="text-gray-300">codastra.conect@gmail.com</p>
             </div>
           </div>
         </div>
