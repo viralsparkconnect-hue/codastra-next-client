@@ -27,7 +27,7 @@ export default function Contact() {
   // EmailJS Configuration
   const EMAILJS_CONFIG = {
     SERVICE_ID: 'service_5dpu0tn',
-    TEMPLATE_ID: 'template_mfgh2kn',
+    TEMPLATE_ID: 'template_qteujwt',
     PUBLIC_KEY: 'AlryU3umMzVGedPYh'
   }
 
