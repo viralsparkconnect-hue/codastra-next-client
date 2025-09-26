@@ -34,9 +34,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>hello@codastra.com</li>
-              <li>+1 (555) 123-4567</li>
-              <li>New York, NY</li>
+              <li>codastra.conect@gmail.com</li>
+              <li>+91 (902) 169-8707</li>
+              <li>India</li>
             </ul>
           </div>
         </div>
