@@ -26,10 +26,10 @@ export default function Contact() {
     {
       icon: Mail,
       title: 'Email Us',
-      info: 'hello@codastra.com',
+      info: 'codastra.conect@gmail.com',
       desc: 'Send us an email anytime!',
       color: 'from-blue-500 to-blue-700',
-      action: () => window.location.href = 'mailto:hello@codastra.com'
+      action: () => window.location.href = 'mailto:codastra.conect@gmail.com'
     },
     {
       icon: Phone,
@@ -80,7 +80,7 @@ export default function Contact() {
       address: 'Maharashtra, India',
       phone: '+91 98346 83297',
       whatsapp: '+91 98346 83297',
-      email: 'nashik@codastra.com',
+      email: 'codastra.conect@gmail.com',
       timezone: 'IST (GMT+5:30)',
       team: 50,
       specialties: ['Web Development', 'Mobile Apps', 'International Sales']
@@ -91,7 +91,7 @@ export default function Contact() {
       address: 'North America',
       phone: '+1 (555) 123-4567',
       whatsapp: '+91 98346 83297',
-      email: 'usa@codastra.com',
+      email: 'codastra.conect@gmail.com',
       timezone: 'EST/PST',
       team: 50,
       specialties: ['Client Support', 'Sales', 'Consulting']
