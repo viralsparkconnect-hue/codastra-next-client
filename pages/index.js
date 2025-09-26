@@ -7,7 +7,7 @@ import Footer from '../components/Footer'
 import Services from '../components/Services'
 import ContactForm from '../components/ContactForm'
 
-// Icons - using simple components instead of lucide-react for build stability
+// Simple icon components to avoid external dependencies
 const ArrowRight = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -80,7 +80,7 @@ export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const heroRef = useRef(null)
 
-  // Enhanced stats with better animations
+  // Stats with proper animations
   const stats = [
     { 
       icon: Users, 
@@ -116,7 +116,7 @@ export default function Home() {
     },
   ]
 
-  // Enhanced testimonials with more details
+  // Testimonials data
   const testimonials = [
     {
       name: "Sarah Johnson",
@@ -147,7 +147,7 @@ export default function Home() {
     }
   ]
 
-  // Enhanced features showcase
+  // Features showcase
   const features = [
     {
       icon: Shield,
@@ -169,13 +169,14 @@ export default function Home() {
     }
   ]
 
-  // Enhanced counter hook with easing
+  // Counter hook with proper cleanup
   const useCounter = (end, duration = 2500, start = 0) => {
     const [count, setCount] = useState(start)
     
     useEffect(() => {
       if (!isLoaded) return
       
+      let animationFrameId
       let startTime
       const startCount = start
       
@@ -183,16 +184,22 @@ export default function Home() {
         if (!startTime) startTime = currentTime
         const progress = Math.min((currentTime - startTime) / duration, 1)
         
-        // Enhanced easing function
+        // Easing function
         const easeOutCubic = 1 - Math.pow(1 - progress, 3)
         setCount(startCount + (end - startCount) * easeOutCubic)
         
         if (progress < 1) {
-          requestAnimationFrame(animate)
+          animationFrameId = requestAnimationFrame(animate)
         }
       }
       
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
+      
+      return () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId)
+        }
+      }
     }, [end, duration, start, isLoaded])
     
     return count
@@ -230,12 +237,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Digital Excellence Delivered | Professional Web Development Agency</title>
+        <title>Codastra - Digital Excellence Delivered | Professional Web Development Agency</title>
         <meta name="description" content="Transform your business with our award-winning digital solutions. 300+ happy clients, 200+ projects completed. Web development, mobile apps, UI/UX design." />
         <meta name="keywords" content="web development, mobile apps, UI/UX design, digital agency, software development" />
-        <meta property="og:title" content="Digital Excellence Delivered" />
+        <meta property="og:title" content="Codastra - Digital Excellence Delivered" />
         <meta property="og:description" content="Professional digital agency with 300+ happy clients and 200+ completed projects." />
         <meta property="og:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
         <link rel="canonical" href="https://yourwebsite.com" />
         
         {/* Structured Data for SEO */}
@@ -245,7 +254,7 @@ export default function Home() {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Digital Excellence Agency",
+              "name": "Codastra",
               "description": "Professional digital agency specializing in web development, mobile apps, and UI/UX design",
               "url": "https://yourwebsite.com",
               "aggregateRating": {
@@ -266,7 +275,7 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
         <Navigation />
         
-        {/* Enhanced Hero Section */}
+        {/* Hero Section */}
         <section 
           ref={heroRef}
           className="pt-32 pb-20 px-4 text-center relative overflow-hidden min-h-screen flex items-center"
@@ -292,34 +301,17 @@ export default function Home() {
                 transform: `translate(${mousePosition.x * 0.08}px, ${-mousePosition.y * 0.08}px)`
               }}
             />
-            
-            {/* Animated geometric shapes */}
-            <div 
-              className="absolute top-20 right-20 w-32 h-32 border border-blue-400/30 animate-spin-slow"
-              style={{ transform: "rotate(45deg)" }}
-            />
-            <div className="absolute bottom-40 left-16 w-24 h-24 border border-purple-400/30 rounded-full animate-bounce-slow" />
           </div>
           
-          {/* Animated grid pattern */}
-          <div 
-            className="absolute inset-0 opacity-[0.02]"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)`,
-              backgroundSize: '50px 50px',
-              transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`
-            }}
-          />
-          
           <div className="max-w-7xl mx-auto relative z-10">
-            {/* Enhanced Hero Badge */}
+            {/* Hero Badge */}
             <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 mb-8 backdrop-blur-md hover:border-blue-400/50 transition-all duration-300">
               <Sparkles className="w-5 h-5 text-blue-400 mr-3 animate-pulse" />
               <span className="text-sm text-blue-300 font-semibold tracking-wide">Award-Winning Digital Agency</span>
               <div className="w-2 h-2 bg-green-400 rounded-full ml-3 animate-pulse" />
             </div>
 
-            {/* Enhanced Hero Title */}
+            {/* Hero Title */}
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight">
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent bg-300% animate-gradient-x inline-block">
                 Digital Excellence
@@ -330,22 +322,21 @@ export default function Home() {
               </span>
             </h1>
             
-            {/* Enhanced Hero Description */}
+            {/* Hero Description */}
             <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 mb-16 max-w-4xl mx-auto leading-relaxed font-light">
               We create <span className="text-blue-400 font-medium hover:text-purple-400 transition-colors duration-300">
                 extraordinary digital experiences
               </span> that transform businesses and captivate audiences through cutting-edge technology and creative brilliance.
             </p>
 
-            {/* Enhanced CTA Buttons */}
+            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
               <Link href="/contact">
                 <button className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold text-lg overflow-hidden shadow-2xl hover:scale-105 hover:shadow-blue-500/50 transition-all duration-300">
                   <span className="relative z-10 flex items-center gap-3">
                     Start Your Project
-                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight />
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full animate-shimmer" />
                 </button>
               </Link>
               
@@ -355,31 +346,11 @@ export default function Home() {
                     <Play className="w-5 h-5" />
                     Watch Our Work
                   </span>
-                  <div className="absolute inset-0 bg-blue-500/10 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300" />
                 </button>
               </Link>
             </div>
 
-            {/* Enhanced Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-8 mb-20 opacity-70">
-              <div className="text-sm text-gray-400 font-medium">Trusted by businesses worldwide</div>
-              {[
-                { icon: Users, text: "50+ Expert Team", color: "bg-blue-400" },
-                { icon: Trophy, text: "300+ Happy Clients", color: "bg-green-400" },
-                { text: "200+ Projects Completed", color: "bg-purple-400" }
-              ].map((item, i) => (
-                <div 
-                  key={i}
-                  className="flex items-center gap-2 text-gray-400 hover:scale-105 hover:text-blue-400 transition-all duration-300 cursor-default"
-                >
-                  <div className={`w-2 h-2 ${item.color} rounded-full animate-pulse`} style={{ animationDelay: `${i * 0.3}s` }} />
-                  {item.icon && <item.icon className="w-4 h-4" />}
-                  <span className="text-sm font-medium">{item.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Enhanced Stats Grid */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map(({ icon: Icon, number, label, isDecimal, isPercentage, suffix, color, description }, i) => {
                 const animatedNumber = useCounter(number, 3000)
@@ -389,14 +360,10 @@ export default function Home() {
                     key={i}
                     className="relative group cursor-pointer hover:-translate-y-4 hover:scale-105 transition-all duration-300"
                   >
-                    {/* Hover Glow Effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${color} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300`} />
-                    
                     {/* Card Content */}
                     <div className="relative text-center p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
-                      {/* Icon with Background */}
+                      {/* Icon */}
                       <div className="relative mb-6">
-                        <div className={`absolute inset-0 bg-gradient-to-r ${color} rounded-full blur-lg opacity-50 animate-pulse`} style={{ animationDelay: `${i * 0.5}s` }} />
                         <Icon className="relative w-12 h-12 mx-auto text-blue-400" />
                       </div>
                       
@@ -417,9 +384,6 @@ export default function Home() {
                       <div className="text-gray-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         {description}
                       </div>
-                      
-                      {/* Status Indicator */}
-                      <div className="absolute top-4 right-4 w-3 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
                     </div>
                   </div>
                 )
@@ -428,7 +392,7 @@ export default function Home() {
 
             {/* Scroll Indicator */}
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-              <div className="flex flex-col items-center gap-2 text-gray-400 cursor-pointer animate-bounce-slow hover:text-blue-400 transition-colors duration-300">
+              <div className="flex flex-col items-center gap-2 text-gray-400 cursor-pointer animate-bounce hover:text-blue-400 transition-colors duration-300">
                 <span className="text-sm">Scroll to explore</span>
                 <ChevronDown className="w-6 h-6" />
               </div>
@@ -436,7 +400,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Enhanced Services Section */}
+        {/* Services Section */}
         <section className="py-32 px-4 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-purple-900/10" />
           <div className="max-w-7xl mx-auto relative z-10">
@@ -444,7 +408,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Enhanced Client Testimonials */}
+        {/* Client Testimonials */}
         <section className="py-32 px-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-slate-900/50" />
           <div className="max-w-6xl mx-auto relative z-10">
@@ -458,9 +422,6 @@ export default function Home() {
             <div className="relative">
               <div className="flex justify-center">
                 <div className="relative max-w-4xl w-full">
-                  {/* Background Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur-xl animate-pulse" />
-                  
                   {/* Testimonial Card */}
                   <div className="relative bg-white/5 backdrop-blur-md rounded-3xl p-12 border border-white/10">
                     <div className="flex flex-col md:flex-row items-center gap-8">
@@ -529,25 +490,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Enhanced CTA Section */}
+        {/* CTA Section */}
         <section className="py-32 px-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30" />
-          <div 
-            className="absolute inset-0 animate-gradient-bg"
-            style={{
-              background: "radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)"
-            }}
-          />
           
           <div className="max-w-5xl mx-auto text-center relative z-10">
             <div className="relative">
-              {/* Background Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl blur-xl animate-pulse" />
-              
               {/* CTA Card */}
               <div className="relative p-16 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10">
                 <div className="mb-8">
-                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mb-8 animate-spin-slow">
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mb-8 animate-pulse">
                     <Sparkles className="w-12 h-12 text-white" />
                   </div>
                 </div>
@@ -564,7 +516,7 @@ export default function Home() {
                   Let&apos;s discuss how we can transform your vision into reality with our cutting-edge expertise and innovative solutions.
                 </p>
 
-                {/* Enhanced Feature Highlights */}
+                {/* Feature Highlights */}
                 <div className="grid md:grid-cols-3 gap-8 mb-12">
                   {features.map(({ icon: Icon, title, description, color }, i) => (
                     <div
@@ -582,7 +534,7 @@ export default function Home() {
                   ))}
                 </div>
 
-                {/* Enhanced Contact Form */}
+                {/* Contact Form */}
                 <div className="scale-95 hover:scale-100 transition-transform duration-300">
                   <ContactForm />
                 </div>
@@ -611,7 +563,7 @@ export default function Home() {
 
         <Footer />
         
-        {/* Enhanced Global Styles */}
+        {/* Custom Styles */}
         <style jsx>{`
           .floating-orb {
             border-radius: 50%;
@@ -629,28 +581,12 @@ export default function Home() {
             }
           }
           
-          .animate-spin-slow {
-            animation: spin 20s linear infinite;
-          }
-          
-          .animate-bounce-slow {
-            animation: bounce 3s ease-in-out infinite;
-          }
-          
           .bg-300\\% {
             background-size: 300% 300%;
           }
           
           .animate-gradient-x {
             animation: gradient-x 3s ease infinite;
-          }
-
-          .animate-shimmer {
-            animation: shimmer 2s infinite;
-          }
-
-          .animate-gradient-bg {
-            animation: gradientBg 10s ease infinite;
           }
           
           @keyframes gradient-x {
@@ -661,67 +597,7 @@ export default function Home() {
               background-position: 100% 50%;
             }
           }
-
-          @keyframes shimmer {
-            0% {
-              transform: translateX(-100%) skewX(-12deg);
-            }
-            100% {
-              transform: translateX(200%) skewX(-12deg);
-            }
-          }
-
-          @keyframes gradientBg {
-            0%, 100% {
-              background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
-            }
-            33% {
-              background: radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
-            }
-            66% {
-              background: radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
-            }
-          }
           
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-          
-          @keyframes bounce {
-            0%, 100% { 
-              transform: translateY(0px);
-            }
-            50% { 
-              transform: translateY(-10px);
-            }
-          }
-
-          /* Enhanced scroll behavior */
-          html {
-            scroll-behavior: smooth;
-          }
-
-          /* Custom selection colors */
-          ::selection {
-            background: rgba(59, 130, 246, 0.3);
-            color: white;
-          }
-
-          /* Enhanced focus styles */
-          button:focus,
-          input:focus,
-          textarea:focus {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-          }
-
-          /* Loading states */
-          .loading {
-            opacity: 0.6;
-            pointer-events: none;
-          }
-
           /* Mobile optimizations */
           @media (max-width: 768px) {
             .floating-orb {
@@ -741,11 +617,7 @@ export default function Home() {
           /* Reduced motion preferences */
           @media (prefers-reduced-motion: reduce) {
             .floating-orb,
-            .animate-spin-slow,
-            .animate-bounce-slow,
-            .animate-gradient-x,
-            .animate-shimmer,
-            .animate-gradient-bg {
+            .animate-gradient-x {
               animation: none !important;
             }
             
@@ -762,20 +634,6 @@ export default function Home() {
             
             .border-white\\/10 {
               border-color: rgba(255, 255, 255, 0.3) !important;
-            }
-          }
-
-          /* Print styles */
-          @media print {
-            .floating-orb,
-            .animate-spin-slow,
-            .animate-bounce-slow {
-              display: none !important;
-            }
-            
-            body {
-              background: white !important;
-              color: black !important;
             }
           }
         `}</style>
