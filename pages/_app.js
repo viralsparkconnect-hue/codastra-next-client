@@ -1,8 +1,9 @@
-// pages/_app.js - Fixed for Vercel Deployment
+// pages/_app.js - Fixed for Vercel Deployment with EmailJS
 import '../styles/globals.css'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import Script from 'next/script'
 import dynamic from 'next/dynamic'
 
 // Dynamically import AIChatWidget to prevent SSR issues
@@ -16,6 +17,20 @@ function MyApp({ Component, pageProps }) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [isPageLoading, setIsPageLoading] = useState(false)
+  const [emailjsLoaded, setEmailjsLoaded] = useState(false)
+
+  // Initialize EmailJS when script loads
+  const initializeEmailJS = () => {
+    if (typeof window !== 'undefined' && window.emailjs) {
+      try {
+        window.emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh')
+        setEmailjsLoaded(true)
+        console.log('EmailJS initialized successfully')
+      } catch (error) {
+        console.error('EmailJS initialization failed:', error)
+      }
+    }
+  }
 
   // Initialize app state
   useEffect(() => {
@@ -55,7 +70,7 @@ function MyApp({ Component, pageProps }) {
 
   // Pages where chat should be hidden
   const hideChatPages = ['/admin', '/login', '/dashboard', '/api', '/404']
-  const shouldShowChat = isLoaded && !hideChatPages.some(page => 
+  const shouldShowChat = isLoaded && emailjsLoaded && !hideChatPages.some(page => 
     router.pathname.startsWith(page)
   )
 
@@ -68,6 +83,15 @@ function MyApp({ Component, pageProps }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </Head>
+
+      {/* Load EmailJS script */}
+      <Script
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
+        onLoad={initializeEmailJS}
+        onError={(e) => {
+          console.error('Failed to load EmailJS:', e)
+        }}
+      />
 
       {/* Page loading indicator */}
       {isPageLoading && (
@@ -85,6 +109,16 @@ function MyApp({ Component, pageProps }) {
         </div>
       )}
 
+      {/* EmailJS loading indicator */}
+      {isLoaded && !emailjsLoaded && (
+        <div className="fixed bottom-4 left-4 bg-blue-600/20 border border-blue-500/30 rounded-lg p-3 text-blue-300 text-sm z-30">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            <span>Initializing chat system...</span>
+          </div>
+        </div>
+      )}
+
       {/* Main content wrapper */}
       <div className={`min-h-screen transition-opacity duration-200 ${
         isPageLoading ? 'opacity-90' : 'opacity-100'
@@ -94,7 +128,7 @@ function MyApp({ Component, pageProps }) {
         </main>
       </div>
       
-      {/* AI Chat Widget - Only render client-side */}
+      {/* AI Chat Widget - Only render when EmailJS is ready */}
       {shouldShowChat && <AIChatWidget />}
       
       {/* Skip to main content link for accessibility */}
