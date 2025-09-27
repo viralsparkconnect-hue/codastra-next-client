@@ -1,4 +1,4 @@
-// components/AIChatWidget.js - Enhanced with AI Sales Agent & Lead Capture
+// components/AIChatWidget.js - Enhanced with Google Sheets Integration
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
@@ -33,6 +33,12 @@ const User = ({ className }) => (
   </svg>
 )
 
+const Check = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+)
+
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState('')
@@ -58,6 +64,7 @@ export default function AIChatWidget() {
   })
   const [awaitingInfo, setAwaitingInfo] = useState('')
   const [hasProvidedContact, setHasProvidedContact] = useState(false)
+  const [leadSaved, setLeadSaved] = useState(false)
   
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
@@ -186,8 +193,8 @@ export default function AIChatWidget() {
       setHasProvidedContact(true)
       setConversationStage('closing')
       
-      // Send lead info to email
-      setTimeout(() => sendLeadToEmail(), 1000)
+      // Save lead info to Google Sheets and send email
+      setTimeout(() => saveLead(), 1000)
       
       return `Excellent! I have all your details. I'm sending this conversation and your requirements to our project manager right now. You'll receive a detailed proposal within 2 hours, and I'll call you tomorrow to discuss next steps. Is there anything else about your project I should mention to the team?`
     }
@@ -209,274 +216,4 @@ export default function AIChatWidget() {
 
     // Closing responses
     if (hasProvidedContact) {
-      return "Perfect! I've noted that down. Your dedicated project manager will include this in your custom proposal. You can expect to hear from us within 2 hours via email, and I'll personally follow up with a call tomorrow. Thanks for choosing Codastra! 🚀"
-    }
-
-    // Default responses based on conversation stage
-    const responses = {
-      greeting: [
-        "That sounds interesting! Tell me more about your business and what challenges you're facing. Understanding your goals helps me recommend the perfect solution.",
-        "I'd love to help you with that! We've successfully completed 200+ similar projects. What's the main goal you want to achieve with this project?",
-        "Excellent! You've come to the right place. We've helped 300+ businesses just like yours achieve incredible results. What's your biggest challenge right now?"
-      ],
-      qualifying: [
-        "That makes sense! Based on what you've told me, I can already see a few ways we could help. To give you the best recommendation, what's your target timeline for this project?",
-        "Great insight! We've solved similar challenges for many clients with fantastic results. What would success look like for you in 6 months?",
-        "I love your vision! We specialize in exactly what you're describing. What's your estimated budget range for this investment?"
-      ],
-      collecting_info: [
-        "This sounds like an amazing project! I'd love to connect you with our specialist team. Could you share your contact details so I can send you a detailed proposal?",
-        "Perfect! Let me get your information so our team can prepare a custom solution for you. What's the best email to reach you at?",
-        "I'm excited about this opportunity! To move forward quickly, I'll need your contact details. What's your name and email address?"
-      ]
-    }
-
-    const stageResponses = responses[stage] || responses.greeting
-    return stageResponses[Math.floor(Math.random() * stageResponses.length)]
-  }
-
-  // Send lead information to email using EmailJS
-  const sendLeadToEmail = async () => {
-    try {
-      const conversationHistory = messages.map(msg => 
-        `${msg.isBot ? 'AI Agent' : 'Customer'} (${msg.timestamp.toLocaleTimeString()}): ${msg.text}`
-      ).join('\n\n')
-
-      const templateParams = {
-        customer_name: leadData.name || 'Unknown',
-        customer_email: leadData.email || 'Not provided',
-        customer_phone: leadData.phone || 'Not provided',
-        service_interest: leadData.service || 'General Inquiry',
-        budget_range: leadData.budget || 'Not specified',
-        company_name: leadData.company || 'Not provided',
-        conversation_history: conversationHistory,
-        lead_source: 'Website AI Chat',
-        timestamp: new Date().toLocaleString(),
-        to_email: 'codastra.conect@gmail.com'
-      }
-
-      await emailjs.send(
-        'service_5dpu0tn',     // Your service ID
-        'template_8w0jacd',    // Your template ID  
-        templateParams,
-        'AlryU3umMzVGedPYh'    // Your public key
-      )
-
-      console.log('Lead successfully sent to email!')
-      
-      // Add a system message
-      setTimeout(() => {
-        const confirmationMessage = {
-          id: Date.now(),
-          text: "✅ Perfect! I've sent your information to our team. You'll receive a detailed proposal at " + leadData.email + " within 2 hours!",
-          isBot: true,
-          timestamp: new Date()
-        }
-        setMessages(prev => [...prev, confirmationMessage])
-      }, 2000)
-
-    } catch (error) {
-      console.error('Failed to send lead:', error)
-    }
-  }
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault()
-    if (!message.trim()) return
-
-    const userMessage = {
-      id: Date.now(),
-      text: message,
-      isBot: false,
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    const currentMessage = message
-    setMessage('')
-    setIsTyping(true)
-
-    // Update conversation stage logic
-    if (!hasProvidedContact && (leadData.name && leadData.email && leadData.phone)) {
-      setHasProvidedContact(true)
-      setConversationStage('closing')
-    }
-
-    // Add slight delay for more natural feel
-    setTimeout(() => {
-      const botResponse = {
-        id: Date.now() + 1,
-        text: getBotResponse(currentMessage, conversationStage),
-        isBot: true,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, botResponse])
-      setIsTyping(false)
-      
-      // Update conversation stage
-      if (conversationStage === 'greeting' && messages.length > 2) {
-        setConversationStage('qualifying')
-      } else if (conversationStage === 'qualifying' && messages.length > 6) {
-        setConversationStage('collecting_info')
-      }
-    }, 1000 + Math.random() * 1500)
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage(e)
-    }
-  }
-
-  if (!isOpen) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="relative w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-          aria-label="Chat with Sales Agent"
-        >
-          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-          <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-pulse" />
-        </button>
-        
-        {/* Attention-grabbing popup */}
-        <div className="absolute bottom-20 right-0 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-gray-200 max-w-xs transform scale-0 group-hover:scale-100 transition-transform duration-300 origin-bottom-right">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <Bot className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="text-gray-800 font-semibold text-sm">Hi! I'm Alex 👋</p>
-              <p className="text-gray-600 text-xs">Ready to discuss your project? Click to chat!</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="fixed bottom-6 right-6 w-96 h-[32rem] bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 z-50 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
-          </div>
-          <div>
-            <h3 className="text-white font-semibold">Alex - Sales Agent</h3>
-            <p className="text-gray-300 text-xs">
-              {isTyping ? 'Typing...' : 'Online • Ready to help!'}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => setIsOpen(false)}
-          className="text-gray-400 hover:text-white transition-colors p-1"
-          aria-label="Close chat"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
-          >
-            <div className={`flex gap-2 max-w-[85%] ${msg.isBot ? '' : 'flex-row-reverse'}`}>
-              {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                msg.isBot 
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500' 
-                  : 'bg-gradient-to-r from-gray-600 to-gray-700'
-              }`}>
-                {msg.isBot ? (
-                  <Bot className="w-4 h-4 text-white" />
-                ) : (
-                  <User className="w-4 h-4 text-white" />
-                )}
-              </div>
-              
-              {/* Message Bubble */}
-              <div
-                className={`p-3 rounded-2xl ${
-                  msg.isBot
-                    ? 'bg-white/10 text-white rounded-bl-sm'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-sm'
-                }`}
-              >
-                <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
-                <span className="text-xs opacity-70 mt-1 block">
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-        
-        {isTyping && (
-          <div className="flex justify-start">
-            <div className="flex gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-white" />
-              </div>
-              <div className="bg-white/10 text-white p-3 rounded-2xl rounded-bl-sm">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Lead Progress Indicator */}
-      {(leadData.name || leadData.email || leadData.service) && (
-        <div className="px-4 py-2 bg-blue-900/20 border-t border-white/10">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span className="text-green-300">
-              {leadData.name && leadData.email && leadData.phone 
-                ? "✅ Contact details collected!" 
-                : "Gathering your information..."}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t border-white/10">
-        <div className="flex gap-2">
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={awaitingInfo === 'name' ? "Your name..." : awaitingInfo === 'email' ? "Your email address..." : awaitingInfo === 'phone' ? "Your phone number..." : "Type your message..."}
-            className="flex-1 bg-white/10 text-white placeholder-gray-400 rounded-xl px-4 py-2 border border-white/20 focus:border-blue-400 focus:outline-none resize-none min-h-[40px] max-h-[80px]"
-            rows={1}
-          />
-          <button
-            type="submit"
-            disabled={!message.trim()}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-      </form>
-    </div>
-  )
-}
+      return "Perfect! I've noted that down. Your dedicated project manager will include this in your custom proposal. You can expect to hear from us within
