@@ -1,4 +1,4 @@
-// components/SheetsLeadDashboard.js - Simple working version
+// components/SheetsLeadDashboard.js - Fixed working version
 import { useState, useEffect } from 'react'
 
 export default function SheetsLeadDashboard() {
