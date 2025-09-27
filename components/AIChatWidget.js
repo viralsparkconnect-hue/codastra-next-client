@@ -1,4 +1,4 @@
-// components/AIChatWidget.js - Enhanced with Google Sheets Integration
+// components/AIChatWidget.js - Complete Enhanced with Google Sheets Integration
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
@@ -51,7 +51,7 @@ export default function AIChatWidget() {
     }
   ])
   const [isTyping, setIsTyping] = useState(false)
-  const [conversationStage, setConversationStage] = useState('greeting') // greeting, qualifying, collecting_info, closing
+  const [conversationStage, setConversationStage] = useState('greeting')
   const [leadData, setLeadData] = useState({
     name: '',
     email: '',
@@ -81,6 +81,62 @@ export default function AIChatWidget() {
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'
     }
   }, [message])
+
+  // Save lead to Google Sheets
+  const saveLead = async () => {
+    try {
+      const conversationHistory = messages
+        .map(msg => `${msg.isBot ? 'Bot' : 'User'}: ${msg.text}`)
+        .join('\n')
+
+      const leadPayload = {
+        ...leadData,
+        conversationHistory,
+        source: 'AI Chat Widget',
+        timestamp: new Date().toISOString()
+      }
+
+      const response = await fetch('/api/save-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leadPayload)
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setLeadSaved(true)
+        console.log('Lead saved successfully:', result.leadId)
+        
+        // Also send email notification
+        try {
+          await emailjs.send(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
+            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_8w0jacd',
+            {
+              to_name: 'Codastra Team',
+              from_name: leadData.name || 'Chat Lead',
+              from_email: leadData.email || 'No email provided',
+              phone: leadData.phone || 'No phone provided',
+              service: leadData.service || 'General Inquiry',
+              message: conversationHistory,
+              lead_source: 'AI Chat Widget'
+            },
+            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+          )
+          console.log('Email notification sent')
+        } catch (emailError) {
+          console.error('Email sending failed:', emailError)
+        }
+      } else {
+        console.error('Failed to save lead:', result.error)
+      }
+    } catch (error) {
+      console.error('Error saving lead:', error)
+    }
+  }
 
   // Enhanced AI responses with sales conversation logic
   const getBotResponse = (userMessage, stage) => {
@@ -167,7 +223,6 @@ export default function AIChatWidget() {
       if (foundEmail) {
         setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
       } else {
-        // Extract email manually if regex didn't catch it
         const emailMatch = userMessage.match(/\S+@\S+\.\S+/)
         if (emailMatch) {
           setLeadData(prev => ({ ...prev, email: emailMatch[0] }))
@@ -181,7 +236,6 @@ export default function AIChatWidget() {
       if (foundPhone) {
         setLeadData(prev => ({ ...prev, phone: foundPhone[0] }))
       } else {
-        // Extract phone manually or use the message as phone
         const phoneMatch = userMessage.match(/[\d\s\-\+\(\)]+/)
         if (phoneMatch) {
           setLeadData(prev => ({ ...prev, phone: phoneMatch[0].trim() }))
@@ -216,4 +270,205 @@ export default function AIChatWidget() {
 
     // Closing responses
     if (hasProvidedContact) {
-      return "Perfect! I've noted that down. Your dedicated project manager will include this in your custom proposal. You can expect to hear from us within
+      return "Perfect! I've noted that down. Your dedicated project manager will include this in your custom proposal. You can expect to hear from us within 2 hours with a detailed plan and pricing. Thank you for choosing Codastra! 🚀"
+    }
+
+    // Default responses based on stage
+    if (stage === 'greeting') {
+      setConversationStage('qualifying')
+      return "Thanks for reaching out! I'd love to help you with your digital transformation. What specific challenge are you looking to solve, or what goal are you trying to achieve with your project?"
+    }
+
+    if (stage === 'qualifying') {
+      setConversationStage('collecting_info')
+      return "That sounds like an exciting project! To provide you with the most accurate proposal and timeline, I'd like to get a few details. What's your name?"
+    }
+
+    // Fallback responses
+    const fallbackResponses = [
+      "That's interesting! Tell me more about what you have in mind for your project.",
+      "I see! What's the main goal you're trying to achieve with this project?",
+      "Great question! To give you the best recommendation, could you tell me more about your specific needs?",
+      "I'd love to help with that! What's your timeline for getting this project started?",
+      "Excellent! What's driving this project for your business right now?"
+    ]
+
+    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
+  }
+
+  const addMessage = (text, isBot = false) => {
+    const newMessage = {
+      id: Date.now(),
+      text,
+      isBot,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, newMessage])
+  }
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) return
+    
+    const userMessage = message.trim()
+    addMessage(userMessage)
+    setMessage('')
+    setIsTyping(true)
+
+    // Store user message in lead data
+    setLeadData(prev => ({ ...prev, message: prev.message + '\n' + userMessage }))
+    
+    // Simulate typing delay
+    setTimeout(() => {
+      const botResponse = getBotResponse(userMessage, conversationStage)
+      addMessage(botResponse, true)
+      setIsTyping(false)
+    }, 1000 + Math.random() * 1000) // 1-2 second delay
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  return (
+    <>
+      {/* Chat Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-blue-500/50 hover:scale-110 transition-all duration-300 flex items-center justify-center ${
+          isOpen ? 'rotate-180' : 'animate-bounce'
+        }`}
+        aria-label="Open chat"
+      >
+        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        
+        {/* Notification dot */}
+        {!isOpen && (
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+            <span className="text-xs text-white font-bold">1</span>
+          </div>
+        )}
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] h-[500px] bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-4 border-b border-gray-700/50">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gray-900"></div>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white">Alex - Sales Assistant</h3>
+                <p className="text-sm text-gray-400">Usually replies instantly</p>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700/50 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 h-80">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex items-start gap-2 ${msg.isBot ? '' : 'justify-end'}`}
+              >
+                {msg.isBot && (
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                )}
+                
+                <div
+                  className={`max-w-xs p-3 rounded-2xl ${
+                    msg.isBot
+                      ? 'bg-gray-800 text-white border border-gray-700/50'
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white ml-auto'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                  <p className="text-xs opacity-60 mt-1">
+                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+
+                {!msg.isBot && (
+                  <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex items-start gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div className="bg-gray-800 p-3 rounded-2xl border border-gray-700/50">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="p-4 border-t border-gray-700/50">
+            <div className="flex gap-2">
+              <textarea
+                ref={textareaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                className="flex-1 bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-24 min-h-[48px]"
+                disabled={isTyping}
+                rows={1}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!message.trim() || isTyping}
+                className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Powered by */}
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Powered by <span className="text-blue-400">Codastra AI</span>
+            </p>
+          </div>
+
+          {/* Success indicator */}
+          {leadSaved && (
+            <div className="absolute top-20 left-4 right-4 bg-green-600/20 border border-green-500/30 rounded-xl p-3 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-green-400 text-sm">
+                <Check className="w-4 h-4" />
+                <span>Lead saved successfully!</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  )
+}
