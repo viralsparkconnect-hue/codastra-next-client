@@ -135,32 +135,53 @@ export default function AIChatWidget() {
     }
 
     // Contact information requests
-    if (stage === 'collecting_info' || msg.includes('contact') || (!leadData.name && !leadData.email)) {
-      if (!leadData.name) {
+    if (stage === 'collecting_info' || msg.includes('contact') || (!leadData.name && !leadData.email && awaitingInfo !== 'name' && awaitingInfo !== 'email' && awaitingInfo !== 'phone')) {
+      if (!leadData.name && awaitingInfo !== 'name') {
         setAwaitingInfo('name')
         return "I'd love to personalize our conversation! What's your name? 😊"
-      } else if (!leadData.email) {
+      } else if (!leadData.email && awaitingInfo !== 'email') {
         setAwaitingInfo('email')
         return `Nice to meet you, ${leadData.name}! Could you share your email address? I'll send you a detailed proposal with pricing and next steps.`
-      } else if (!leadData.phone) {
+      } else if (!leadData.phone && awaitingInfo !== 'phone') {
         setAwaitingInfo('phone')
         return "Perfect! And your phone number? Sometimes it's easier to discuss project details over a quick call."
       }
     }
 
     // Handle awaiting specific information
-    if (awaitingInfo === 'name' && !foundName) {
-      setLeadData(prev => ({ ...prev, name: userMessage.trim() }))
+    if (awaitingInfo === 'name') {
+      const extractedName = foundName ? foundName[1].trim() : userMessage.trim()
+      setLeadData(prev => ({ ...prev, name: extractedName }))
       setAwaitingInfo('email')
-      return `Great to meet you, ${userMessage.trim()}! What's your email address? I'll send you a customized proposal with our best recommendations.`
+      return `Great to meet you, ${extractedName}! What's your email address? I'll send you a customized proposal with our best recommendations.`
     }
 
-    if (awaitingInfo === 'email' && foundEmail) {
+    if (awaitingInfo === 'email' && (foundEmail || msg.includes('@'))) {
+      if (foundEmail) {
+        setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
+      } else {
+        // Extract email manually if regex didn't catch it
+        const emailMatch = userMessage.match(/\S+@\S+\.\S+/)
+        if (emailMatch) {
+          setLeadData(prev => ({ ...prev, email: emailMatch[0] }))
+        }
+      }
       setAwaitingInfo('phone')
       return "Perfect! And could I get your phone number? Sometimes a quick 10-minute call can save hours of back-and-forth messaging. 📞"
     }
 
-    if (awaitingInfo === 'phone' && foundPhone) {
+    if (awaitingInfo === 'phone' && (foundPhone || msg.match(/\d{3}/) || msg.includes('phone') || msg.includes('number'))) {
+      if (foundPhone) {
+        setLeadData(prev => ({ ...prev, phone: foundPhone[0] }))
+      } else {
+        // Extract phone manually or use the message as phone
+        const phoneMatch = userMessage.match(/[\d\s\-\+\(\)]+/)
+        if (phoneMatch) {
+          setLeadData(prev => ({ ...prev, phone: phoneMatch[0].trim() }))
+        } else {
+          setLeadData(prev => ({ ...prev, phone: userMessage.trim() }))
+        }
+      }
       setAwaitingInfo('')
       setHasProvidedContact(true)
       setConversationStage('closing')
