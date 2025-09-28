@@ -1,8 +1,10 @@
+// components/ContactForm.js - Fixed version
 "use client"
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import emailjs from '@emailjs/browser'
 
-// Simple icons
+// Simple icons (unchanged)
 const Send = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -37,6 +39,14 @@ export default function ContactForm() {
   })
   const [status, setStatus] = useState('idle') // idle, loading, success, error
   const [errors, setErrors] = useState({})
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // EmailJS Configuration - Use environment variables with fallbacks
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
+    TEMPLATE_ID: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt', // Fixed template ID
+    PUBLIC_KEY: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+  }
 
   const validateForm = () => {
     const newErrors = {}
@@ -48,16 +58,21 @@ export default function ContactForm() {
       newErrors.name = 'Name must be at least 2 characters'
     }
     
-    // Email validation
+    // Email validation - improved regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
     if (!form.email.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    } else if (!emailRegex.test(form.email.trim())) {
       newErrors.email = 'Please enter a valid email address'
     }
     
     // Phone validation (optional but if provided, should be valid)
-    if (form.phone.trim() && !/^[\+]?[1-9][\d]{0,15}$/.test(form.phone.replace(/[\s\-\(\)]/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number'
+    if (form.phone.trim()) {
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
+      const cleanPhone = form.phone.replace(/[\s\-\(\)\.]/g, '')
+      if (!phoneRegex.test(cleanPhone)) {
+        newErrors.phone = 'Please enter a valid phone number'
+      }
     }
     
     // Message validation
@@ -81,6 +96,11 @@ export default function ContactForm() {
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' })
     }
+    
+    // Clear general error message
+    if (errorMessage) {
+      setErrorMessage('')
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -89,60 +109,95 @@ export default function ContactForm() {
     if (!validateForm()) return
     
     setStatus('loading')
+    setErrorMessage('')
 
     try {
-      // Save to Google Sheets via API
-      const saveResponse = await fetch('/api/save-lead', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: form.name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          service: form.service || 'General Inquiry',
-          message: form.message.trim(),
-          source: 'Contact Form'
-        })
-      })
-
-      const saveResult = await saveResponse.json()
-      console.log('Lead save result:', saveResult)
-
-      // Send email notification (fallback if Google Sheets fails)
+      // Save to Google Sheets first
+      let sheetsSaved = false
       try {
-        // Check if emailjs is available
-        if (typeof window !== 'undefined' && window.emailjs) {
-          await window.emailjs.send(
-            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "service_5dpu0tn",
-            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "template_qteujwt",
-            {
-              from_name: form.name,
-              from_email: form.email,
-              phone: form.phone || 'Not provided',
-              service: form.service || 'General Inquiry',
-              message: form.message,
-              to_email: "codastra.conect@gmail.com"
-            },
-            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "AlryU3umMzVGedPYh"
-          )
+        const saveResponse = await fetch('/api/save-lead', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            service: form.service || 'General Inquiry',
+            message: form.message.trim(),
+            source: 'Contact Form',
+            timestamp: new Date().toISOString()
+          })
+        })
+
+        const saveResult = await saveResponse.json()
+        if (saveResult.success) {
+          sheetsSaved = true
+          console.log('Lead saved to Google Sheets:', saveResult.leadId)
+        } else {
+          console.warn('Google Sheets save failed:', saveResult.error)
         }
-      } catch (emailError) {
-        console.error("Email sending failed:", emailError)
-        // Don't fail the whole process if email fails
+      } catch (sheetsError) {
+        console.warn('Google Sheets error (continuing with email):', sheetsError.message)
       }
 
-      setStatus('success')
-      setForm({ name: '', email: '', phone: '', service: '', message: '' })
-      
-      // Reset to idle after 5 seconds
-      setTimeout(() => setStatus('idle'), 5000)
+      // Send email notification using EmailJS
+      try {
+        // Initialize EmailJS if not already done
+        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
+
+        const templateParams = {
+          to_name: 'Codastra Team',
+          from_name: form.name.trim(),
+          from_email: form.email.trim(), 
+          phone: form.phone.trim() || 'Not provided',
+          service: form.service || 'General Inquiry',
+          message: form.message.trim(),
+          reply_to: form.email.trim(),
+          contact_source: 'Website Contact Form',
+          timestamp: new Date().toLocaleString('en-US', {
+            timeZone: 'Asia/Kolkata',
+            timeZoneName: 'short'
+          })
+        }
+
+        const emailResult = await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          templateParams,
+          EMAILJS_CONFIG.PUBLIC_KEY
+        )
+
+        console.log('Email sent successfully:', emailResult.text)
+        
+        setStatus('success')
+        setForm({ name: '', email: '', phone: '', service: '', message: '' })
+        
+        // Reset to idle after 5 seconds
+        setTimeout(() => setStatus('idle'), 5000)
+
+      } catch (emailError) {
+        console.error('EmailJS error:', emailError)
+        
+        // If sheets saved but email failed, still show partial success
+        if (sheetsSaved) {
+          setStatus('success') 
+          setForm({ name: '', email: '', phone: '', service: '', message: '' })
+          setTimeout(() => setStatus('idle'), 5000)
+        } else {
+          throw emailError // Re-throw to trigger error handling
+        }
+      }
 
     } catch (error) {
       console.error("Form submission error:", error)
       setStatus('error')
-      setTimeout(() => setStatus('idle'), 3000)
+      setErrorMessage('Failed to send message. Please try again or contact us directly.')
+      setTimeout(() => {
+        setStatus('idle')
+        setErrorMessage('')
+      }, 5000)
     }
   }
 
@@ -164,6 +219,7 @@ export default function ContactForm() {
     'Cloud Solutions',
     'E-commerce Solutions',
     'UI/UX Design',
+    'SEO & Analytics',
     'Other'
   ]
 
@@ -172,12 +228,12 @@ export default function ContactForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="text-center p-8 bg-green-900/20 border border-green-600/30 rounded-2xl"
+        className="text-center p-8 bg-green-900/20 border border-green-600/30 rounded-2xl backdrop-blur-sm"
       >
         <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
         <h3 className="text-2xl font-bold text-green-400 mb-2">Message Sent Successfully!</h3>
         <p className="text-green-300 mb-4">
-          Thank you for contacting us. We've received your message and will get back to you within 24 hours.
+          Thank you for contacting us. We've received your message and will get back to you within 2 hours during business hours.
         </p>
         <div className="text-sm text-green-400 bg-green-900/20 rounded-lg p-3 border border-green-600/20">
           <p>✅ Lead saved to our system</p>
@@ -209,6 +265,8 @@ export default function ContactForm() {
           onChange={handleChange}
           className={inputClasses('name')}
           disabled={status === 'loading'}
+          maxLength={100}
+          autoComplete="name"
         />
         {errors.name && (
           <motion.p 
@@ -216,7 +274,7 @@ export default function ContactForm() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-2 text-red-400 text-sm flex items-center gap-1"
           >
-            <AlertCircle className="w-4 h-4" />
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {errors.name}
           </motion.p>
         )}
@@ -235,6 +293,8 @@ export default function ContactForm() {
           onChange={handleChange}
           className={inputClasses('email')}
           disabled={status === 'loading'}
+          maxLength={200}
+          autoComplete="email"
         />
         {errors.email && (
           <motion.p 
@@ -242,7 +302,7 @@ export default function ContactForm() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-2 text-red-400 text-sm flex items-center gap-1"
           >
-            <AlertCircle className="w-4 h-4" />
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {errors.email}
           </motion.p>
         )}
@@ -261,6 +321,8 @@ export default function ContactForm() {
           onChange={handleChange}
           className={inputClasses('phone')}
           disabled={status === 'loading'}
+          maxLength={20}
+          autoComplete="tel"
         />
         {errors.phone && (
           <motion.p 
@@ -268,7 +330,7 @@ export default function ContactForm() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-2 text-red-400 text-sm flex items-center gap-1"
           >
-            <AlertCircle className="w-4 h-4" />
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {errors.phone}
           </motion.p>
         )}
@@ -308,6 +370,7 @@ export default function ContactForm() {
           rows={5}
           className={inputClasses('message')}
           disabled={status === 'loading'}
+          maxLength={1000}
           style={{ resize: 'vertical', minHeight: '120px' }}
         />
         <div className="flex justify-between items-center mt-1">
@@ -317,7 +380,7 @@ export default function ContactForm() {
               animate={{ opacity: 1, y: 0 }}
               className="text-red-400 text-sm flex items-center gap-1"
             >
-              <AlertCircle className="w-4 h-4" />
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {errors.message}
             </motion.p>
           ) : (
@@ -333,17 +396,17 @@ export default function ContactForm() {
       </div>
 
       {/* Error Message */}
-      {status === 'error' && (
+      {status === 'error' && errorMessage && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-red-900/20 border border-red-600/30 rounded-xl"
+          className="p-4 bg-red-900/20 border border-red-600/30 rounded-xl backdrop-blur-sm"
         >
           <div className="flex items-center gap-2 text-red-300">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <div>
               <p className="font-medium">Submission Failed</p>
-              <p className="text-sm">There was an error sending your message. Please try again or contact us directly.</p>
+              <p className="text-sm">{errorMessage}</p>
             </div>
           </div>
         </motion.div>
@@ -353,7 +416,7 @@ export default function ContactForm() {
       <motion.button
         type="submit"
         disabled={status === 'loading'}
-        className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
+        className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden ${
           status === 'loading'
             ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-blue-500/25'
@@ -371,6 +434,11 @@ export default function ContactForm() {
             <Send className="w-5 h-5" />
             Send Message
           </>
+        )}
+        
+        {/* Button shine effect */}
+        {status !== 'loading' && (
+          <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
         )}
       </motion.button>
 
