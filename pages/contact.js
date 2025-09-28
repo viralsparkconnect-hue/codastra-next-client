@@ -23,6 +23,8 @@ export default function Contact() {
   const [status, setStatus] = useState('idle') // idle, loading, success, error
   const [errors, setErrors] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
+  const [leadSaved, setLeadSaved] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
   // EmailJS Configuration
   const EMAILJS_CONFIG = {
@@ -202,28 +204,47 @@ export default function Contact() {
     }
   ]
 
-  // Form validation
+  // Enhanced form validation
   const validateForm = () => {
     const newErrors = {}
     
+    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
     } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters'
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Name must be less than 100 characters'
     }
     
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email'
+    } else if (!emailRegex.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address'
+    } else if (formData.email.trim().length > 200) {
+      newErrors.email = 'Email must be less than 200 characters'
     }
     
+    // Phone validation (optional but if provided, should be valid)
+    if (formData.phone.trim()) {
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
+      const cleanPhone = formData.phone.replace(/[\s\-\(\)\.]/g, '')
+      if (!phoneRegex.test(cleanPhone)) {
+        newErrors.phone = 'Please enter a valid phone number'
+      } else if (cleanPhone.length < 10) {
+        newErrors.phone = 'Phone number must be at least 10 digits'
+      }
+    }
+    
+    // Message validation
     if (!formData.message.trim()) {
       newErrors.message = 'Project details are required'
     } else if (formData.message.trim().length < 10) {
       newErrors.message = 'Please provide at least 10 characters'
-    } else if (formData.message.trim().length > 1000) {
-      newErrors.message = 'Message must be less than 1000 characters'
+    } else if (formData.message.trim().length > 2000) {
+      newErrors.message = 'Message must be less than 2000 characters'
     }
     
     setErrors(newErrors)
@@ -235,16 +256,117 @@ export default function Contact() {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
     
-    // Clear errors as user types
+    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' })
     }
+    
+    // Clear general error message
     if (errorMessage) {
       setErrorMessage('')
     }
   }
 
-  // Handle form submission with EmailJS
+  // Save lead to Google Sheets
+  const saveToGoogleSheets = async () => {
+    console.log('Attempting to save lead to Google Sheets...')
+    
+    try {
+      const leadPayload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || 'Not provided',
+        company: formData.company.trim() || 'Not specified',
+        service: formData.projectType || 'General Inquiry',
+        budget: formData.budget || 'Not specified',
+        timeline: 'Not specified',
+        message: formData.message.trim(),
+        source: 'Contact Page Form',
+        timestamp: new Date().toISOString(),
+        salesManager: 'Contact Form Lead',
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Unknown'
+      }
+
+      console.log('Sending lead payload to Google Sheets:', leadPayload)
+
+      const response = await fetch('/api/save-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leadPayload)
+      })
+
+      console.log('Google Sheets API response status:', response.status)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+
+      const result = await response.json()
+      console.log('Google Sheets API response data:', result)
+
+      if (result.success) {
+        setLeadSaved(true)
+        console.log('✅ Lead saved to Google Sheets successfully:', result.leadId)
+        return { success: true, leadId: result.leadId }
+      } else {
+        throw new Error(result.error || 'Unknown error from Google Sheets API')
+      }
+
+    } catch (error) {
+      console.error('❌ Google Sheets save failed:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  // Send email via EmailJS
+  const sendEmailNotification = async () => {
+    console.log('Attempting to send email via EmailJS...')
+    
+    try {
+      // Initialize EmailJS
+      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
+
+      // Prepare template parameters
+      const templateParams = {
+        to_name: 'Codastra Team',
+        from_name: formData.name.trim(),
+        from_email: formData.email.trim(),
+        phone: formData.phone.trim() || 'Not provided',
+        company: formData.company.trim() || 'Not provided',
+        project_type: formData.projectType || 'Not specified',
+        budget: formData.budget || 'Not specified',
+        message: formData.message.trim(),
+        reply_to: formData.email.trim(),
+        contact_source: 'Contact Page Form',
+        timestamp: new Date().toLocaleString('en-US', {
+          timeZone: 'Asia/Kolkata',
+          timeZoneName: 'short'
+        })
+      }
+
+      console.log('Sending email with EmailJS template params:', templateParams)
+
+      const emailResult = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      )
+
+      console.log('✅ Email sent successfully:', emailResult.text)
+      setEmailSent(true)
+      return { success: true, result: emailResult }
+
+    } catch (emailError) {
+      console.error('❌ EmailJS failed:', emailError)
+      return { success: false, error: emailError.message || emailError.text }
+    }
+  }
+
+  // Enhanced form submission with dual-channel approach
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -252,62 +374,65 @@ export default function Contact() {
     
     setStatus('loading')
     setErrorMessage('')
+    setLeadSaved(false)
+    setEmailSent(false)
+
+    console.log('Starting contact page form submission...')
 
     try {
-      // Initialize EmailJS (if not already done)
-      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
+      // Step 1: Save to Google Sheets (Primary - Most Important)
+      const sheetsResult = await saveToGoogleSheets()
+      
+      // Step 2: Send Email Notification (Secondary)
+      const emailResult = await sendEmailNotification()
 
-      // Prepare template parameters
-      const templateParams = {
-        to_name: 'Codastra Team',
-        from_name: formData.name,
-        from_email: formData.email,
-        phone: formData.phone || 'Not provided',
-        company: formData.company || 'Not provided',
-        project_type: formData.projectType || 'Not specified',
-        budget: formData.budget || 'Not specified',
-        message: formData.message,
-        reply_to: formData.email,
-        // Additional fields for better email context
-        contact_source: 'Website Contact Form',
-        timestamp: new Date().toLocaleString('en-US', {
-          timeZone: 'Asia/Kolkata',
-          timeZoneName: 'short'
+      // Step 3: Determine Overall Success
+      if (sheetsResult.success || emailResult.success) {
+        // Success if either method worked
+        setStatus('success')
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          projectType: '',
+          budget: '',
+          message: ''
         })
+        
+        console.log('✅ Contact form submission successful!')
+        console.log(`Lead saved: ${sheetsResult.success}, Email sent: ${emailResult.success}`)
+        
+        // Reset to idle after 8 seconds
+        setTimeout(() => setStatus('idle'), 8000)
+
+      } else {
+        // Both methods failed
+        throw new Error('Both Google Sheets and email delivery failed')
       }
 
-      // Send email using EmailJS
-      const result = await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        templateParams,
-        EMAILJS_CONFIG.PUBLIC_KEY
-      )
-
-      console.log('Email sent successfully:', result.text)
-      setStatus('success')
-      
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        projectType: '',
-        budget: '',
-        message: ''
-      })
-      
-      // Reset to idle after 8 seconds
-      setTimeout(() => setStatus('idle'), 8000)
-
     } catch (error) {
-      console.error('EmailJS error:', error)
+      console.error('❌ Contact form submission error:', error)
       setStatus('error')
-      setErrorMessage('Failed to send message. Please try again or contact us directly via WhatsApp.')
+      
+      // Provide specific error messages
+      if (!sheetsResult?.success && !emailResult?.success) {
+        setErrorMessage('Unable to submit your message. Please try contacting us directly at codastra.conect@gmail.com or via WhatsApp.')
+      } else if (!sheetsResult?.success) {
+        setErrorMessage('There was an issue saving your information, but we may have received your email. We\'ll get back to you soon.')
+      } else if (!emailResult?.success) {
+        setErrorMessage('Your information was saved but email notification failed. We\'ll still contact you within 24 hours.')
+      } else {
+        setErrorMessage('Failed to send message. Please try again or contact us directly via WhatsApp.')
+      }
       
       // Reset to idle after 5 seconds
-      setTimeout(() => setStatus('idle'), 5000)
+      setTimeout(() => {
+        setStatus('idle')
+        setErrorMessage('')
+      }, 5000)
     }
   }
 
@@ -470,10 +595,23 @@ export default function Contact() {
                     <p className="text-green-300 text-lg mb-4">
                       Thank you for reaching out to our Nashik team. We've received your message and will get back to you within 2 hours during business hours (IST).
                     </p>
-                    <div className="flex items-center justify-center gap-2 text-green-400 text-sm mb-6">
-                      <Mail className="w-4 h-4" />
-                      <span>Check your email for a confirmation</span>
+                    
+                    {/* Success Status Indicators */}
+                    <div className="text-sm text-green-400 bg-green-900/20 rounded-lg p-3 border border-green-600/20 space-y-1 mb-6">
+                      <p className="flex items-center justify-center gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        {leadSaved ? 'Lead saved to our system' : 'Message recorded'}
+                      </p>
+                      <p className="flex items-center justify-center gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        {emailSent ? 'Email notification sent to our team' : 'Team notified'}
+                      </p>
+                      <p className="flex items-center justify-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        You'll receive a confirmation email shortly
+                      </p>
                     </div>
+                    
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       <button 
                         onClick={() => window.open('https://wa.me/919834683297', '_blank')}
@@ -509,10 +647,6 @@ export default function Contact() {
                     
                     {/* Contact Form */}
                     <form ref={form} onSubmit={handleSubmit} className="space-y-6">
-                      {/* Hidden fields for EmailJS template */}
-                      <input type="hidden" name="to_name" value="Codastra Team" />
-                      <input type="hidden" name="contact_source" value="Website Contact Form" />
-                      
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-white text-sm font-semibold mb-2">Full Name *</label>
@@ -569,6 +703,12 @@ export default function Contact() {
                             placeholder="+1 (555) 123-4567"
                             maxLength={20}
                           />
+                          {errors.phone && (
+                            <p className="mt-2 text-red-400 text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                              {errors.phone}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-white text-sm font-semibold mb-2">Company</label>
@@ -635,7 +775,7 @@ export default function Contact() {
                           disabled={status === 'loading'}
                           className={inputClasses('message') + ' resize-vertical'}
                           placeholder="Tell us about your project requirements, timeline, and any specific features you need..."
-                          maxLength={1000}
+                          maxLength={2000}
                         />
                         <div className="flex justify-between items-center mt-2">
                           {errors.message ? (
@@ -646,8 +786,11 @@ export default function Contact() {
                           ) : (
                             <div />
                           )}
-                          <span className="text-gray-500 text-xs">
-                            {formData.message.length}/1000
+                          <span className={`text-sm ${
+                            formData.message.length > 2000 ? 'text-red-400' : 
+                            formData.message.length > 1600 ? 'text-yellow-400' : 'text-gray-500'
+                          }`}>
+                            {formData.message.length}/2000
                           </span>
                         </div>
                       </div>
