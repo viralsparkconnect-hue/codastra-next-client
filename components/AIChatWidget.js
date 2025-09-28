@@ -1,8 +1,8 @@
-// components/AIChatWidget.js - Complete Enhanced with Google Sheets Integration
+// components/AIChatWidget.js - Enhanced Sales Manager Bot (Pratik Rajput)
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
-// Simple icons as components to avoid external dependencies
+// Simple icons as components
 const MessageCircle = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.985L3 21l1.985-5.874A8.955 8.955 0 013 12a8 8 0 1118 0z" />
@@ -18,12 +18,6 @@ const X = ({ className }) => (
 const Send = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-  </svg>
-)
-
-const Bot = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
 )
 
@@ -45,7 +39,7 @@ export default function AIChatWidget() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi there! 👋 I'm Alex from Codastra's sales team. I'm here to help you transform your business with our digital solutions. What brings you here today?",
+      text: "Hi there! I'm Pratik Rajput, Sales Manager at Codastra. 👋 With 5+ years in international sales, I help businesses transform digitally. I've personally handled 200+ successful projects across 15 countries. What brings you here today?",
       isBot: true,
       timestamp: new Date()
     }
@@ -86,14 +80,15 @@ export default function AIChatWidget() {
   const saveLead = async () => {
     try {
       const conversationHistory = messages
-        .map(msg => `${msg.isBot ? 'Bot' : 'User'}: ${msg.text}`)
+        .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
         .join('\n')
 
       const leadPayload = {
         ...leadData,
         conversationHistory,
-        source: 'AI Chat Widget',
-        timestamp: new Date().toISOString()
+        source: 'AI Chat Widget - Pratik',
+        timestamp: new Date().toISOString(),
+        salesManager: 'Pratik Rajput'
       }
 
       const response = await fetch('/api/save-lead', {
@@ -114,7 +109,7 @@ export default function AIChatWidget() {
         try {
           await emailjs.send(
             process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
-            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_8w0jacd',
+            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
             {
               to_name: 'Codastra Team',
               from_name: leadData.name || 'Chat Lead',
@@ -122,7 +117,8 @@ export default function AIChatWidget() {
               phone: leadData.phone || 'No phone provided',
               service: leadData.service || 'General Inquiry',
               message: conversationHistory,
-              lead_source: 'AI Chat Widget'
+              lead_source: 'AI Chat Widget - Pratik Rajput',
+              sales_manager: 'Pratik Rajput'
             },
             process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
           )
@@ -138,7 +134,7 @@ export default function AIChatWidget() {
     }
   }
 
-  // Enhanced AI responses with sales conversation logic
+  // Enhanced AI responses with professional sales approach
   const getBotResponse = (userMessage, stage) => {
     const msg = userMessage.toLowerCase()
     
@@ -162,52 +158,67 @@ export default function AIChatWidget() {
       setLeadData(prev => ({ ...prev, name: foundName[1].trim() }))
     }
 
-    // Service-specific responses
+    // Service-specific responses with ROI focus
     if (msg.includes('web') || msg.includes('website') || msg.includes('site')) {
       setLeadData(prev => ({ ...prev, service: 'Web Development' }))
-      return "Excellent! Web development is one of our specialties. We've built 200+ websites using React, Next.js, and modern technologies. Are you looking to create a new website or redesign an existing one?"
+      return "Excellent choice! I've personally overseen 80+ website projects that averaged 250% ROI within 6 months. Our React/Next.js websites typically see 40% faster load times and 60% higher conversion rates. What's your current website challenge - outdated design, poor performance, or starting fresh?"
     }
     
     if (msg.includes('mobile') || msg.includes('app') || msg.includes('ios') || msg.includes('android')) {
       setLeadData(prev => ({ ...prev, service: 'Mobile App Development' }))
-      return "Perfect! We've developed 89+ mobile apps for iOS and Android. Our apps have generated amazing results for our clients. What type of app do you have in mind? E-commerce, business app, or something else?"
+      return "Perfect timing! Mobile apps are my specialty - I've launched 45+ apps with an average 4.8-star rating. Our clients typically see 300% user engagement increase. Are you thinking native iOS/Android or cross-platform React Native? What's the core functionality you need?"
     }
     
     if (msg.includes('marketing') || msg.includes('seo') || msg.includes('social media') || msg.includes('ads')) {
       setLeadData(prev => ({ ...prev, service: 'Digital Marketing' }))
-      return "Great choice! Our digital marketing campaigns have helped 234+ clients increase their ROI by an average of 250%. Are you looking to increase leads, improve brand awareness, or boost sales?"
+      return "Smart investment! Our marketing campaigns have generated $2.5M+ in client revenue this year alone. I personally manage accounts that average 180% ROAS. Are you looking to increase leads, improve brand awareness, or boost online sales? What's your current biggest marketing challenge?"
     }
     
     if (msg.includes('design') || msg.includes('logo') || msg.includes('brand') || msg.includes('graphics')) {
       setLeadData(prev => ({ ...prev, service: 'Branding & Design' }))
-      return "Wonderful! We've created stunning brand identities for 267+ companies. A strong brand can increase business value by 20-30%. Do you need a complete rebrand or specific design work?"
+      return "Great decision! Strong branding increases business value by 20-25%. I've worked with 150+ companies on brand transformation - from startups to Fortune 500s. Do you need a complete rebrand, logo refresh, or specific marketing materials? What industry are you in?"
     }
 
-    // Budget discussion
-    if (msg.includes('cost') || msg.includes('price') || msg.includes('budget') || msg.includes('$')) {
+    if (msg.includes('ecommerce') || msg.includes('e-commerce') || msg.includes('online store') || msg.includes('shop')) {
+      setLeadData(prev => ({ ...prev, service: 'E-commerce Development' }))
+      return "Fantastic opportunity! E-commerce is booming - I've built stores that hit $100K+ monthly revenue within 6 months. Our Shopify/WooCommerce solutions average 25% higher conversion rates than industry standard. What products are you selling, and what's your target market?"
+    }
+
+    // Budget and ROI discussion
+    if (msg.includes('cost') || msg.includes('price') || msg.includes('budget') || msg.includes('$') || msg.includes('investment')) {
       const budgetMatch = msg.match(/(\$?\d+(?:,\d{3})*(?:k|thousand|million)?)/i)
       if (budgetMatch) {
         setLeadData(prev => ({ ...prev, budget: budgetMatch[0] }))
       }
-      return "I understand budget is important. Our projects typically range from $999 to $10,000+ depending on complexity. What's your ideal investment range for this project? This helps me recommend the perfect solution for you."
+      return "I appreciate you thinking about investment wisely. Our projects range from $2,000 to $50,000+ depending on scope and complexity. Here's what matters most - ROI. Our average client sees 250% return within 8 months. What's your ideal budget range? I'll show you exactly how we can maximize your returns."
     }
 
-    // Timeline discussion
-    if (msg.includes('when') || msg.includes('timeline') || msg.includes('urgent') || msg.includes('asap') || msg.includes('deadline')) {
-      return "Great question! Most of our projects complete within 2-12 weeks depending on scope. Do you have a specific deadline in mind? Understanding your timeline helps us prioritize your project appropriately."
+    // Timeline and urgency
+    if (msg.includes('when') || msg.includes('timeline') || msg.includes('urgent') || msg.includes('asap') || msg.includes('deadline') || msg.includes('launch')) {
+      return "Great question! Speed matters in business. Our typical timelines: Simple websites (2-3 weeks), Complex web apps (6-8 weeks), Mobile apps (8-12 weeks). I can fast-track urgent projects with my priority team. What's driving your timeline - market opportunity, competitor pressure, or business launch?"
     }
 
-    // Contact information requests
+    // Competition and market positioning
+    if (msg.includes('competitor') || msg.includes('competition') || msg.includes('better than') || msg.includes('market')) {
+      return "Smart thinking! Competitive advantage is crucial. I've helped clients outrank competitors and capture market share. We analyze your competition and build solutions that give you the edge. Who are your main competitors, and what's their weakness you want to exploit?"
+    }
+
+    // Technology and technical questions
+    if (msg.includes('technology') || msg.includes('tech stack') || msg.includes('platform') || msg.includes('cms')) {
+      return "Great technical question! We use cutting-edge tech: React/Next.js for web, React Native for mobile, Node.js backends, AWS cloud infrastructure. I personally ensure we choose the right stack for your business goals, not just the latest trends. What specific technical challenges are you facing?"
+    }
+
+    // Contact information collection with urgency
     if (stage === 'collecting_info' || msg.includes('contact') || (!leadData.name && !leadData.email && awaitingInfo !== 'name' && awaitingInfo !== 'email' && awaitingInfo !== 'phone')) {
       if (!leadData.name && awaitingInfo !== 'name') {
         setAwaitingInfo('name')
-        return "I'd love to personalize our conversation! What's your name? 😊"
+        return "I'd love to personalize our conversation! What's your name? As a sales manager, I believe in building real relationships, not just transactions."
       } else if (!leadData.email && awaitingInfo !== 'email') {
         setAwaitingInfo('email')
-        return `Nice to meet you, ${leadData.name}! Could you share your email address? I'll send you a detailed proposal with pricing and next steps.`
+        return `Perfect to meet you, ${leadData.name}! What's your email address? I'll send you our portfolio with case studies showing exactly how we've helped businesses like yours achieve 200-300% growth. Plus, you'll get my direct contact for priority support.`
       } else if (!leadData.phone && awaitingInfo !== 'phone') {
         setAwaitingInfo('phone')
-        return "Perfect! And your phone number? Sometimes it's easier to discuss project details over a quick call."
+        return "Excellent! And your phone number? I prefer quick 10-15 minute strategy calls - they're way more effective than long email chains. I'll call you personally to discuss your project and share some insider tips that could save you thousands."
       }
     }
 
@@ -216,7 +227,7 @@ export default function AIChatWidget() {
       const extractedName = foundName ? foundName[1].trim() : userMessage.trim()
       setLeadData(prev => ({ ...prev, name: extractedName }))
       setAwaitingInfo('email')
-      return `Great to meet you, ${extractedName}! What's your email address? I'll send you a customized proposal with our best recommendations.`
+      return `${extractedName}, great to meet you! I'm excited to learn about your project. What's your email? I'll send you our exclusive client success stories and a custom strategy blueprint for your industry.`
     }
 
     if (awaitingInfo === 'email' && (foundEmail || msg.includes('@'))) {
@@ -229,7 +240,7 @@ export default function AIChatWidget() {
         }
       }
       setAwaitingInfo('phone')
-      return "Perfect! And could I get your phone number? Sometimes a quick 10-minute call can save hours of back-and-forth messaging. 📞"
+      return "Perfect! I'm preparing a custom proposal for you right now. What's your phone number? I guarantee a call with me will give you at least 3 actionable strategies to grow your business, whether you work with us or not. That's my commitment to every entrepreneur."
     }
 
     if (awaitingInfo === 'phone' && (foundPhone || msg.match(/\d{3}/) || msg.includes('phone') || msg.includes('number'))) {
@@ -247,53 +258,73 @@ export default function AIChatWidget() {
       setHasProvidedContact(true)
       setConversationStage('closing')
       
-      // Save lead info to Google Sheets and send email
+      // Save lead info
       setTimeout(() => saveLead(), 1000)
       
-      return `Excellent! I have all your details. I'm sending this conversation and your requirements to our project manager right now. You'll receive a detailed proposal within 2 hours, and I'll call you tomorrow to discuss next steps. Is there anything else about your project I should mention to the team?`
+      return `Outstanding! ${leadData.name}, I have all your details. Here's what happens next:\n\n✅ I'm sending your info to our project team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll call you personally tomorrow to discuss strategy\n✅ I'll share 3 growth hacks specific to your industry\n\nThis project sounds exciting! Any specific features or concerns I should highlight to our technical team?`
     }
 
-    // Qualification questions
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-      setConversationStage('qualifying')
-      return "Hello! 👋 I'm excited to learn about your project. What type of digital solution are you looking for? We specialize in:\n\n• Web Development\n• Mobile Apps  \n• Digital Marketing\n• Branding & Design\n• Cloud Solutions"
+    // Objection handling with social proof
+    if (msg.includes('expensive') || msg.includes('too much') || msg.includes('high price') || msg.includes('cost too much')) {
+      return "I totally understand - smart business owners question every investment. Here's the reality: Our cheapest client made $85K additional revenue in 8 months from a $5K investment. Our most expensive client ($40K project) generated $500K+ in the first year. Price isn't the issue - it's ROI. Want to see specific case studies in your industry?"
     }
 
-    // Objection handling
-    if (msg.includes('expensive') || msg.includes('too much') || msg.includes('high price')) {
-      return "I completely understand your concern about investment. Here's the thing - our clients typically see 250% ROI within 6 months. We're not the cheapest, but we deliver results that pay for themselves. Would you like to see some client case studies showing actual returns?"
+    if (msg.includes('think about') || msg.includes('consider') || msg.includes('not sure') || msg.includes('maybe later')) {
+      return "Absolutely, this is a big decision! Here's what I tell all my clients: while you're thinking, your competitors are acting. I've seen businesses lose market opportunities by waiting 6 months. How about this - let me send you our client results portfolio? No pressure, just proof. What's your email again?"
     }
 
-    if (msg.includes('think about') || msg.includes('consider') || msg.includes('not sure')) {
-      return "Absolutely, this is an important decision! While you're thinking, would you like me to send you our portfolio and client testimonials? No pressure - just so you can see the quality of work we deliver. What's your email address?"
+    if (msg.includes('other companies') || msg.includes('shopping around') || msg.includes('comparing')) {
+      return "Smart approach! I encourage comparing - it validates you'll make the right choice. Here's what sets us apart: I personally oversee every project, 99% on-time delivery rate, and our clients become long-term partners, not one-time transactions. What specific criteria are you using to compare companies?"
     }
 
-    // Closing responses
+    // Closing responses with urgency
     if (hasProvidedContact) {
-      return "Perfect! I've noted that down. Your dedicated project manager will include this in your custom proposal. You can expect to hear from us within 2 hours with a detailed plan and pricing. Thank you for choosing Codastra! 🚀"
+      return "Perfect! I've noted that for our technical team. Your project is now in our priority queue. Expect my call within 24 hours with a detailed roadmap and pricing. Pro tip: We're offering 15% off for projects starting this month. Ready to dominate your market? 🚀"
+    }
+
+    // Industry-specific responses
+    if (msg.includes('restaurant') || msg.includes('food') || msg.includes('cafe')) {
+      setLeadData(prev => ({ ...prev, service: 'Restaurant Solutions' }))
+      return "Food industry is booming online! I've helped restaurants increase orders by 300% with the right digital strategy. Online ordering, delivery apps, social media marketing - it all works together. What's your biggest challenge right now - online presence, delivery systems, or customer retention?"
+    }
+
+    if (msg.includes('real estate') || msg.includes('property') || msg.includes('realtor')) {
+      setLeadData(prev => ({ ...prev, service: 'Real Estate Solutions' }))
+      return "Real estate is perfect for digital transformation! I've built systems that helped agents close 40% more deals. Virtual tours, lead generation, CRM systems, automated follow-ups - the whole pipeline. Are you an agent, broker, or property developer? What's your biggest lead generation challenge?"
+    }
+
+    if (msg.includes('healthcare') || msg.includes('medical') || msg.includes('clinic') || msg.includes('doctor')) {
+      setLeadData(prev => ({ ...prev, service: 'Healthcare Solutions' }))
+      return "Healthcare digital transformation is crucial! I've helped medical practices reduce admin work by 50% and increase patient satisfaction scores by 35%. Patient portals, appointment systems, HIPAA-compliant solutions - we handle it all. What's your practice's biggest operational challenge?"
+    }
+
+    // Greeting and qualification responses
+    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('good morning') || msg.includes('good afternoon')) {
+      setConversationStage('qualifying')
+      return "Hello! Fantastic to connect with you. I'm here to help transform your business digitally. In my 5+ years managing international projects, I've seen businesses 3X their revenue with the right strategy. What's your biggest business challenge right now? Here's what we excel at:\n\n🌐 Web Development (avg 250% ROI)\n📱 Mobile Apps (avg 300% engagement boost)\n📈 Digital Marketing (avg 180% ROAS)\n🎨 Branding & Design\n☁️ Cloud Solutions"
     }
 
     // Default responses based on stage
     if (stage === 'greeting') {
       setConversationStage('qualifying')
-      return "Thanks for reaching out! I'd love to help you with your digital transformation. What specific challenge are you looking to solve, or what goal are you trying to achieve with your project?"
+      return "Thanks for reaching out! As someone who's helped 200+ businesses scale internationally, I'm excited to learn about your vision. What specific business goal are you trying to achieve? More customers, better efficiency, or entering new markets?"
     }
 
     if (stage === 'qualifying') {
       setConversationStage('collecting_info')
-      return "That sounds like an exciting project! To provide you with the most accurate proposal and timeline, I'd like to get a few details. What's your name?"
+      return "That sounds like an amazing opportunity! I can already see 3-4 strategies that could work perfectly for you. To create a winning proposal, I need a few details. First, what's your name? I prefer personal conversations - it's how I've built lasting partnerships with clients across 15 countries."
     }
 
-    // Fallback responses
-    const fallbackResponses = [
-      "That's interesting! Tell me more about what you have in mind for your project.",
-      "I see! What's the main goal you're trying to achieve with this project?",
-      "Great question! To give you the best recommendation, could you tell me more about your specific needs?",
-      "I'd love to help with that! What's your timeline for getting this project started?",
-      "Excellent! What's driving this project for your business right now?"
+    // Professional fallback responses
+    const professionalResponses = [
+      "That's a great point! Based on my experience with similar projects, here's what I'd recommend... But first, help me understand your specific situation better. What's your main business objective with this project?",
+      "Interesting perspective! I've seen this challenge before with other clients. The solution usually involves a strategic approach combining technology and marketing. What's your target audience looking for?",
+      "I love your thinking! In my 5+ years managing international projects, the most successful clients are those who ask detailed questions like this. What's driving this project - growth opportunity, competitive pressure, or operational efficiency?",
+      "Excellent question! This tells me you're serious about results, not just features. The best ROI comes from aligning technology with business strategy. What's your biggest business bottleneck right now?",
+      "Smart approach! I appreciate clients who think strategically. Based on your needs, I can recommend the perfect solution. What industry are you in, and who's your target customer?"
     ]
 
-    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
+    return professionalResponses[Math.floor(Math.random() * professionalResponses.length)]
   }
 
   const addMessage = (text, isBot = false) => {
@@ -317,12 +348,12 @@ export default function AIChatWidget() {
     // Store user message in lead data
     setLeadData(prev => ({ ...prev, message: prev.message + '\n' + userMessage }))
     
-    // Simulate typing delay
+    // Simulate typing delay (realistic response time)
     setTimeout(() => {
       const botResponse = getBotResponse(userMessage, conversationStage)
       addMessage(botResponse, true)
       setIsTyping(false)
-    }, 1000 + Math.random() * 1000) // 1-2 second delay
+    }, 1200 + Math.random() * 800) // 1.2-2 second delay
   }
 
   const handleKeyPress = (e) => {
@@ -340,7 +371,7 @@ export default function AIChatWidget() {
         className={`fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-blue-500/50 hover:scale-110 transition-all duration-300 flex items-center justify-center ${
           isOpen ? 'rotate-180' : 'animate-bounce'
         }`}
-        aria-label="Open chat"
+        aria-label="Chat with Pratik"
       >
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
         
@@ -359,14 +390,14 @@ export default function AIChatWidget() {
           <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-4 border-b border-gray-700/50">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-bold text-sm">
+                  PR
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gray-900"></div>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white">Alex - Sales Assistant</h3>
-                <p className="text-sm text-gray-400">Usually replies instantly</p>
+                <h3 className="font-semibold text-white">Pratik Rajput</h3>
+                <p className="text-sm text-blue-300">Sales Manager • Online now</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -385,8 +416,8 @@ export default function AIChatWidget() {
                 className={`flex items-start gap-2 ${msg.isBot ? '' : 'justify-end'}`}
               >
                 {msg.isBot && (
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    PR
                   </div>
                 )}
                 
@@ -414,14 +445,14 @@ export default function AIChatWidget() {
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex items-start gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                  PR
                 </div>
                 <div className="bg-gray-800 p-3 rounded-2xl border border-gray-700/50">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -438,7 +469,7 @@ export default function AIChatWidget() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
+                placeholder="Ask Pratik about your project..."
                 className="flex-1 bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-24 min-h-[48px]"
                 disabled={isTyping}
                 rows={1}
@@ -454,7 +485,7 @@ export default function AIChatWidget() {
             
             {/* Powered by */}
             <p className="text-xs text-gray-500 text-center mt-2">
-              Powered by <span className="text-blue-400">Codastra AI</span>
+              Powered by <span className="text-blue-400">Codastra AI</span> • Sales Manager: Pratik Rajput
             </p>
           </div>
 
@@ -463,7 +494,7 @@ export default function AIChatWidget() {
             <div className="absolute top-20 left-4 right-4 bg-green-600/20 border border-green-500/30 rounded-xl p-3 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-green-400 text-sm">
                 <Check className="w-4 h-4" />
-                <span>Lead saved successfully!</span>
+                <span>Lead saved! Pratik will contact you soon.</span>
               </div>
             </div>
           )}
