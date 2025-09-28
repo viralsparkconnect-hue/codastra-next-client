@@ -1,4 +1,4 @@
-// components/AIChatWidget.js - Enhanced Sales Manager Bot (Pratik Rajput)
+// components/AIChatWidget.js - Complete Fixed Version with Pratik Sales Manager
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
@@ -33,13 +33,19 @@ const Check = ({ className }) => (
   </svg>
 )
 
+const AlertTriangle = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+  </svg>
+)
+
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi there! I'm Pratik Rajput, Sales Manager at Codastra. 👋 With 5+ years in international sales, I help businesses transform digitally. I've personally handled 200+ successful projects across 15 countries. What brings you here today?",
+      text: "Hi there! I'm Pratik Rajput, Sales Manager at Codastra. With 5+ years in international sales, I help businesses transform digitally. I've personally handled 200+ successful projects across 15 countries. What brings you here today?",
       isBot: true,
       timestamp: new Date()
     }
@@ -59,9 +65,17 @@ export default function AIChatWidget() {
   const [awaitingInfo, setAwaitingInfo] = useState('')
   const [hasProvidedContact, setHasProvidedContact] = useState(false)
   const [leadSaved, setLeadSaved] = useState(false)
+  const [saveAttempted, setSaveAttempted] = useState(false)
   
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
+
+  // EmailJS Configuration
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
+    TEMPLATE_ID: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
+    PUBLIC_KEY: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+  }
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -76,21 +90,52 @@ export default function AIChatWidget() {
     }
   }, [message])
 
-  // Save lead to Google Sheets
+  // Initialize EmailJS when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
+      console.log('EmailJS initialized with public key:', EMAILJS_CONFIG.PUBLIC_KEY)
+    }
+  }, [])
+
+  // Save lead to Google Sheets and send email
   const saveLead = async () => {
+    if (saveAttempted) {
+      console.log('Save already attempted, skipping...')
+      return
+    }
+    
+    setSaveAttempted(true)
+    console.log('Starting to save lead from Pratik chat...')
+    console.log('Lead data:', leadData)
+
     try {
+      // Prepare conversation history
       const conversationHistory = messages
         .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
         .join('\n')
 
+      console.log('Conversation history length:', conversationHistory.length)
+
+      // Prepare lead payload for Google Sheets
       const leadPayload = {
-        ...leadData,
-        conversationHistory,
+        name: leadData.name || 'Unknown',
+        email: leadData.email || '',
+        phone: leadData.phone || '',
+        service: leadData.service || 'General Inquiry',
+        budget: leadData.budget || '',
+        timeline: leadData.timeline || '',
+        company: leadData.company || '',
+        message: leadData.message || conversationHistory,
+        conversationHistory: conversationHistory,
         source: 'AI Chat Widget - Pratik',
         timestamp: new Date().toISOString(),
         salesManager: 'Pratik Rajput'
       }
 
+      console.log('Sending POST request to /api/save-lead with payload:', leadPayload)
+
+      // Save to Google Sheets via API
       const response = await fetch('/api/save-lead', {
         method: 'POST',
         headers: {
@@ -99,38 +144,65 @@ export default function AIChatWidget() {
         body: JSON.stringify(leadPayload)
       })
 
+      console.log('API Response status:', response.status)
+      console.log('API Response headers:', response.headers)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const result = await response.json()
+      console.log('API Response data:', result)
       
       if (result.success) {
         setLeadSaved(true)
-        console.log('Lead saved successfully:', result.leadId)
+        console.log('Lead saved successfully to Google Sheets:', result.leadId)
         
-        // Also send email notification
+        // Send email notification using EmailJS
+        console.log('Attempting to send email via EmailJS...')
         try {
-          await emailjs.send(
-            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
-            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
-            {
-              to_name: 'Codastra Team',
-              from_name: leadData.name || 'Chat Lead',
-              from_email: leadData.email || 'No email provided',
-              phone: leadData.phone || 'No phone provided',
-              service: leadData.service || 'General Inquiry',
-              message: conversationHistory,
-              lead_source: 'AI Chat Widget - Pratik Rajput',
-              sales_manager: 'Pratik Rajput'
-            },
-            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+          const templateParams = {
+            to_name: 'Codastra Team',
+            from_name: leadData.name || 'Chat Lead',
+            from_email: leadData.email || 'No email provided',
+            phone: leadData.phone || 'No phone provided',
+            service: leadData.service || 'General Inquiry',
+            budget: leadData.budget || 'Not specified',
+            timeline: leadData.timeline || 'Not specified',
+            company: leadData.company || 'Not specified',
+            message: conversationHistory,
+            lead_source: 'AI Chat Widget - Pratik Rajput',
+            sales_manager: 'Pratik Rajput',
+            timestamp: new Date().toLocaleString('en-US', {
+              timeZone: 'Asia/Kolkata',
+              timeZoneName: 'short'
+            })
+          }
+
+          console.log('EmailJS template params:', templateParams)
+
+          const emailResult = await emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            templateParams,
+            EMAILJS_CONFIG.PUBLIC_KEY
           )
-          console.log('Email notification sent')
+
+          console.log('Email sent successfully via EmailJS:', emailResult.text)
+          
         } catch (emailError) {
-          console.error('Email sending failed:', emailError)
+          console.error('EmailJS error:', emailError)
+          // Don't fail the whole process if email fails
         }
       } else {
-        console.error('Failed to save lead:', result.error)
+        console.error('Failed to save lead to Google Sheets:', result.error)
+        throw new Error(result.error || 'Unknown error from Google Sheets API')
       }
+
     } catch (error) {
-      console.error('Error saving lead:', error)
+      console.error('Error in saveLead function:', error)
+      // Show error message to user
+      addMessage("I apologize, there was a technical issue saving your information. Please try contacting us directly at codastra.conect@gmail.com or +91 98346 83297.", true)
     }
   }
 
@@ -195,17 +267,8 @@ export default function AIChatWidget() {
 
     // Timeline and urgency
     if (msg.includes('when') || msg.includes('timeline') || msg.includes('urgent') || msg.includes('asap') || msg.includes('deadline') || msg.includes('launch')) {
+      setLeadData(prev => ({ ...prev, timeline: userMessage }))
       return "Great question! Speed matters in business. Our typical timelines: Simple websites (2-3 weeks), Complex web apps (6-8 weeks), Mobile apps (8-12 weeks). I can fast-track urgent projects with my priority team. What's driving your timeline - market opportunity, competitor pressure, or business launch?"
-    }
-
-    // Competition and market positioning
-    if (msg.includes('competitor') || msg.includes('competition') || msg.includes('better than') || msg.includes('market')) {
-      return "Smart thinking! Competitive advantage is crucial. I've helped clients outrank competitors and capture market share. We analyze your competition and build solutions that give you the edge. Who are your main competitors, and what's their weakness you want to exploit?"
-    }
-
-    // Technology and technical questions
-    if (msg.includes('technology') || msg.includes('tech stack') || msg.includes('platform') || msg.includes('cms')) {
-      return "Great technical question! We use cutting-edge tech: React/Next.js for web, React Native for mobile, Node.js backends, AWS cloud infrastructure. I personally ensure we choose the right stack for your business goals, not just the latest trends. What specific technical challenges are you facing?"
     }
 
     // Contact information collection with urgency
@@ -258,7 +321,7 @@ export default function AIChatWidget() {
       setHasProvidedContact(true)
       setConversationStage('closing')
       
-      // Save lead info
+      // Save lead info to Google Sheets and send email
       setTimeout(() => saveLead(), 1000)
       
       return `Outstanding! ${leadData.name}, I have all your details. Here's what happens next:\n\n✅ I'm sending your info to our project team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll call you personally tomorrow to discuss strategy\n✅ I'll share 3 growth hacks specific to your industry\n\nThis project sounds exciting! Any specific features or concerns I should highlight to our technical team?`
@@ -273,29 +336,9 @@ export default function AIChatWidget() {
       return "Absolutely, this is a big decision! Here's what I tell all my clients: while you're thinking, your competitors are acting. I've seen businesses lose market opportunities by waiting 6 months. How about this - let me send you our client results portfolio? No pressure, just proof. What's your email again?"
     }
 
-    if (msg.includes('other companies') || msg.includes('shopping around') || msg.includes('comparing')) {
-      return "Smart approach! I encourage comparing - it validates you'll make the right choice. Here's what sets us apart: I personally oversee every project, 99% on-time delivery rate, and our clients become long-term partners, not one-time transactions. What specific criteria are you using to compare companies?"
-    }
-
     // Closing responses with urgency
     if (hasProvidedContact) {
-      return "Perfect! I've noted that for our technical team. Your project is now in our priority queue. Expect my call within 24 hours with a detailed roadmap and pricing. Pro tip: We're offering 15% off for projects starting this month. Ready to dominate your market? 🚀"
-    }
-
-    // Industry-specific responses
-    if (msg.includes('restaurant') || msg.includes('food') || msg.includes('cafe')) {
-      setLeadData(prev => ({ ...prev, service: 'Restaurant Solutions' }))
-      return "Food industry is booming online! I've helped restaurants increase orders by 300% with the right digital strategy. Online ordering, delivery apps, social media marketing - it all works together. What's your biggest challenge right now - online presence, delivery systems, or customer retention?"
-    }
-
-    if (msg.includes('real estate') || msg.includes('property') || msg.includes('realtor')) {
-      setLeadData(prev => ({ ...prev, service: 'Real Estate Solutions' }))
-      return "Real estate is perfect for digital transformation! I've built systems that helped agents close 40% more deals. Virtual tours, lead generation, CRM systems, automated follow-ups - the whole pipeline. Are you an agent, broker, or property developer? What's your biggest lead generation challenge?"
-    }
-
-    if (msg.includes('healthcare') || msg.includes('medical') || msg.includes('clinic') || msg.includes('doctor')) {
-      setLeadData(prev => ({ ...prev, service: 'Healthcare Solutions' }))
-      return "Healthcare digital transformation is crucial! I've helped medical practices reduce admin work by 50% and increase patient satisfaction scores by 35%. Patient portals, appointment systems, HIPAA-compliant solutions - we handle it all. What's your practice's biggest operational challenge?"
+      return "Perfect! I've noted that for our technical team. Your project is now in our priority queue. Expect my call within 24 hours with a detailed roadmap and pricing. Pro tip: We're offering 15% off for projects starting this month. Ready to dominate your market?"
     }
 
     // Greeting and qualification responses
@@ -500,6 +543,3 @@ export default function AIChatWidget() {
           )}
         </div>
       )}
-    </>
-  )
-}
