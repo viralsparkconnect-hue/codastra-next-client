@@ -1,8 +1,8 @@
-// components/AIChatWidget.js - Fixed Lead Saving Issues
+// components/AIChatWidget.js - Improved Contact Collection
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
-// Simple icons as components (unchanged)
+// Icons (unchanged)
 const MessageCircle = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.985L3 21l1.985-5.874A8.955 8.955 0 013 12a8 8 0 1118 0z" />
@@ -63,7 +63,7 @@ export default function AIChatWidget() {
     message: ''
   })
   const [awaitingInfo, setAwaitingInfo] = useState('')
-  const [hasProvidedContact, setHasProvidedContact] = useState(false)
+  const [contactAttempts, setContactAttempts] = useState(0)
   const [leadSaved, setLeadSaved] = useState(false)
   const [leadSaveError, setLeadSaveError] = useState(false)
   const [saveAttempts, setSaveAttempts] = useState(0)
@@ -84,14 +84,16 @@ export default function AIChatWidget() {
     }
   }, [message])
 
-  // Save lead to Google Sheets - FIXED VERSION
-  const saveLead = async () => {
-    // Don't save if already saved or not enough data
+  // Save lead to backend - AGGRESSIVE VERSION
+  const saveLead = async (forceMinimal = false) => {
     if (leadSaved || saveAttempts >= 3) return
     
-    // Require at least name or email
-    if (!leadData.name && !leadData.email) {
-      console.log('Not enough lead data to save yet')
+    // More lenient saving criteria
+    const hasMinimalData = leadData.name || leadData.email || leadData.phone
+    const hasConversation = messages.length > 2
+    
+    if (!forceMinimal && !hasMinimalData) {
+      console.log('Insufficient data for lead save')
       return
     }
 
@@ -99,49 +101,44 @@ export default function AIChatWidget() {
     setLeadSaveError(false)
 
     try {
-      console.log('Attempting to save lead:', {
-        name: leadData.name,
-        email: leadData.email,
-        phone: leadData.phone,
-        service: leadData.service,
-        attempt: saveAttempts + 1
+      console.log('🔄 Attempting lead save:', {
+        attempt: saveAttempts + 1,
+        name: leadData.name || 'Anonymous',
+        email: leadData.email || 'No email',
+        hasConversation
       })
 
-      // Create conversation history
       const conversationHistory = messages
         .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
         .join('\n\n')
 
-      // Prepare lead payload with all available data
       const leadPayload = {
-        name: leadData.name.trim() || 'AI Chat Lead',
-        email: leadData.email.trim() || '',
-        phone: leadData.phone.trim() || '',
-        service: leadData.service || 'General Inquiry',
-        message: leadData.message || conversationHistory || 'AI Chat conversation',
+        name: leadData.name || `Anonymous Chat User ${Date.now()}`,
+        email: leadData.email || '',
+        phone: leadData.phone || '',
+        service: leadData.service || 'Chat Inquiry',
+        message: conversationHistory,
         budget: leadData.budget || '',
         timeline: leadData.timeline || '',
         company: leadData.company || '',
         source: 'AI Chat Widget - Pratik Rajput',
         timestamp: new Date().toISOString(),
         salesManager: 'Pratik Rajput',
-        conversationHistory: conversationHistory
+        conversationHistory: conversationHistory,
+        leadScore: calculateLeadScore(),
+        status: 'Chat Incomplete' // Special status for incomplete leads
       }
 
-      console.log('Sending lead payload to API:', leadPayload)
+      console.log('📤 Sending lead payload:', leadPayload)
 
-      // Save to Google Sheets via API
       const response = await fetch('/api/save-lead', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadPayload)
       })
 
-      console.log('API Response status:', response.status)
       const result = await response.json()
-      console.log('API Response data:', result)
+      console.log('📥 API Response:', result)
       
       if (result.success) {
         setLeadSaved(true)
@@ -151,96 +148,85 @@ export default function AIChatWidget() {
         // Send email notification
         await sendEmailNotification(leadPayload, conversationHistory)
         
-        // Show success message to user
-        setTimeout(() => {
-          addMessage("Great! I've saved your information and our team will contact you soon. You should receive a confirmation email shortly. 🎉", true)
-        }, 500)
-        
       } else {
-        throw new Error(result.error || 'API returned failure status')
+        throw new Error(result.error || 'API returned failure')
       }
 
     } catch (error) {
-      console.error('❌ Error saving lead:', error)
+      console.error('❌ Lead save error:', error)
       setLeadSaveError(true)
       
-      // Retry logic - try again in 2 seconds if not max attempts
+      // Retry logic
       if (saveAttempts < 2) {
-        console.log(`Retrying lead save in 2 seconds... (attempt ${saveAttempts + 1}/3)`)
-        setTimeout(() => {
-          saveLead()
-        }, 2000)
-      } else {
-        console.error('Max save attempts reached. Lead save failed.')
-        // Still try to send email notification
-        try {
-          const conversationHistory = messages
-            .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
-            .join('\n\n')
-          await sendEmailNotification(leadData, conversationHistory)
-        } catch (emailError) {
-          console.error('Email notification also failed:', emailError)
-        }
+        setTimeout(() => saveLead(forceMinimal), 3000)
       }
     }
+  }
+
+  // Calculate lead score based on available data
+  const calculateLeadScore = () => {
+    let score = 1 // Base score for engagement
+    
+    if (leadData.name) score += 2
+    if (leadData.email) score += 3
+    if (leadData.phone) score += 2
+    if (leadData.service) score += 1
+    if (messages.length > 4) score += 2 // Engagement
+    
+    return Math.min(score, 10)
   }
 
   // Send email notification
   const sendEmailNotification = async (data, conversationHistory) => {
     try {
-      console.log('Sending email notification...')
-      
-      const emailResult = await emailjs.send(
+      await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
         {
           to_name: 'Codastra Team',
-          from_name: data.name || 'AI Chat Lead',
+          from_name: data.name || 'Anonymous Chat User',
           from_email: data.email || 'No email provided',
           phone: data.phone || 'No phone provided',
-          service: data.service || 'General Inquiry',
-          message: conversationHistory || data.message || 'No message provided',
+          service: data.service || 'Chat Inquiry',
+          message: conversationHistory,
           lead_source: 'AI Chat Widget - Pratik Rajput',
           sales_manager: 'Pratik Rajput',
-          budget: data.budget || 'Not specified',
-          timeline: data.timeline || 'Not specified',
-          company: data.company || 'Not specified'
+          lead_score: data.leadScore || 'Unknown',
+          status: data.status || 'New'
         },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
       )
-      
-      console.log('✅ Email notification sent successfully:', emailResult.text)
-    } catch (emailError) {
-      console.error('❌ Email sending failed:', emailError)
+      console.log('✅ Email notification sent')
+    } catch (error) {
+      console.error('❌ Email failed:', error)
     }
   }
 
-  // Enhanced AI responses with better lead data collection
+  // Enhanced response system with persistent contact collection
   const getBotResponse = (userMessage, stage) => {
     const msg = userMessage.toLowerCase()
     
-    // Extract contact information more aggressively
+    // Extract contact information
     const emailRegex = /[\w\.-]+@[\w\.-]+\.\w+/g
-    const phoneRegex = /(\+?\d{1,4}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3,4}[\s-]?\d{3,4}/g
+    const phoneRegex = /(\+?\d{1,4}[\s-]?)?\(?\d{3,4}\)?[\s-]?\d{3,4}[\s-]?\d{3,5}/g
     const namePatterns = [
-      /(?:i'm|i am|my name is|call me|this is)\s+([a-zA-Z\s]+)/i,
-      /^([a-zA-Z\s]{2,30})(?:\s|$)/i  // First few words might be a name
+      /(?:i'm|i am|my name is|call me|this is|name:)\s*([a-zA-Z\s]{2,30})/i,
+      /^([a-zA-Z]{2,20}(?:\s+[a-zA-Z]{2,20}){0,2})(?:\s|$)/
     ]
     
     const foundEmail = userMessage.match(emailRegex)
     const foundPhone = userMessage.match(phoneRegex)
-    
-    // Try multiple name patterns
     let foundName = null
+    
     for (const pattern of namePatterns) {
       const match = userMessage.match(pattern)
-      if (match) {
+      if (match && match[1]) {
         foundName = match[1].trim()
         break
       }
     }
 
-    // Update lead data when contact info is found
+    // Update lead data
     let dataUpdated = false
     if (foundEmail && !leadData.email) {
       setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
@@ -255,37 +241,57 @@ export default function AIChatWidget() {
       dataUpdated = true
     }
 
-    // Auto-save when we get contact info
-    if (dataUpdated && (foundName || foundEmail)) {
-      console.log('Contact info detected, attempting auto-save...')
+    // Auto-save when we get any contact info
+    if (dataUpdated) {
+      console.log('Contact info detected, triggering save...')
       setTimeout(() => saveLead(), 1000)
     }
 
-    // Service detection and data collection
-    if (msg.includes('web') || msg.includes('website') || msg.includes('site')) {
+    // Service detection with immediate follow-up for contact
+    if (msg.includes('web') || msg.includes('website')) {
       setLeadData(prev => ({ ...prev, service: 'Web Development' }))
-      return "Excellent choice! I've personally overseen 80+ website projects that averaged 250% ROI within 6 months. Our React/Next.js websites typically see 40% faster load times and 60% higher conversion rates. What's your current website challenge - outdated design, poor performance, or starting fresh? Also, what's your name so I can personalize our conversation?"
-    }
-    
-    if (msg.includes('mobile') || msg.includes('app') || msg.includes('ios') || msg.includes('android')) {
-      setLeadData(prev => ({ ...prev, service: 'Mobile App Development' }))
-      return "Perfect timing! Mobile apps are my specialty - I've launched 45+ apps with an average 4.8-star rating. Our clients typically see 300% user engagement increase. Are you thinking native iOS/Android or cross-platform React Native? By the way, I'd love to know your name and email so I can send you some relevant case studies!"
-    }
-    
-    if (msg.includes('marketing') || msg.includes('seo') || msg.includes('social media') || msg.includes('ads')) {
-      setLeadData(prev => ({ ...prev, service: 'Digital Marketing' }))
-      return "Smart investment! Our marketing campaigns have generated $2.5M+ in client revenue this year alone. I personally manage accounts that average 180% ROAS. Are you looking to increase leads, improve brand awareness, or boost online sales? What's your name and email so I can share some specific results from your industry?"
+      
+      if (!leadData.name && !foundName) {
+        setAwaitingInfo('name')
+        return "Excellent! Web development is my specialty - I've built 80+ websites with an average 250% ROI. To create a perfect solution for you, what's your name? I like to keep things personal! 😊"
+      } else if (!leadData.email && !foundEmail) {
+        setAwaitingInfo('email')
+        return `Perfect choice, ${leadData.name || foundName}! I've personally overseen websites that get 40% faster load times and 60% higher conversions. What's your email? I'll send you our web development portfolio with real client results immediately!`
+      }
+      
+      return "Web development is a great investment! What specific features do you need for your website?"
     }
 
-    // Handle contact info collection based on stage
+    if (msg.includes('mobile') || msg.includes('app')) {
+      setLeadData(prev => ({ ...prev, service: 'Mobile App Development' }))
+      
+      if (!leadData.name && !foundName) {
+        setAwaitingInfo('name')
+        return "Mobile apps are the future! I've launched 45+ apps averaging 4.8-star ratings. What's your name so I can personalize my recommendations for your app idea?"
+      }
+      
+      return "Mobile app development is exciting! Are you thinking iOS, Android, or both?"
+    }
+
+    // Handle specific contact collection stages
     if (awaitingInfo === 'name') {
-      const extractedName = foundName || userMessage.trim().split(' ').slice(0, 2).join(' ')
+      const extractedName = foundName || userMessage.trim().split(/[^\w\s]/).filter(part => part.trim().length > 1)[0] || userMessage.trim()
+      
       if (extractedName && extractedName.length > 1) {
         setLeadData(prev => ({ ...prev, name: extractedName }))
         setAwaitingInfo('email')
-        return `${extractedName}, great to meet you! I'm excited to learn about your project. What's your email? I'll send you our exclusive client success stories and a custom strategy blueprint for your industry.`
+        setContactAttempts(prev => prev + 1)
+        
+        // Save partial lead
+        setTimeout(() => saveLead(), 500)
+        
+        return `${extractedName}, fantastic to meet you! 🎉 I'm already excited about your project. What's your email address? I'll immediately send you:\n\n📊 Our portfolio with 200+ successful projects\n💡 Industry-specific case studies\n📈 ROI benchmarks for your sector\n🎁 Free strategy consultation booking link`
       } else {
-        return "I'd love to know your name so I can personalize our conversation better. What should I call you?"
+        setContactAttempts(prev => prev + 1)
+        if (contactAttempts >= 2) {
+          return "No worries about the name! Let's focus on your project. What's your email so I can send you our portfolio? Even if you're just browsing, you'll get valuable insights about your industry! 📧"
+        }
+        return "I'd love to know what to call you! What's your name? 😊"
       }
     }
 
@@ -293,58 +299,56 @@ export default function AIChatWidget() {
       if (foundEmail) {
         setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
         setAwaitingInfo('phone')
-        return "Perfect! I'm preparing a custom proposal for you right now. What's your phone number? I guarantee a call with me will give you at least 3 actionable strategies to grow your business, whether you work with us or not. That's my commitment to every entrepreneur."
-      } else if (msg.includes('@') || msg.includes('email')) {
-        const possibleEmail = userMessage.match(/\S+@\S+\.\S+/)
-        if (possibleEmail) {
-          setLeadData(prev => ({ ...prev, email: possibleEmail[0] }))
+        setContactAttempts(prev => prev + 1)
+        
+        // Save with email
+        setTimeout(() => saveLead(), 500)
+        
+        return `Perfect! I'm sending resources to ${foundEmail[0]} right now! 📧 Last question - what's your phone number? I prefer quick 10-15 minute strategy calls over long emails. I guarantee you'll get at least 3 actionable insights, even if you don't work with us!`
+      } else {
+        setContactAttempts(prev => prev + 1)
+        if (contactAttempts >= 3) {
+          // Give up on email, try phone
           setAwaitingInfo('phone')
-          return "Great! Got your email. And your phone number? I prefer quick 10-15 minute strategy calls - they're way more effective than long email chains."
+          return "No problem! Some people prefer phone calls anyway. What's your phone number? I'll call you personally to discuss your project and share some insider strategies! 📱"
         }
+        return "I need your email to send you our exclusive resources! What's your email address? (Don't worry, no spam - just valuable content!) ✉️"
       }
-      return "I need your email address to send you our portfolio and case studies. What's your email?"
     }
 
     if (awaitingInfo === 'phone') {
       if (foundPhone) {
         setLeadData(prev => ({ ...prev, phone: foundPhone[0] }))
         setAwaitingInfo('')
-        setHasProvidedContact(true)
-        setConversationStage('closing')
         
-        // Trigger lead save
+        // Save complete lead
         setTimeout(() => saveLead(), 500)
         
-        return `Outstanding! ${leadData.name}, I have all your details. Here's what happens next:\n\n✅ I'm sending your info to our project team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll call you personally tomorrow to discuss strategy\n✅ I'll share 3 growth hacks specific to your industry\n\nThis project sounds exciting! Any specific features or concerns I should highlight to our technical team?`
+        return `Excellent! ${leadData.name}, I have all your details now! 🎯\n\n✅ Sending your info to our team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll personally call you tomorrow for strategy discussion\n✅ Immediate access to our client portal\n\nThis is going to be an amazing project! Any specific features you're excited about?`
       } else {
-        const phoneMatch = userMessage.match(/[\d\s\-\+\(\)]+/)
-        if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10) {
-          setLeadData(prev => ({ ...prev, phone: phoneMatch[0].trim() }))
-          setAwaitingInfo('')
-          setHasProvidedContact(true)
-          setConversationStage('closing')
-          
-          setTimeout(() => saveLead(), 500)
-          
-          return `Perfect! I have your contact details. I'm processing your information now and you'll hear from us soon with a custom proposal tailored to your needs. 🚀`
+        setContactAttempts(prev => prev + 1)
+        if (contactAttempts >= 4) {
+          // Final attempt - save what we have
+          setTimeout(() => saveLead(true), 1000)
+          return `No worries about the phone for now! I have enough to get started. My team will reach out via email with a detailed proposal. Thanks for your interest, ${leadData.name}! 🚀`
         }
+        return "What's your phone number? Quick calls are so much more effective than endless emails! I promise it'll be valuable! 📞"
       }
-      return "What's your phone number? I'd love to schedule a quick strategy call to discuss your project in detail."
     }
 
-    // If no contact info yet, start collecting
-    if (!leadData.name && !leadData.email && conversationStage !== 'collecting_info') {
-      setConversationStage('collecting_info')
+    // If we don't have basic contact info after a few exchanges, start collecting
+    if (messages.length > 3 && !leadData.name && !leadData.email && !awaitingInfo) {
       setAwaitingInfo('name')
-      return "I'd love to personalize our conversation and send you some relevant resources! What's your name?"
+      setContactAttempts(0)
+      return "I'm excited about helping with your project! To give you personalized recommendations, what's your name? 😊"
     }
 
-    // Default professional responses
+    // Default responses with contact prompts
     const responses = [
-      "That's a great point! Based on my experience with similar projects, I can definitely help you with that. What's your name and email so I can send you some specific examples?",
-      "Interesting! I've helped many clients with similar challenges. The key is finding the right strategy for your specific situation. What's your contact information so I can share some relevant case studies?",
-      "Excellent question! This shows you're thinking strategically about your business. I'd love to discuss this further - what's your name and email so I can follow up with detailed information?",
-      "I appreciate your interest! Based on what you're telling me, I can see several opportunities for growth. What's your name so I can personalize my recommendations?"
+      `That's interesting! I'd love to help you with that. By the way, what's your name so I can personalize my recommendations?`,
+      `Great question! I have some specific insights for your situation. What's your email so I can send you relevant case studies?`,
+      `Perfect! I can see several opportunities for your project. What's your phone number? A quick call would be much more effective than typing back and forth!`,
+      `Excellent point! Based on your needs, I have some targeted solutions. What should I call you?`
     ]
 
     return responses[Math.floor(Math.random() * responses.length)]
@@ -368,10 +372,17 @@ export default function AIChatWidget() {
     setMessage('')
     setIsTyping(true)
 
-    // Store user message in lead data
-    setLeadData(prev => ({ ...prev, message: prev.message + '\nUser: ' + userMessage }))
+    // Update lead message data
+    setLeadData(prev => ({ 
+      ...prev, 
+      message: prev.message + (prev.message ? '\n' : '') + `User: ${userMessage}` 
+    }))
     
-    // Simulate typing delay
+    // Auto-save every 3 messages as backup
+    if (messages.length % 3 === 0 && (leadData.name || leadData.email)) {
+      setTimeout(() => saveLead(), 2000)
+    }
+    
     setTimeout(() => {
       const botResponse = getBotResponse(userMessage, conversationStage)
       addMessage(botResponse, true)
@@ -398,7 +409,6 @@ export default function AIChatWidget() {
       >
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
         
-        {/* Notification dot */}
         {!isOpen && (
           <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
             <span className="text-xs text-white font-bold">1</span>
@@ -506,7 +516,6 @@ export default function AIChatWidget() {
               </button>
             </div>
             
-            {/* Powered by */}
             <p className="text-xs text-gray-500 text-center mt-2">
               Powered by <span className="text-blue-400">Codastra AI</span> • Sales Manager: Pratik Rajput
             </p>
@@ -517,7 +526,7 @@ export default function AIChatWidget() {
             <div className="absolute top-20 left-4 right-4 bg-green-600/20 border border-green-500/30 rounded-xl p-3 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-green-400 text-sm">
                 <Check className="w-4 h-4" />
-                <span>Lead saved! Pratik will contact you soon.</span>
+                <span>Information saved! Pratik will contact you soon.</span>
               </div>
             </div>
           )}
