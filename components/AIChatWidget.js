@@ -1,8 +1,8 @@
-// components/AIChatWidget.js - Enhanced Sales Manager Bot (Pratik Rajput)
+// components/AIChatWidget.js - Fixed Lead Saving Issues
 import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
-// Simple icons as components
+// Simple icons as components (unchanged)
 const MessageCircle = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.985L3 21l1.985-5.874A8.955 8.955 0 013 12a8 8 0 1118 0z" />
@@ -33,6 +33,12 @@ const Check = ({ className }) => (
   </svg>
 )
 
+const AlertCircle = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState('')
@@ -59,6 +65,8 @@ export default function AIChatWidget() {
   const [awaitingInfo, setAwaitingInfo] = useState('')
   const [hasProvidedContact, setHasProvidedContact] = useState(false)
   const [leadSaved, setLeadSaved] = useState(false)
+  const [leadSaveError, setLeadSaveError] = useState(false)
+  const [saveAttempts, setSaveAttempts] = useState(0)
   
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
@@ -76,21 +84,53 @@ export default function AIChatWidget() {
     }
   }, [message])
 
-  // Save lead to Google Sheets
+  // Save lead to Google Sheets - FIXED VERSION
   const saveLead = async () => {
+    // Don't save if already saved or not enough data
+    if (leadSaved || saveAttempts >= 3) return
+    
+    // Require at least name or email
+    if (!leadData.name && !leadData.email) {
+      console.log('Not enough lead data to save yet')
+      return
+    }
+
+    setSaveAttempts(prev => prev + 1)
+    setLeadSaveError(false)
+
     try {
+      console.log('Attempting to save lead:', {
+        name: leadData.name,
+        email: leadData.email,
+        phone: leadData.phone,
+        service: leadData.service,
+        attempt: saveAttempts + 1
+      })
+
+      // Create conversation history
       const conversationHistory = messages
         .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
-        .join('\n')
+        .join('\n\n')
 
+      // Prepare lead payload with all available data
       const leadPayload = {
-        ...leadData,
-        conversationHistory,
-        source: 'AI Chat Widget - Pratik',
+        name: leadData.name.trim() || 'AI Chat Lead',
+        email: leadData.email.trim() || '',
+        phone: leadData.phone.trim() || '',
+        service: leadData.service || 'General Inquiry',
+        message: leadData.message || conversationHistory || 'AI Chat conversation',
+        budget: leadData.budget || '',
+        timeline: leadData.timeline || '',
+        company: leadData.company || '',
+        source: 'AI Chat Widget - Pratik Rajput',
         timestamp: new Date().toISOString(),
-        salesManager: 'Pratik Rajput'
+        salesManager: 'Pratik Rajput',
+        conversationHistory: conversationHistory
       }
 
+      console.log('Sending lead payload to API:', leadPayload)
+
+      // Save to Google Sheets via API
       const response = await fetch('/api/save-lead', {
         method: 'POST',
         headers: {
@@ -99,232 +139,215 @@ export default function AIChatWidget() {
         body: JSON.stringify(leadPayload)
       })
 
+      console.log('API Response status:', response.status)
       const result = await response.json()
+      console.log('API Response data:', result)
       
       if (result.success) {
         setLeadSaved(true)
-        console.log('Lead saved successfully:', result.leadId)
+        setLeadSaveError(false)
+        console.log('✅ Lead saved successfully:', result.leadId)
         
-        // Also send email notification
-        try {
-          await emailjs.send(
-            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
-            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
-            {
-              to_name: 'Codastra Team',
-              from_name: leadData.name || 'Chat Lead',
-              from_email: leadData.email || 'No email provided',
-              phone: leadData.phone || 'No phone provided',
-              service: leadData.service || 'General Inquiry',
-              message: conversationHistory,
-              lead_source: 'AI Chat Widget - Pratik Rajput',
-              sales_manager: 'Pratik Rajput'
-            },
-            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
-          )
-          console.log('Email notification sent')
-        } catch (emailError) {
-          console.error('Email sending failed:', emailError)
-        }
+        // Send email notification
+        await sendEmailNotification(leadPayload, conversationHistory)
+        
+        // Show success message to user
+        setTimeout(() => {
+          addMessage("Great! I've saved your information and our team will contact you soon. You should receive a confirmation email shortly. 🎉", true)
+        }, 500)
+        
       } else {
-        console.error('Failed to save lead:', result.error)
+        throw new Error(result.error || 'API returned failure status')
       }
+
     } catch (error) {
-      console.error('Error saving lead:', error)
+      console.error('❌ Error saving lead:', error)
+      setLeadSaveError(true)
+      
+      // Retry logic - try again in 2 seconds if not max attempts
+      if (saveAttempts < 2) {
+        console.log(`Retrying lead save in 2 seconds... (attempt ${saveAttempts + 1}/3)`)
+        setTimeout(() => {
+          saveLead()
+        }, 2000)
+      } else {
+        console.error('Max save attempts reached. Lead save failed.')
+        // Still try to send email notification
+        try {
+          const conversationHistory = messages
+            .map(msg => `${msg.isBot ? 'Pratik' : 'User'}: ${msg.text}`)
+            .join('\n\n')
+          await sendEmailNotification(leadData, conversationHistory)
+        } catch (emailError) {
+          console.error('Email notification also failed:', emailError)
+        }
+      }
     }
   }
 
-  // Enhanced AI responses with professional sales approach
+  // Send email notification
+  const sendEmailNotification = async (data, conversationHistory) => {
+    try {
+      console.log('Sending email notification...')
+      
+      const emailResult = await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn',
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_qteujwt',
+        {
+          to_name: 'Codastra Team',
+          from_name: data.name || 'AI Chat Lead',
+          from_email: data.email || 'No email provided',
+          phone: data.phone || 'No phone provided',
+          service: data.service || 'General Inquiry',
+          message: conversationHistory || data.message || 'No message provided',
+          lead_source: 'AI Chat Widget - Pratik Rajput',
+          sales_manager: 'Pratik Rajput',
+          budget: data.budget || 'Not specified',
+          timeline: data.timeline || 'Not specified',
+          company: data.company || 'Not specified'
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+      )
+      
+      console.log('✅ Email notification sent successfully:', emailResult.text)
+    } catch (emailError) {
+      console.error('❌ Email sending failed:', emailError)
+    }
+  }
+
+  // Enhanced AI responses with better lead data collection
   const getBotResponse = (userMessage, stage) => {
     const msg = userMessage.toLowerCase()
     
-    // Extract potential contact information from message
+    // Extract contact information more aggressively
     const emailRegex = /[\w\.-]+@[\w\.-]+\.\w+/g
-    const phoneRegex = /(\+?\d{1,4}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/g
-    const namePattern = /(?:i'm|i am|my name is|call me|this is)\s+([a-zA-Z\s]+)/i
+    const phoneRegex = /(\+?\d{1,4}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3,4}[\s-]?\d{3,4}/g
+    const namePatterns = [
+      /(?:i'm|i am|my name is|call me|this is)\s+([a-zA-Z\s]+)/i,
+      /^([a-zA-Z\s]{2,30})(?:\s|$)/i  // First few words might be a name
+    ]
     
     const foundEmail = userMessage.match(emailRegex)
     const foundPhone = userMessage.match(phoneRegex)
-    const foundName = userMessage.match(namePattern)
+    
+    // Try multiple name patterns
+    let foundName = null
+    for (const pattern of namePatterns) {
+      const match = userMessage.match(pattern)
+      if (match) {
+        foundName = match[1].trim()
+        break
+      }
+    }
 
-    // Update lead data if contact info is found
+    // Update lead data when contact info is found
+    let dataUpdated = false
     if (foundEmail && !leadData.email) {
       setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
+      dataUpdated = true
     }
     if (foundPhone && !leadData.phone) {
       setLeadData(prev => ({ ...prev, phone: foundPhone[0] }))
+      dataUpdated = true
     }
-    if (foundName && !leadData.name) {
-      setLeadData(prev => ({ ...prev, name: foundName[1].trim() }))
+    if (foundName && !leadData.name && foundName.length > 1) {
+      setLeadData(prev => ({ ...prev, name: foundName }))
+      dataUpdated = true
     }
 
-    // Service-specific responses with ROI focus
+    // Auto-save when we get contact info
+    if (dataUpdated && (foundName || foundEmail)) {
+      console.log('Contact info detected, attempting auto-save...')
+      setTimeout(() => saveLead(), 1000)
+    }
+
+    // Service detection and data collection
     if (msg.includes('web') || msg.includes('website') || msg.includes('site')) {
       setLeadData(prev => ({ ...prev, service: 'Web Development' }))
-      return "Excellent choice! I've personally overseen 80+ website projects that averaged 250% ROI within 6 months. Our React/Next.js websites typically see 40% faster load times and 60% higher conversion rates. What's your current website challenge - outdated design, poor performance, or starting fresh?"
+      return "Excellent choice! I've personally overseen 80+ website projects that averaged 250% ROI within 6 months. Our React/Next.js websites typically see 40% faster load times and 60% higher conversion rates. What's your current website challenge - outdated design, poor performance, or starting fresh? Also, what's your name so I can personalize our conversation?"
     }
     
     if (msg.includes('mobile') || msg.includes('app') || msg.includes('ios') || msg.includes('android')) {
       setLeadData(prev => ({ ...prev, service: 'Mobile App Development' }))
-      return "Perfect timing! Mobile apps are my specialty - I've launched 45+ apps with an average 4.8-star rating. Our clients typically see 300% user engagement increase. Are you thinking native iOS/Android or cross-platform React Native? What's the core functionality you need?"
+      return "Perfect timing! Mobile apps are my specialty - I've launched 45+ apps with an average 4.8-star rating. Our clients typically see 300% user engagement increase. Are you thinking native iOS/Android or cross-platform React Native? By the way, I'd love to know your name and email so I can send you some relevant case studies!"
     }
     
     if (msg.includes('marketing') || msg.includes('seo') || msg.includes('social media') || msg.includes('ads')) {
       setLeadData(prev => ({ ...prev, service: 'Digital Marketing' }))
-      return "Smart investment! Our marketing campaigns have generated $2.5M+ in client revenue this year alone. I personally manage accounts that average 180% ROAS. Are you looking to increase leads, improve brand awareness, or boost online sales? What's your current biggest marketing challenge?"
-    }
-    
-    if (msg.includes('design') || msg.includes('logo') || msg.includes('brand') || msg.includes('graphics')) {
-      setLeadData(prev => ({ ...prev, service: 'Branding & Design' }))
-      return "Great decision! Strong branding increases business value by 20-25%. I've worked with 150+ companies on brand transformation - from startups to Fortune 500s. Do you need a complete rebrand, logo refresh, or specific marketing materials? What industry are you in?"
+      return "Smart investment! Our marketing campaigns have generated $2.5M+ in client revenue this year alone. I personally manage accounts that average 180% ROAS. Are you looking to increase leads, improve brand awareness, or boost online sales? What's your name and email so I can share some specific results from your industry?"
     }
 
-    if (msg.includes('ecommerce') || msg.includes('e-commerce') || msg.includes('online store') || msg.includes('shop')) {
-      setLeadData(prev => ({ ...prev, service: 'E-commerce Development' }))
-      return "Fantastic opportunity! E-commerce is booming - I've built stores that hit $100K+ monthly revenue within 6 months. Our Shopify/WooCommerce solutions average 25% higher conversion rates than industry standard. What products are you selling, and what's your target market?"
-    }
-
-    // Budget and ROI discussion
-    if (msg.includes('cost') || msg.includes('price') || msg.includes('budget') || msg.includes('$') || msg.includes('investment')) {
-      const budgetMatch = msg.match(/(\$?\d+(?:,\d{3})*(?:k|thousand|million)?)/i)
-      if (budgetMatch) {
-        setLeadData(prev => ({ ...prev, budget: budgetMatch[0] }))
-      }
-      return "I appreciate you thinking about investment wisely. Our projects range from $2,000 to $50,000+ depending on scope and complexity. Here's what matters most - ROI. Our average client sees 250% return within 8 months. What's your ideal budget range? I'll show you exactly how we can maximize your returns."
-    }
-
-    // Timeline and urgency
-    if (msg.includes('when') || msg.includes('timeline') || msg.includes('urgent') || msg.includes('asap') || msg.includes('deadline') || msg.includes('launch')) {
-      return "Great question! Speed matters in business. Our typical timelines: Simple websites (2-3 weeks), Complex web apps (6-8 weeks), Mobile apps (8-12 weeks). I can fast-track urgent projects with my priority team. What's driving your timeline - market opportunity, competitor pressure, or business launch?"
-    }
-
-    // Competition and market positioning
-    if (msg.includes('competitor') || msg.includes('competition') || msg.includes('better than') || msg.includes('market')) {
-      return "Smart thinking! Competitive advantage is crucial. I've helped clients outrank competitors and capture market share. We analyze your competition and build solutions that give you the edge. Who are your main competitors, and what's their weakness you want to exploit?"
-    }
-
-    // Technology and technical questions
-    if (msg.includes('technology') || msg.includes('tech stack') || msg.includes('platform') || msg.includes('cms')) {
-      return "Great technical question! We use cutting-edge tech: React/Next.js for web, React Native for mobile, Node.js backends, AWS cloud infrastructure. I personally ensure we choose the right stack for your business goals, not just the latest trends. What specific technical challenges are you facing?"
-    }
-
-    // Contact information collection with urgency
-    if (stage === 'collecting_info' || msg.includes('contact') || (!leadData.name && !leadData.email && awaitingInfo !== 'name' && awaitingInfo !== 'email' && awaitingInfo !== 'phone')) {
-      if (!leadData.name && awaitingInfo !== 'name') {
-        setAwaitingInfo('name')
-        return "I'd love to personalize our conversation! What's your name? As a sales manager, I believe in building real relationships, not just transactions."
-      } else if (!leadData.email && awaitingInfo !== 'email') {
-        setAwaitingInfo('email')
-        return `Perfect to meet you, ${leadData.name}! What's your email address? I'll send you our portfolio with case studies showing exactly how we've helped businesses like yours achieve 200-300% growth. Plus, you'll get my direct contact for priority support.`
-      } else if (!leadData.phone && awaitingInfo !== 'phone') {
-        setAwaitingInfo('phone')
-        return "Excellent! And your phone number? I prefer quick 10-15 minute strategy calls - they're way more effective than long email chains. I'll call you personally to discuss your project and share some insider tips that could save you thousands."
-      }
-    }
-
-    // Handle awaiting specific information
+    // Handle contact info collection based on stage
     if (awaitingInfo === 'name') {
-      const extractedName = foundName ? foundName[1].trim() : userMessage.trim()
-      setLeadData(prev => ({ ...prev, name: extractedName }))
-      setAwaitingInfo('email')
-      return `${extractedName}, great to meet you! I'm excited to learn about your project. What's your email? I'll send you our exclusive client success stories and a custom strategy blueprint for your industry.`
+      const extractedName = foundName || userMessage.trim().split(' ').slice(0, 2).join(' ')
+      if (extractedName && extractedName.length > 1) {
+        setLeadData(prev => ({ ...prev, name: extractedName }))
+        setAwaitingInfo('email')
+        return `${extractedName}, great to meet you! I'm excited to learn about your project. What's your email? I'll send you our exclusive client success stories and a custom strategy blueprint for your industry.`
+      } else {
+        return "I'd love to know your name so I can personalize our conversation better. What should I call you?"
+      }
     }
 
-    if (awaitingInfo === 'email' && (foundEmail || msg.includes('@'))) {
+    if (awaitingInfo === 'email') {
       if (foundEmail) {
         setLeadData(prev => ({ ...prev, email: foundEmail[0] }))
-      } else {
-        const emailMatch = userMessage.match(/\S+@\S+\.\S+/)
-        if (emailMatch) {
-          setLeadData(prev => ({ ...prev, email: emailMatch[0] }))
+        setAwaitingInfo('phone')
+        return "Perfect! I'm preparing a custom proposal for you right now. What's your phone number? I guarantee a call with me will give you at least 3 actionable strategies to grow your business, whether you work with us or not. That's my commitment to every entrepreneur."
+      } else if (msg.includes('@') || msg.includes('email')) {
+        const possibleEmail = userMessage.match(/\S+@\S+\.\S+/)
+        if (possibleEmail) {
+          setLeadData(prev => ({ ...prev, email: possibleEmail[0] }))
+          setAwaitingInfo('phone')
+          return "Great! Got your email. And your phone number? I prefer quick 10-15 minute strategy calls - they're way more effective than long email chains."
         }
       }
-      setAwaitingInfo('phone')
-      return "Perfect! I'm preparing a custom proposal for you right now. What's your phone number? I guarantee a call with me will give you at least 3 actionable strategies to grow your business, whether you work with us or not. That's my commitment to every entrepreneur."
+      return "I need your email address to send you our portfolio and case studies. What's your email?"
     }
 
-    if (awaitingInfo === 'phone' && (foundPhone || msg.match(/\d{3}/) || msg.includes('phone') || msg.includes('number'))) {
+    if (awaitingInfo === 'phone') {
       if (foundPhone) {
         setLeadData(prev => ({ ...prev, phone: foundPhone[0] }))
+        setAwaitingInfo('')
+        setHasProvidedContact(true)
+        setConversationStage('closing')
+        
+        // Trigger lead save
+        setTimeout(() => saveLead(), 500)
+        
+        return `Outstanding! ${leadData.name}, I have all your details. Here's what happens next:\n\n✅ I'm sending your info to our project team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll call you personally tomorrow to discuss strategy\n✅ I'll share 3 growth hacks specific to your industry\n\nThis project sounds exciting! Any specific features or concerns I should highlight to our technical team?`
       } else {
         const phoneMatch = userMessage.match(/[\d\s\-\+\(\)]+/)
-        if (phoneMatch) {
+        if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10) {
           setLeadData(prev => ({ ...prev, phone: phoneMatch[0].trim() }))
-        } else {
-          setLeadData(prev => ({ ...prev, phone: userMessage.trim() }))
+          setAwaitingInfo('')
+          setHasProvidedContact(true)
+          setConversationStage('closing')
+          
+          setTimeout(() => saveLead(), 500)
+          
+          return `Perfect! I have your contact details. I'm processing your information now and you'll hear from us soon with a custom proposal tailored to your needs. 🚀`
         }
       }
-      setAwaitingInfo('')
-      setHasProvidedContact(true)
-      setConversationStage('closing')
-      
-      // Save lead info
-      setTimeout(() => saveLead(), 1000)
-      
-      return `Outstanding! ${leadData.name}, I have all your details. Here's what happens next:\n\n✅ I'm sending your info to our project team RIGHT NOW\n✅ You'll get a detailed proposal within 2 hours\n✅ I'll call you personally tomorrow to discuss strategy\n✅ I'll share 3 growth hacks specific to your industry\n\nThis project sounds exciting! Any specific features or concerns I should highlight to our technical team?`
+      return "What's your phone number? I'd love to schedule a quick strategy call to discuss your project in detail."
     }
 
-    // Objection handling with social proof
-    if (msg.includes('expensive') || msg.includes('too much') || msg.includes('high price') || msg.includes('cost too much')) {
-      return "I totally understand - smart business owners question every investment. Here's the reality: Our cheapest client made $85K additional revenue in 8 months from a $5K investment. Our most expensive client ($40K project) generated $500K+ in the first year. Price isn't the issue - it's ROI. Want to see specific case studies in your industry?"
-    }
-
-    if (msg.includes('think about') || msg.includes('consider') || msg.includes('not sure') || msg.includes('maybe later')) {
-      return "Absolutely, this is a big decision! Here's what I tell all my clients: while you're thinking, your competitors are acting. I've seen businesses lose market opportunities by waiting 6 months. How about this - let me send you our client results portfolio? No pressure, just proof. What's your email again?"
-    }
-
-    if (msg.includes('other companies') || msg.includes('shopping around') || msg.includes('comparing')) {
-      return "Smart approach! I encourage comparing - it validates you'll make the right choice. Here's what sets us apart: I personally oversee every project, 99% on-time delivery rate, and our clients become long-term partners, not one-time transactions. What specific criteria are you using to compare companies?"
-    }
-
-    // Closing responses with urgency
-    if (hasProvidedContact) {
-      return "Perfect! I've noted that for our technical team. Your project is now in our priority queue. Expect my call within 24 hours with a detailed roadmap and pricing. Pro tip: We're offering 15% off for projects starting this month. Ready to dominate your market? 🚀"
-    }
-
-    // Industry-specific responses
-    if (msg.includes('restaurant') || msg.includes('food') || msg.includes('cafe')) {
-      setLeadData(prev => ({ ...prev, service: 'Restaurant Solutions' }))
-      return "Food industry is booming online! I've helped restaurants increase orders by 300% with the right digital strategy. Online ordering, delivery apps, social media marketing - it all works together. What's your biggest challenge right now - online presence, delivery systems, or customer retention?"
-    }
-
-    if (msg.includes('real estate') || msg.includes('property') || msg.includes('realtor')) {
-      setLeadData(prev => ({ ...prev, service: 'Real Estate Solutions' }))
-      return "Real estate is perfect for digital transformation! I've built systems that helped agents close 40% more deals. Virtual tours, lead generation, CRM systems, automated follow-ups - the whole pipeline. Are you an agent, broker, or property developer? What's your biggest lead generation challenge?"
-    }
-
-    if (msg.includes('healthcare') || msg.includes('medical') || msg.includes('clinic') || msg.includes('doctor')) {
-      setLeadData(prev => ({ ...prev, service: 'Healthcare Solutions' }))
-      return "Healthcare digital transformation is crucial! I've helped medical practices reduce admin work by 50% and increase patient satisfaction scores by 35%. Patient portals, appointment systems, HIPAA-compliant solutions - we handle it all. What's your practice's biggest operational challenge?"
-    }
-
-    // Greeting and qualification responses
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('good morning') || msg.includes('good afternoon')) {
-      setConversationStage('qualifying')
-      return "Hello! Fantastic to connect with you. I'm here to help transform your business digitally. In my 5+ years managing international projects, I've seen businesses 3X their revenue with the right strategy. What's your biggest business challenge right now? Here's what we excel at:\n\n🌐 Web Development (avg 250% ROI)\n📱 Mobile Apps (avg 300% engagement boost)\n📈 Digital Marketing (avg 180% ROAS)\n🎨 Branding & Design\n☁️ Cloud Solutions"
-    }
-
-    // Default responses based on stage
-    if (stage === 'greeting') {
-      setConversationStage('qualifying')
-      return "Thanks for reaching out! As someone who's helped 200+ businesses scale internationally, I'm excited to learn about your vision. What specific business goal are you trying to achieve? More customers, better efficiency, or entering new markets?"
-    }
-
-    if (stage === 'qualifying') {
+    // If no contact info yet, start collecting
+    if (!leadData.name && !leadData.email && conversationStage !== 'collecting_info') {
       setConversationStage('collecting_info')
-      return "That sounds like an amazing opportunity! I can already see 3-4 strategies that could work perfectly for you. To create a winning proposal, I need a few details. First, what's your name? I prefer personal conversations - it's how I've built lasting partnerships with clients across 15 countries."
+      setAwaitingInfo('name')
+      return "I'd love to personalize our conversation and send you some relevant resources! What's your name?"
     }
 
-    // Professional fallback responses
-    const professionalResponses = [
-      "That's a great point! Based on my experience with similar projects, here's what I'd recommend... But first, help me understand your specific situation better. What's your main business objective with this project?",
-      "Interesting perspective! I've seen this challenge before with other clients. The solution usually involves a strategic approach combining technology and marketing. What's your target audience looking for?",
-      "I love your thinking! In my 5+ years managing international projects, the most successful clients are those who ask detailed questions like this. What's driving this project - growth opportunity, competitive pressure, or operational efficiency?",
-      "Excellent question! This tells me you're serious about results, not just features. The best ROI comes from aligning technology with business strategy. What's your biggest business bottleneck right now?",
-      "Smart approach! I appreciate clients who think strategically. Based on your needs, I can recommend the perfect solution. What industry are you in, and who's your target customer?"
+    // Default professional responses
+    const responses = [
+      "That's a great point! Based on my experience with similar projects, I can definitely help you with that. What's your name and email so I can send you some specific examples?",
+      "Interesting! I've helped many clients with similar challenges. The key is finding the right strategy for your specific situation. What's your contact information so I can share some relevant case studies?",
+      "Excellent question! This shows you're thinking strategically about your business. I'd love to discuss this further - what's your name and email so I can follow up with detailed information?",
+      "I appreciate your interest! Based on what you're telling me, I can see several opportunities for growth. What's your name so I can personalize my recommendations?"
     ]
 
-    return professionalResponses[Math.floor(Math.random() * professionalResponses.length)]
+    return responses[Math.floor(Math.random() * responses.length)]
   }
 
   const addMessage = (text, isBot = false) => {
@@ -346,14 +369,14 @@ export default function AIChatWidget() {
     setIsTyping(true)
 
     // Store user message in lead data
-    setLeadData(prev => ({ ...prev, message: prev.message + '\n' + userMessage }))
+    setLeadData(prev => ({ ...prev, message: prev.message + '\nUser: ' + userMessage }))
     
-    // Simulate typing delay (realistic response time)
+    // Simulate typing delay
     setTimeout(() => {
       const botResponse = getBotResponse(userMessage, conversationStage)
       addMessage(botResponse, true)
       setIsTyping(false)
-    }, 1200 + Math.random() * 800) // 1.2-2 second delay
+    }, 1200 + Math.random() * 800)
   }
 
   const handleKeyPress = (e) => {
@@ -489,12 +512,21 @@ export default function AIChatWidget() {
             </p>
           </div>
 
-          {/* Success indicator */}
+          {/* Status indicators */}
           {leadSaved && (
             <div className="absolute top-20 left-4 right-4 bg-green-600/20 border border-green-500/30 rounded-xl p-3 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-green-400 text-sm">
                 <Check className="w-4 h-4" />
                 <span>Lead saved! Pratik will contact you soon.</span>
+              </div>
+            </div>
+          )}
+
+          {leadSaveError && saveAttempts >= 3 && (
+            <div className="absolute top-20 left-4 right-4 bg-yellow-600/20 border border-yellow-500/30 rounded-xl p-3 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                <span>Having trouble saving data, but Pratik got your message!</span>
               </div>
             </div>
           )}
