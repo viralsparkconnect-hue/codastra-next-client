@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import * as XLSX from 'xlsx'
 
 // Icons
 const Lock = ({ className }) => (
@@ -42,12 +41,6 @@ const Search = ({ className }) => (
 const Download = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-  </svg>
-)
-
-const Upload = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
   </svg>
 )
 
@@ -105,6 +98,12 @@ const Sparkles = ({ className }) => (
   </svg>
 )
 
+const Refresh = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+)
+
 export default function CRMAdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
@@ -126,7 +125,6 @@ export default function CRMAdminPage() {
   const [uploadStatus, setUploadStatus] = useState('')
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Mouse tracking
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
@@ -364,102 +362,38 @@ export default function CRMAdminPage() {
     }
   }
 
-  const handleDownloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(leads.map(lead => ({
-      'Name': lead.name,
-      'Email': lead.email,
-      'Phone': lead.phone,
-      'Company': lead.company,
-      'Service': lead.service,
-      'Status': lead.status,
-      'Lead Score': lead.lead_score,
-      'Budget': lead.budget,
-      'Timeline': lead.timeline,
-      'Source': lead.source,
-      'Follow-up Date': lead.follow_up_date,
-      'Message': lead.message,
-      'Notes': lead.notes,
-      'Created': new Date(lead.timestamp).toLocaleString()
-    })))
+  const handleDownloadCSV = () => {
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Service', 'Status', 'Lead Score', 'Budget', 'Timeline', 'Source', 'Follow-up Date', 'Message', 'Notes', 'Created']
     
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads')
-    XLSX.writeFile(workbook, `Codastra_Leads_${new Date().toISOString().split('T')[0]}.xlsx`)
-  }
+    const csvData = leads.map(lead => [
+      lead.name,
+      lead.email,
+      lead.phone,
+      lead.company,
+      lead.service,
+      lead.status,
+      lead.lead_score,
+      lead.budget,
+      lead.timeline,
+      lead.source,
+      lead.follow_up_date,
+      `"${(lead.message || '').replace(/"/g, '""')}"`,
+      `"${(lead.notes || '').replace(/"/g, '""')}"`,
+      new Date(lead.timestamp).toLocaleString()
+    ])
 
-  const handleUploadExcel = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
+    const csv = [
+      headers.join(','),
+      ...csvData.map(row => row.join(','))
+    ].join('\n')
 
-    setUploadStatus('Processing Excel file...')
-    const reader = new FileReader()
-
-    reader.onload = async (event) => {
-      try {
-        const workbook = XLSX.read(event.target.result, { type: 'binary' })
-        const sheetName = workbook.SheetNames[0]
-        const sheet = workbook.Sheets[sheetName]
-        const data = XLSX.utils.sheet_to_json(sheet)
-
-        setUploadStatus(`Uploading ${data.length} leads to Google Sheets...`)
-
-        let successCount = 0
-        let failCount = 0
-
-        for (let i = 0; i < data.length; i++) {
-          const row = data[i]
-          
-          try {
-            const response = await fetch('/api/save-lead', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                name: row.Name || row.name || '',
-                email: row.Email || row.email || '',
-                phone: row.Phone || row.phone || '',
-                company: row.Company || row.company || '',
-                service: row.Service || row.service || 'General Inquiry',
-                status: row.Status || row.status || 'New',
-                lead_score: parseInt(row['Lead Score'] || row.lead_score || 5),
-                budget: row.Budget || row.budget || '',
-                timeline: row.Timeline || row.timeline || '',
-                source: 'Excel Import',
-                follow_up_date: row['Follow-up Date'] || row.follow_up_date || '',
-                message: row.Message || row.message || '',
-                notes: row.Notes || row.notes || `Imported from Excel on ${new Date().toLocaleDateString()}`
-              })
-            })
-
-            const result = await response.json()
-            
-            if (result.success) {
-              successCount++
-            } else {
-              failCount++
-            }
-
-            setUploadStatus(`Uploading... ${i + 1}/${data.length} (${successCount} successful)`)
-            await new Promise(resolve => setTimeout(resolve, 300))
-            
-          } catch (error) {
-            console.error('Error uploading lead:', error)
-            failCount++
-          }
-        }
-
-        await loadLeads()
-        setUploadStatus(`✓ Import complete! ${successCount} leads added${failCount > 0 ? `, ${failCount} failed` : ''}`)
-        setTimeout(() => setUploadStatus(''), 5000)
-        
-      } catch (error) {
-        console.error('Error processing Excel:', error)
-        setUploadStatus('✗ Error processing Excel file')
-        setTimeout(() => setUploadStatus(''), 3000)
-      }
-    }
-
-    reader.readAsBinaryString(file)
-    e.target.value = ''
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Codastra_Leads_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
   }
 
   const getStatusColor = (status) => {
@@ -603,6 +537,13 @@ export default function CRMAdminPage() {
             </div>
             
             <div className="flex items-center gap-4">
+              <button
+                onClick={loadLeads}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+                title="Refresh leads"
+              >
+                <Refresh className="w-5 h-5" />
+              </button>
               <div className="text-sm text-gray-300">Welcome, Admin</div>
               <button
                 onClick={handleLogout}
@@ -704,23 +645,12 @@ export default function CRMAdminPage() {
             </div>
 
             <div className="flex gap-3">
-              <label className="relative px-4 py-2 bg-green-500/20 text-green-300 border border-green-400/30 rounded-lg hover:bg-green-500/30 transition-all cursor-pointer flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                <span className="hidden sm:inline">Upload</span>
-                <input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleUploadExcel}
-                  className="hidden"
-                />
-              </label>
-
               <button
-                onClick={handleDownloadExcel}
+                onClick={handleDownloadCSV}
                 className="px-4 py-2 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export</span>
+                <span className="hidden sm:inline">Export CSV</span>
               </button>
 
               <button
