@@ -105,12 +105,6 @@ const Sparkles = ({ className }) => (
   </svg>
 )
 
-const FileText = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-  </svg>
-)
-
 export default function CRMAdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
@@ -132,7 +126,7 @@ export default function CRMAdminPage() {
   const [uploadStatus, setUploadStatus] = useState('')
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Mouse tracking for effects
+  // Mouse tracking
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
@@ -228,6 +222,19 @@ export default function CRMAdminPage() {
   const loadLeads = async () => {
     setLoading(true)
     try {
+      const response = await fetch('/api/get-leads')
+      const data = await response.json()
+      
+      if (data.success && data.leads) {
+        setLeads(data.leads || [])
+        setStats(data.stats || {})
+      } else {
+        throw new Error(data.error || 'Failed to fetch leads')
+      }
+    } catch (error) {
+      console.error('Error loading leads:', error)
+      setUploadStatus('⚠ Using demo data - Connect Google Sheets for live data')
+      
       const dummyData = [
         {
           id: 1,
@@ -236,7 +243,7 @@ export default function CRMAdminPage() {
           phone: "123-456-7890",
           service: "Web Development",
           message: "Looking for a modern website.",
-          source: "Website",
+          source: "Demo Data",
           status: "New",
           timestamp: new Date().toISOString(),
           budget: "$5,000",
@@ -245,52 +252,12 @@ export default function CRMAdminPage() {
           lead_score: 8,
           follow_up_date: "2024-01-15",
           notes: "High priority"
-        },
-        {
-          id: 2,
-          name: "Bob Smith",
-          email: "bob@example.com",
-          phone: "987-654-3210",
-          service: "SEO Optimization",
-          message: "Need SEO help.",
-          source: "Google Ads",
-          status: "Contacted",
-          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          budget: "$2,000",
-          timeline: "1 month",
-          company: "Bob Enterprises",
-          lead_score: 6,
-          follow_up_date: "2024-01-20",
-          notes: "Responded"
-        },
-        {
-          id: 3,
-          name: "Charlie Davis",
-          email: "charlie@example.com",
-          phone: "555-666-7777",
-          service: "App Development",
-          message: "Mobile app needed.",
-          source: "Referral",
-          status: "Qualified",
-          timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          budget: "$15,000",
-          timeline: "3 months",
-          company: "Charlie Tech",
-          lead_score: 9,
-          follow_up_date: "2024-01-18",
-          notes: "Ready to start"
         }
       ]
 
       setLeads(dummyData)
-      setStats({
-        total: dummyData.length,
-        newLeads: dummyData.filter(l => l.status === 'New').length,
-        contacted: dummyData.filter(l => l.status === 'Contacted').length,
-        qualified: dummyData.filter(l => l.status === 'Qualified').length,
-        closed: 0,
-        averageScore: 7.7
-      })
+      setStats({ total: 1, newLeads: 1, contacted: 0, qualified: 0, closed: 0, averageScore: 8 })
+      setTimeout(() => setUploadStatus(''), 5000)
     } finally {
       setLoading(false)
     }
@@ -302,36 +269,101 @@ export default function CRMAdminPage() {
     setShowEditModal(true)
   }
 
-  const handleUpdateLead = () => {
-    const updatedLeads = leads.map(lead =>
-      lead.id === selectedLead.id ? { ...lead, ...editForm } : lead
-    )
-    setLeads(updatedLeads)
-    setShowEditModal(false)
-    setSelectedLead(null)
-    setEditForm({})
-  }
+  const handleUpdateLead = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/update-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm)
+      })
 
-  const handleDeleteLead = (leadId) => {
-    if (window.confirm('Delete this lead?')) {
-      setLeads(leads.filter(lead => lead.id !== leadId))
+      const result = await response.json()
+
+      if (result.success) {
+        const updatedLeads = leads.map(lead =>
+          lead.id === selectedLead.id ? { ...lead, ...editForm } : lead
+        )
+        setLeads(updatedLeads)
+        setShowEditModal(false)
+        setSelectedLead(null)
+        setEditForm({})
+        setUploadStatus('✓ Lead updated successfully!')
+        setTimeout(() => setUploadStatus(''), 3000)
+      } else {
+        throw new Error(result.error || 'Failed to update lead')
+      }
+    } catch (error) {
+      console.error('Error updating lead:', error)
+      setUploadStatus('✗ Error: ' + error.message)
+      setTimeout(() => setUploadStatus(''), 5000)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleAddLead = () => {
-    const newLead = {
-      id: Date.now(),
-      ...editForm,
-      timestamp: new Date().toISOString(),
-      lead_score: editForm.lead_score || 5,
-      status: 'New'
+  const handleDeleteLead = async (leadId) => {
+    if (!window.confirm('Delete this lead? This action cannot be undone.')) return
+
+    try {
+      setLoading(true)
+      const response = await fetch('/api/delete-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: leadId })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setLeads(leads.filter(lead => lead.id !== leadId))
+        setUploadStatus('✓ Lead deleted successfully!')
+        setTimeout(() => setUploadStatus(''), 3000)
+      } else {
+        throw new Error(result.error || 'Failed to delete lead')
+      }
+    } catch (error) {
+      console.error('Error deleting lead:', error)
+      setUploadStatus('✗ Error: ' + error.message)
+      setTimeout(() => setUploadStatus(''), 5000)
+    } finally {
+      setLoading(false)
     }
-    setLeads([newLead, ...leads])
-    setShowAddModal(false)
-    setEditForm({})
   }
 
-  // Excel Download
+  const handleAddLead = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/save-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...editForm,
+          source: 'CRM Manual Entry',
+          timestamp: new Date().toISOString()
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        await loadLeads()
+        setShowAddModal(false)
+        setEditForm({})
+        setUploadStatus('✓ Lead added successfully!')
+        setTimeout(() => setUploadStatus(''), 3000)
+      } else {
+        throw new Error(result.error || 'Failed to add lead')
+      }
+    } catch (error) {
+      console.error('Error adding lead:', error)
+      setUploadStatus('✗ Error: ' + error.message)
+      setTimeout(() => setUploadStatus(''), 5000)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleDownloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(leads.map(lead => ({
       'Name': lead.name,
@@ -355,44 +387,73 @@ export default function CRMAdminPage() {
     XLSX.writeFile(workbook, `Codastra_Leads_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
-  // Excel Upload
-  const handleUploadExcel = (e) => {
+  const handleUploadExcel = async (e) => {
     const file = e.target.files[0]
     if (!file) return
 
-    setUploadStatus('Processing...')
+    setUploadStatus('Processing Excel file...')
     const reader = new FileReader()
 
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const workbook = XLSX.read(event.target.result, { type: 'binary' })
         const sheetName = workbook.SheetNames[0]
         const sheet = workbook.Sheets[sheetName]
         const data = XLSX.utils.sheet_to_json(sheet)
 
-        const newLeads = data.map((row, index) => ({
-          id: Date.now() + index,
-          name: row.Name || row.name || '',
-          email: row.Email || row.email || '',
-          phone: row.Phone || row.phone || '',
-          company: row.Company || row.company || '',
-          service: row.Service || row.service || 'General Inquiry',
-          status: row.Status || row.status || 'New',
-          lead_score: parseInt(row['Lead Score'] || row.lead_score || 5),
-          budget: row.Budget || row.budget || '',
-          timeline: row.Timeline || row.timeline || '',
-          source: row.Source || row.source || 'Excel Import',
-          follow_up_date: row['Follow-up Date'] || row.follow_up_date || '',
-          message: row.Message || row.message || '',
-          notes: row.Notes || row.notes || '',
-          timestamp: new Date().toISOString()
-        }))
+        setUploadStatus(`Uploading ${data.length} leads to Google Sheets...`)
 
-        setLeads([...newLeads, ...leads])
-        setUploadStatus(`✓ Successfully imported ${newLeads.length} leads!`)
-        setTimeout(() => setUploadStatus(''), 3000)
+        let successCount = 0
+        let failCount = 0
+
+        for (let i = 0; i < data.length; i++) {
+          const row = data[i]
+          
+          try {
+            const response = await fetch('/api/save-lead', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: row.Name || row.name || '',
+                email: row.Email || row.email || '',
+                phone: row.Phone || row.phone || '',
+                company: row.Company || row.company || '',
+                service: row.Service || row.service || 'General Inquiry',
+                status: row.Status || row.status || 'New',
+                lead_score: parseInt(row['Lead Score'] || row.lead_score || 5),
+                budget: row.Budget || row.budget || '',
+                timeline: row.Timeline || row.timeline || '',
+                source: 'Excel Import',
+                follow_up_date: row['Follow-up Date'] || row.follow_up_date || '',
+                message: row.Message || row.message || '',
+                notes: row.Notes || row.notes || `Imported from Excel on ${new Date().toLocaleDateString()}`
+              })
+            })
+
+            const result = await response.json()
+            
+            if (result.success) {
+              successCount++
+            } else {
+              failCount++
+            }
+
+            setUploadStatus(`Uploading... ${i + 1}/${data.length} (${successCount} successful)`)
+            await new Promise(resolve => setTimeout(resolve, 300))
+            
+          } catch (error) {
+            console.error('Error uploading lead:', error)
+            failCount++
+          }
+        }
+
+        await loadLeads()
+        setUploadStatus(`✓ Import complete! ${successCount} leads added${failCount > 0 ? `, ${failCount} failed` : ''}`)
+        setTimeout(() => setUploadStatus(''), 5000)
+        
       } catch (error) {
-        setUploadStatus('✗ Error processing file')
+        console.error('Error processing Excel:', error)
+        setUploadStatus('✗ Error processing Excel file')
         setTimeout(() => setUploadStatus(''), 3000)
       }
     }
@@ -423,7 +484,6 @@ export default function CRMAdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 relative overflow-hidden">
-        {/* Floating Orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
             className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-10 -left-20"
@@ -476,6 +536,91 @@ export default function CRMAdminPage() {
 
             {error && (
               <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
+                <p className="text-red-300 text-sm text-center">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading || loginAttempts >= 5 || !password.trim()}
+              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
+                isLoading || loginAttempts >= 5 || !password.trim()
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-5 h-5" />
+                  Access CRM
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
+            <p className="text-gray-400 text-xs text-center">
+              🔒 Secure area. All access attempts are logged.
+            </p>
+          </div>
+        </div>
+
+        <style jsx>{`
+          .floating-orb {
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 8s ease-in-out infinite;
+            position: absolute;
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <nav className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-8">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                Codastra CRM
+              </h1>
+              <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span>System Online</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-300">Welcome, Admin</div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/20 text-red-300 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-all"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-blue-400/30 transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400">Total Leads</p>
                 <p className="text-3xl font-bold text-white">{stats.total || 0}</p>
               </div>
               <Users className="w-10 h-10 text-blue-400" />
@@ -519,7 +664,6 @@ export default function CRMAdminPage() {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex flex-col sm:flex-row gap-4 flex-1">
@@ -560,7 +704,6 @@ export default function CRMAdminPage() {
             </div>
 
             <div className="flex gap-3">
-              {/* Upload Excel */}
               <label className="relative px-4 py-2 bg-green-500/20 text-green-300 border border-green-400/30 rounded-lg hover:bg-green-500/30 transition-all cursor-pointer flex items-center gap-2">
                 <Upload className="w-4 h-4" />
                 <span className="hidden sm:inline">Upload</span>
@@ -572,7 +715,6 @@ export default function CRMAdminPage() {
                 />
               </label>
 
-              {/* Download Excel */}
               <button
                 onClick={handleDownloadExcel}
                 className="px-4 py-2 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-2"
@@ -581,7 +723,6 @@ export default function CRMAdminPage() {
                 <span className="hidden sm:inline">Export</span>
               </button>
 
-              {/* Add Lead */}
               <button
                 onClick={() => {
                   setEditForm({
@@ -607,7 +748,6 @@ export default function CRMAdminPage() {
             </div>
           </div>
 
-          {/* Upload Status */}
           {uploadStatus && (
             <div className="mt-4 p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-300 text-sm text-center">
               {uploadStatus}
@@ -615,7 +755,6 @@ export default function CRMAdminPage() {
           )}
         </div>
 
-        {/* Leads Table */}
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
@@ -633,30 +772,14 @@ export default function CRMAdminPage() {
               <table className="min-w-full">
                 <thead className="bg-white/5">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Lead Info
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Contact
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Service
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Budget
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Lead Info</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Contact</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Service</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Score</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Budget</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -701,11 +824,27 @@ export default function CRMAdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <select
                           value={lead.status || 'New'}
-                          onChange={(e) => {
-                            const updatedLeads = leads.map(l =>
-                              l.id === lead.id ? { ...l, status: e.target.value } : l
-                            )
-                            setLeads(updatedLeads)
+                          onChange={async (e) => {
+                            const newStatus = e.target.value
+                            try {
+                              const response = await fetch('/api/update-lead', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ ...lead, status: newStatus })
+                              })
+                              
+                              const result = await response.json()
+                              
+                              if (result.success) {
+                                const updatedLeads = leads.map(l =>
+                                  l.id === lead.id ? { ...l, status: newStatus } : l
+                                )
+                                setLeads(updatedLeads)
+                              }
+                            } catch (error) {
+                              console.error('Error updating status:', error)
+                              alert('Failed to update status')
+                            }
                           }}
                           className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(lead.status || 'New')}`}
                         >
@@ -765,7 +904,6 @@ export default function CRMAdminPage() {
         </div>
       </div>
 
-      {/* Edit/Add Modal */}
       {(showEditModal || showAddModal) && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
@@ -792,9 +930,7 @@ export default function CRMAdminPage() {
             }} className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Name *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Name *</label>
                   <input
                     type="text"
                     value={editForm.name || ''}
@@ -805,9 +941,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Email *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Email *</label>
                   <input
                     type="email"
                     value={editForm.email || ''}
@@ -818,9 +952,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Phone
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Phone</label>
                   <input
                     type="tel"
                     value={editForm.phone || ''}
@@ -830,9 +962,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Company
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Company</label>
                   <input
                     type="text"
                     value={editForm.company || ''}
@@ -842,9 +972,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Service
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Service</label>
                   <select
                     value={editForm.service || ''}
                     onChange={(e) => setEditForm({ ...editForm, service: e.target.value })}
@@ -860,9 +988,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Status
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
                   <select
                     value={editForm.status || 'New'}
                     onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
@@ -877,9 +1003,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Budget
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Budget</label>
                   <input
                     type="text"
                     value={editForm.budget || ''}
@@ -890,9 +1014,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Timeline
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Timeline</label>
                   <input
                     type="text"
                     value={editForm.timeline || ''}
@@ -903,9 +1025,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Follow-up Date
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Follow-up Date</label>
                   <input
                     type="date"
                     value={editForm.follow_up_date || ''}
@@ -915,9 +1035,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Lead Score (1-10)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Lead Score (1-10)</label>
                   <input
                     type="number"
                     min="1"
@@ -930,9 +1048,7 @@ export default function CRMAdminPage() {
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Message
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Message</label>
                 <textarea
                   value={editForm.message || ''}
                   onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
@@ -942,9 +1058,7 @@ export default function CRMAdminPage() {
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Notes
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Notes</label>
                 <textarea
                   value={editForm.notes || ''}
                   onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
@@ -992,91 +1106,4 @@ export default function CRMAdminPage() {
       `}</style>
     </div>
   )
-}text-red-300 text-sm text-center">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || loginAttempts >= 5 || !password.trim()}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
-                isLoading || loginAttempts >= 5 || !password.trim()
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg'
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  Access CRM
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-            <p className="text-gray-400 text-xs text-center">
-              🔒 Secure area. All access attempts are logged.
-            </p>
-          </div>
-        </div>
-
-        <style jsx>{`
-          .floating-orb {
-            border-radius: 50%;
-            filter: blur(60px);
-            animation: float 8s ease-in-out infinite;
-            position: absolute;
-          }
-          
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-30px) scale(1.1); }
-          }
-        `}</style>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      {/* Navigation */}
-      <nav className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Codastra CRM
-              </h1>
-              <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span>System Online</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-300">Welcome, Admin</div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-500/20 text-red-300 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-all"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-blue-400/30 transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-400">Total Leads</p>
-                <p className="
+}
