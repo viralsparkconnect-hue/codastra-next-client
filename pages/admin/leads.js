@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import * as XLSX from 'xlsx'
 
 // Icons
 const Lock = ({ className }) => (
@@ -35,6 +36,18 @@ const Users = ({ className }) => (
 const Search = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+)
+
+const Download = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  </svg>
+)
+
+const Upload = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
   </svg>
 )
 
@@ -86,16 +99,25 @@ const Building = ({ className }) => (
   </svg>
 )
 
+const Sparkles = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l3.057-3L12 3l3.943-3L19 3l2.5 8.5L19 20l-3.943-3L12 20l-3.057-3L5 20l-2.5-8.5L5 3z" />
+  </svg>
+)
+
+const FileText = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  </svg>
+)
+
 export default function CRMAdminPage() {
-  // Authentication states
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loginAttempts, setLoginAttempts] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-
-  // CRM states
   const [leads, setLeads] = useState([])
   const [filteredLeads, setFilteredLeads] = useState([])
   const [stats, setStats] = useState({})
@@ -107,36 +129,45 @@ export default function CRMAdminPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editForm, setEditForm] = useState({})
+  const [uploadStatus, setUploadStatus] = useState('')
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Check authentication on mount
+  // Mouse tracking for effects
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const auth = localStorage.getItem('dashboard_auth')
-      const authTimestamp = localStorage.getItem('dashboard_auth_timestamp')
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100
+      })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
+  useEffect(() => {
+    const auth = localStorage.getItem('dashboard_auth')
+    const authTimestamp = localStorage.getItem('dashboard_auth_timestamp')
+    
+    if (auth === 'true' && authTimestamp) {
+      const authTime = parseInt(authTimestamp)
+      const now = Date.now()
+      const twentyFourHours = 24 * 60 * 60 * 1000
       
-      if (auth === 'true' && authTimestamp) {
-        const authTime = parseInt(authTimestamp)
-        const now = Date.now()
-        const twentyFourHours = 24 * 60 * 60 * 1000
-        
-        if (now - authTime < twentyFourHours) {
-          setIsAuthenticated(true)
-        } else {
-          localStorage.removeItem('dashboard_auth')
-          localStorage.removeItem('dashboard_auth_timestamp')
-        }
+      if (now - authTime < twentyFourHours) {
+        setIsAuthenticated(true)
+      } else {
+        localStorage.removeItem('dashboard_auth')
+        localStorage.removeItem('dashboard_auth_timestamp')
       }
     }
   }, [])
 
-  // Load leads when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadLeads()
     }
   }, [isAuthenticated])
 
-  // Filter leads
   useEffect(() => {
     let filtered = leads
 
@@ -166,7 +197,7 @@ export default function CRMAdminPage() {
     setError('')
 
     if (loginAttempts >= 5) {
-      setError('Too many failed attempts. Please wait 5 minutes before trying again.')
+      setError('Too many failed attempts. Please wait 5 minutes.')
       setIsLoading(false)
       return
     }
@@ -175,10 +206,8 @@ export default function CRMAdminPage() {
 
     if (password === 'codastra2024') {
       setIsAuthenticated(true)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('dashboard_auth', 'true')
-        localStorage.setItem('dashboard_auth_timestamp', Date.now().toString())
-      }
+      localStorage.setItem('dashboard_auth', 'true')
+      localStorage.setItem('dashboard_auth_timestamp', Date.now().toString())
       setError('')
       setLoginAttempts(0)
     } else {
@@ -192,96 +221,76 @@ export default function CRMAdminPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false)
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('dashboard_auth')
-      localStorage.removeItem('dashboard_auth_timestamp')
-    }
+    localStorage.removeItem('dashboard_auth')
+    localStorage.removeItem('dashboard_auth_timestamp')
   }
 
   const loadLeads = async () => {
     setLoading(true)
     try {
-      // Try to fetch from API first
-      const response = await fetch('/api/get-leads')
-      const data = await response.json()
-      
-      if (data.success) {
-        setLeads(data.leads || [])
-        setStats(data.stats || {})
-      } else {
-        throw new Error(data.error || 'Failed to fetch leads')
-      }
-    } catch (error) {
-      console.error('Error loading leads:', error)
-      
-      // Fallback to dummy data
-      const dummyData = {
-        success: true,
-        leads: [
-          {
-            id: 1,
-            name: "Alice Johnson",
-            email: "alice@example.com",
-            phone: "123-456-7890",
-            service: "Web Development",
-            message: "Looking for a modern website for my business.",
-            source: "Website",
-            status: "New",
-            timestamp: new Date().toISOString(),
-            budget: "$5,000",
-            timeline: "2 weeks",
-            company: "Alice Co.",
-            lead_score: 8,
-            follow_up_date: "2024-01-15",
-            notes: "High priority client"
-          },
-          {
-            id: 2,
-            name: "Bob Smith",
-            email: "bob@example.com",
-            phone: "987-654-3210",
-            service: "SEO Optimization",
-            message: "Need help with SEO ranking.",
-            source: "Google Ads",
-            status: "Contacted",
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            budget: "$2,000",
-            timeline: "1 month",
-            company: "Bob Enterprises",
-            lead_score: 6,
-            follow_up_date: "2024-01-20",
-            notes: "Responded to initial email"
-          },
-          {
-            id: 3,
-            name: "Charlie Davis",
-            email: "charlie@example.com",
-            phone: "555-666-7777",
-            service: "App Development",
-            message: "Want to build a mobile app for e-commerce.",
-            source: "Referral",
-            status: "Qualified",
-            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            budget: "$15,000",
-            timeline: "3 months",
-            company: "Charlie Tech",
-            lead_score: 9,
-            follow_up_date: "2024-01-18",
-            notes: "Ready to start project"
-          }
-        ],
-        stats: {
-          total: 3,
-          newLeads: 1,
-          contacted: 1,
-          qualified: 1,
-          closed: 0,
-          averageScore: 7.7
+      const dummyData = [
+        {
+          id: 1,
+          name: "Alice Johnson",
+          email: "alice@example.com",
+          phone: "123-456-7890",
+          service: "Web Development",
+          message: "Looking for a modern website.",
+          source: "Website",
+          status: "New",
+          timestamp: new Date().toISOString(),
+          budget: "$5,000",
+          timeline: "2 weeks",
+          company: "Alice Co.",
+          lead_score: 8,
+          follow_up_date: "2024-01-15",
+          notes: "High priority"
+        },
+        {
+          id: 2,
+          name: "Bob Smith",
+          email: "bob@example.com",
+          phone: "987-654-3210",
+          service: "SEO Optimization",
+          message: "Need SEO help.",
+          source: "Google Ads",
+          status: "Contacted",
+          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          budget: "$2,000",
+          timeline: "1 month",
+          company: "Bob Enterprises",
+          lead_score: 6,
+          follow_up_date: "2024-01-20",
+          notes: "Responded"
+        },
+        {
+          id: 3,
+          name: "Charlie Davis",
+          email: "charlie@example.com",
+          phone: "555-666-7777",
+          service: "App Development",
+          message: "Mobile app needed.",
+          source: "Referral",
+          status: "Qualified",
+          timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          budget: "$15,000",
+          timeline: "3 months",
+          company: "Charlie Tech",
+          lead_score: 9,
+          follow_up_date: "2024-01-18",
+          notes: "Ready to start"
         }
-      }
+      ]
 
-      setLeads(dummyData.leads)
-      setStats(dummyData.stats)
+      setLeads(dummyData)
+      setStats({
+        total: dummyData.length,
+        newLeads: dummyData.filter(l => l.status === 'New').length,
+        contacted: dummyData.filter(l => l.status === 'Contacted').length,
+        qualified: dummyData.filter(l => l.status === 'Qualified').length,
+        closed: 0,
+        averageScore: 7.7
+      })
     } finally {
       setLoading(false)
     }
@@ -293,82 +302,148 @@ export default function CRMAdminPage() {
     setShowEditModal(true)
   }
 
-  const handleUpdateLead = async () => {
-    try {
-      const updatedLeads = leads.map(lead =>
-        lead.id === selectedLead.id ? { ...lead, ...editForm } : lead
-      )
-      setLeads(updatedLeads)
-      setShowEditModal(false)
-      setSelectedLead(null)
-      setEditForm({})
-    } catch (error) {
-      console.error('Error updating lead:', error)
+  const handleUpdateLead = () => {
+    const updatedLeads = leads.map(lead =>
+      lead.id === selectedLead.id ? { ...lead, ...editForm } : lead
+    )
+    setLeads(updatedLeads)
+    setShowEditModal(false)
+    setSelectedLead(null)
+    setEditForm({})
+  }
+
+  const handleDeleteLead = (leadId) => {
+    if (window.confirm('Delete this lead?')) {
+      setLeads(leads.filter(lead => lead.id !== leadId))
     }
   }
 
-  const handleDeleteLead = async (leadId) => {
-    if (window.confirm('Are you sure you want to delete this lead?')) {
+  const handleAddLead = () => {
+    const newLead = {
+      id: Date.now(),
+      ...editForm,
+      timestamp: new Date().toISOString(),
+      lead_score: editForm.lead_score || 5,
+      status: 'New'
+    }
+    setLeads([newLead, ...leads])
+    setShowAddModal(false)
+    setEditForm({})
+  }
+
+  // Excel Download
+  const handleDownloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(leads.map(lead => ({
+      'Name': lead.name,
+      'Email': lead.email,
+      'Phone': lead.phone,
+      'Company': lead.company,
+      'Service': lead.service,
+      'Status': lead.status,
+      'Lead Score': lead.lead_score,
+      'Budget': lead.budget,
+      'Timeline': lead.timeline,
+      'Source': lead.source,
+      'Follow-up Date': lead.follow_up_date,
+      'Message': lead.message,
+      'Notes': lead.notes,
+      'Created': new Date(lead.timestamp).toLocaleString()
+    })))
+    
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads')
+    XLSX.writeFile(workbook, `Codastra_Leads_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  // Excel Upload
+  const handleUploadExcel = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploadStatus('Processing...')
+    const reader = new FileReader()
+
+    reader.onload = (event) => {
       try {
-        const updatedLeads = leads.filter(lead => lead.id !== leadId)
-        setLeads(updatedLeads)
-      } catch (error) {
-        console.error('Error deleting lead:', error)
-      }
-    }
-  }
+        const workbook = XLSX.read(event.target.result, { type: 'binary' })
+        const sheetName = workbook.SheetNames[0]
+        const sheet = workbook.Sheets[sheetName]
+        const data = XLSX.utils.sheet_to_json(sheet)
 
-  const handleAddLead = async () => {
-    try {
-      const newLead = {
-        id: Date.now(),
-        ...editForm,
-        timestamp: new Date().toISOString(),
-        lead_score: editForm.lead_score || 5,
-        status: 'New'
+        const newLeads = data.map((row, index) => ({
+          id: Date.now() + index,
+          name: row.Name || row.name || '',
+          email: row.Email || row.email || '',
+          phone: row.Phone || row.phone || '',
+          company: row.Company || row.company || '',
+          service: row.Service || row.service || 'General Inquiry',
+          status: row.Status || row.status || 'New',
+          lead_score: parseInt(row['Lead Score'] || row.lead_score || 5),
+          budget: row.Budget || row.budget || '',
+          timeline: row.Timeline || row.timeline || '',
+          source: row.Source || row.source || 'Excel Import',
+          follow_up_date: row['Follow-up Date'] || row.follow_up_date || '',
+          message: row.Message || row.message || '',
+          notes: row.Notes || row.notes || '',
+          timestamp: new Date().toISOString()
+        }))
+
+        setLeads([...newLeads, ...leads])
+        setUploadStatus(`✓ Successfully imported ${newLeads.length} leads!`)
+        setTimeout(() => setUploadStatus(''), 3000)
+      } catch (error) {
+        setUploadStatus('✗ Error processing file')
+        setTimeout(() => setUploadStatus(''), 3000)
       }
-      setLeads([newLead, ...leads])
-      setShowAddModal(false)
-      setEditForm({})
-    } catch (error) {
-      console.error('Error adding lead:', error)
     }
+
+    reader.readAsBinaryString(file)
+    e.target.value = ''
   }
 
   const getStatusColor = (status) => {
     const colors = {
-      'New': 'bg-blue-100 text-blue-800',
-      'Contacted': 'bg-yellow-100 text-yellow-800',
-      'Qualified': 'bg-green-100 text-green-800',
-      'Closed': 'bg-gray-100 text-gray-800',
-      'Lost': 'bg-red-100 text-red-800'
+      'New': 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+      'Contacted': 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+      'Qualified': 'bg-green-500/20 text-green-300 border-green-400/30',
+      'Closed': 'bg-gray-500/20 text-gray-300 border-gray-400/30',
+      'Lost': 'bg-red-500/20 text-red-300 border-red-400/30'
     }
     return colors[status] || colors['New']
   }
 
   const getScoreColor = (score) => {
-    if (score >= 8) return 'text-green-600'
-    if (score >= 6) return 'text-yellow-600'
-    return 'text-red-600'
+    if (score >= 8) return 'text-green-400'
+    if (score >= 6) return 'text-yellow-400'
+    return 'text-red-400'
   }
 
   const uniqueServices = [...new Set(leads.map(lead => lead.service).filter(Boolean))]
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 flex items-center justify-center px-4">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 relative overflow-hidden">
+        {/* Floating Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="floating-orb w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-600/20 top-10 -left-20"
+            style={{ transform: `translate(${mousePosition.x * 0.1}px, ${mousePosition.y * 0.1}px)` }}
+          />
+          <div 
+            className="floating-orb w-80 h-80 bg-gradient-to-r from-purple-500/15 to-pink-500/15 top-1/3 -right-16"
+            style={{ transform: `translate(${-mousePosition.x * 0.05}px, ${-mousePosition.y * 0.05}px)` }}
+          />
         </div>
 
-        <div className="relative bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-700/50 max-w-md w-full shadow-2xl">
+        <div className="relative bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10 max-w-md w-full shadow-2xl">
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse">
               <Shield className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">CRM Admin</h2>
-            <p className="text-gray-400">Secure access to lead management system</p>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+              CRM Admin
+            </h2>
+            <p className="text-gray-400">Secure access to lead management</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -380,13 +455,11 @@ export default function CRMAdminPage() {
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your admin password"
+                  placeholder="Enter admin password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full pl-12 pr-12 py-4 bg-gray-700/50 border rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:border-transparent transition-all duration-300 ${
-                    error 
-                      ? 'border-red-500 focus:ring-red-500' 
-                      : 'border-gray-600 focus:ring-blue-500 hover:border-gray-500'
+                  className={`w-full pl-12 pr-12 py-4 bg-white/5 border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:border-transparent transition-all ${
+                    error ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-blue-500'
                   }`}
                   required
                   disabled={isLoading || loginAttempts >= 5}
@@ -394,7 +467,7 @@ export default function CRMAdminPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -402,151 +475,69 @@ export default function CRMAdminPage() {
             </div>
 
             {error && (
-              <div className="p-4 bg-red-900/20 border border-red-600/30 rounded-xl">
-                <p className="text-red-300 text-sm text-center">{error}</p>
+              <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
+                <p className="text-3xl font-bold text-white">{stats.total || 0}</p>
               </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || loginAttempts >= 5 || !password.trim()}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
-                isLoading || loginAttempts >= 5 || !password.trim()
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] shadow-lg hover:shadow-xl'
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  Access CRM
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-8 p-4 bg-gray-700/30 rounded-xl border border-gray-600/30">
-            <p className="text-gray-400 text-xs text-center">
-              🔒 This is a secure area. All access attempts are logged and monitored.
-            </p>
-          </div>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-500 text-sm">
-              Powered by <span className="text-blue-400 font-semibold">Codastra CRM</span>
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Codastra CRM
-              </h1>
-              <div className="hidden md:flex items-center gap-2 text-sm text-gray-500">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>System Online</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                Welcome, Admin
-              </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-sm"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Leads</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total || 0}</p>
-              </div>
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-10 h-10 text-blue-400" />
             </div>
           </div>
           
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-yellow-400/30 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">New Leads</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.newLeads || 0}</p>
+                <p className="text-sm font-medium text-gray-400">New Leads</p>
+                <p className="text-3xl font-bold text-blue-400">{stats.newLeads || 0}</p>
               </div>
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+              <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-blue-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-green-400/30 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Qualified</p>
-                <p className="text-2xl font-bold text-green-600">{stats.qualified || 0}</p>
+                <p className="text-sm font-medium text-gray-400">Qualified</p>
+                <p className="text-3xl font-bold text-green-400">{stats.qualified || 0}</p>
               </div>
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-600 rounded-full"></div>
+              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                <Shield className="w-6 h-6 text-green-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-purple-400/30 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg Score</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.averageScore || 0}</p>
+                <p className="text-sm font-medium text-gray-400">Avg Score</p>
+                <p className="text-3xl font-bold text-purple-400">{stats.averageScore || 0}</p>
               </div>
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-purple-600 rounded-full"></div>
+              <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-purple-400" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search leads..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-80"
+                  className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
                 />
               </div>
               
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="All">All Status</option>
                 <option value="New">New</option>
@@ -559,7 +550,7 @@ export default function CRMAdminPage() {
               <select
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="All">All Services</option>
                 {uniqueServices.map(service => (
@@ -568,82 +559,113 @@ export default function CRMAdminPage() {
               </select>
             </div>
 
-            <button
-              onClick={() => {
-                setEditForm({
-                  name: '',
-                  email: '',
-                  phone: '',
-                  service: 'Web Development',
-                  message: '',
-                  company: '',
-                  budget: '',
-                  timeline: '',
-                  source: 'Manual Entry',
-                  follow_up_date: '',
-                  notes: ''
-                })
-                setShowAddModal(true)
-              }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Lead
-            </button>
+            <div className="flex gap-3">
+              {/* Upload Excel */}
+              <label className="relative px-4 py-2 bg-green-500/20 text-green-300 border border-green-400/30 rounded-lg hover:bg-green-500/30 transition-all cursor-pointer flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                <span className="hidden sm:inline">Upload</span>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleUploadExcel}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Download Excel */}
+              <button
+                onClick={handleDownloadExcel}
+                className="px-4 py-2 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+
+              {/* Add Lead */}
+              <button
+                onClick={() => {
+                  setEditForm({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    service: 'Web Development',
+                    message: '',
+                    company: '',
+                    budget: '',
+                    timeline: '',
+                    source: 'Manual Entry',
+                    follow_up_date: '',
+                    notes: ''
+                  })
+                  setShowAddModal(true)
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Add Lead</span>
+              </button>
+            </div>
           </div>
+
+          {/* Upload Status */}
+          {uploadStatus && (
+            <div className="mt-4 p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-300 text-sm text-center">
+              {uploadStatus}
+            </div>
+          )}
         </div>
 
         {/* Leads Table */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
-              <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading leads...</p>
+              <div className="w-8 h-8 border-4 border-white/20 border-t-blue-400 rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-400">Loading leads...</p>
             </div>
           ) : filteredLeads.length === 0 ? (
             <div className="p-12 text-center">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No leads found</h3>
-              <p className="text-gray-500">Try adjusting your search criteria or add a new lead.</p>
+              <Users className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">No leads found</h3>
+              <p className="text-gray-400">Try adjusting your filters or add a new lead.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full">
+                <thead className="bg-white/5">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Lead Info
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Contact
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Service
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Score
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Budget
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-white/5">
                   {filteredLeads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-gray-50">
+                    <tr key={lead.id} className="hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{lead.name || 'Anonymous'}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <div className="text-sm font-medium text-white">{lead.name || 'Anonymous'}</div>
+                          <div className="text-sm text-gray-400 flex items-center gap-1">
                             <Building className="w-3 h-3" />
                             {lead.company || 'No company'}
                           </div>
@@ -653,17 +675,17 @@ export default function CRMAdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="space-y-1">
                           {lead.email && (
-                            <div className="text-sm text-gray-900 flex items-center gap-2">
+                            <div className="text-sm text-white flex items-center gap-2">
                               <Mail className="w-3 h-3 text-gray-400" />
-                              <a href={`mailto:${lead.email}`} className="hover:text-blue-600">
+                              <a href={`mailto:${lead.email}`} className="hover:text-blue-400">
                                 {lead.email}
                               </a>
                             </div>
                           )}
                           {lead.phone && (
-                            <div className="text-sm text-gray-500 flex items-center gap-2">
-                              <Phone className="w-3 h-3 text-gray-400" />
-                              <a href={`tel:${lead.phone}`} className="hover:text-blue-600">
+                            <div className="text-sm text-gray-400 flex items-center gap-2">
+                              <Phone className="w-3 h-3" />
+                              <a href={`tel:${lead.phone}`} className="hover:text-blue-400">
                                 {lead.phone}
                               </a>
                             </div>
@@ -672,8 +694,8 @@ export default function CRMAdminPage() {
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{lead.service || 'General Inquiry'}</div>
-                        <div className="text-sm text-gray-500">{lead.source || 'Unknown'}</div>
+                        <div className="text-sm text-white">{lead.service || 'General Inquiry'}</div>
+                        <div className="text-sm text-gray-400">{lead.source || 'Unknown'}</div>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -685,7 +707,7 @@ export default function CRMAdminPage() {
                             )
                             setLeads(updatedLeads)
                           }}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-blue-500 ${getStatusColor(lead.status || 'New')}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(lead.status || 'New')}`}
                         >
                           <option value="New">New</option>
                           <option value="Contacted">Contacted</option>
@@ -702,33 +724,33 @@ export default function CRMAdminPage() {
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{lead.budget || 'Not specified'}</div>
-                        <div className="text-sm text-gray-500">{lead.timeline || 'Not specified'}</div>
+                        <div className="text-sm text-white">{lead.budget || 'Not specified'}</div>
+                        <div className="text-sm text-gray-400">{lead.timeline || 'Not specified'}</div>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-white">
                           {new Date(lead.timestamp).toLocaleDateString()}
                         </div>
                         {lead.follow_up_date && (
-                          <div className="text-xs text-blue-600 flex items-center gap-1">
+                          <div className="text-xs text-blue-400 flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            Follow up: {new Date(lead.follow_up_date).toLocaleDateString()}
+                            {new Date(lead.follow_up_date).toLocaleDateString()}
                           </div>
                         )}
                       </td>
                       
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEditLead(lead)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                            className="text-blue-400 hover:text-blue-300 p-1 rounded hover:bg-blue-500/20 transition-all"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteLead(lead.id)}
-                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                            className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/20 transition-all"
                           >
                             <Trash className="w-4 h-4" />
                           </button>
@@ -743,82 +765,90 @@ export default function CRMAdminPage() {
         </div>
       </div>
 
-      {/* Edit Lead Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+      {/* Edit/Add Modal */}
+      {(showEditModal || showAddModal) && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
+            <div className="p-6 border-b border-white/10">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Edit Lead</h3>
+                <h3 className="text-lg font-medium text-white">
+                  {showEditModal ? 'Edit Lead' : 'Add New Lead'}
+                </h3>
                 <button
-                  onClick={() => setShowEditModal(false)}
-                  className="text-gray-400 hover:text-gray-500"
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setShowAddModal(false)
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); handleUpdateLead(); }} className="p-6">
+            <form onSubmit={(e) => { 
+              e.preventDefault()
+              showEditModal ? handleUpdateLead() : handleAddLead()
+            }} className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Name *
                   </label>
                   <input
                     type="text"
                     value={editForm.name || ''}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Email *
                   </label>
                   <input
                     type="email"
                     value={editForm.email || ''}
                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Phone
                   </label>
                   <input
                     type="tel"
                     value={editForm.phone || ''}
                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Company
                   </label>
                   <input
                     type="text"
                     value={editForm.company || ''}
                     onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Service
                   </label>
                   <select
                     value={editForm.service || ''}
                     onChange={(e) => setEditForm({ ...editForm, service: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="Web Development">Web Development</option>
                     <option value="App Development">App Development</option>
@@ -826,18 +856,17 @@ export default function CRMAdminPage() {
                     <option value="Digital Marketing">Digital Marketing</option>
                     <option value="E-commerce">E-commerce</option>
                     <option value="Consulting">Consulting</option>
-                    <option value="Other">Other</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Status
                   </label>
                   <select
-                    value={editForm.status || ''}
+                    value={editForm.status || 'New'}
                     onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="New">New</option>
                     <option value="Contacted">Contacted</option>
@@ -848,7 +877,7 @@ export default function CRMAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Budget
                   </label>
                   <input
@@ -856,12 +885,12 @@ export default function CRMAdminPage() {
                     value={editForm.budget || ''}
                     onChange={(e) => setEditForm({ ...editForm, budget: e.target.value })}
                     placeholder="e.g., $5,000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Timeline
                   </label>
                   <input
@@ -869,24 +898,24 @@ export default function CRMAdminPage() {
                     value={editForm.timeline || ''}
                     onChange={(e) => setEditForm({ ...editForm, timeline: e.target.value })}
                     placeholder="e.g., 2 weeks"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Follow-up Date
                   </label>
                   <input
                     type="date"
                     value={editForm.follow_up_date || ''}
                     onChange={(e) => setEditForm({ ...editForm, follow_up_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Lead Score (1-10)
                   </label>
                   <input
@@ -895,25 +924,25 @@ export default function CRMAdminPage() {
                     max="10"
                     value={editForm.lead_score || ''}
                     onChange={(e) => setEditForm({ ...editForm, lead_score: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Message
                 </label>
                 <textarea
                   value={editForm.message || ''}
                   onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Notes
                 </label>
                 <textarea
@@ -921,23 +950,26 @@ export default function CRMAdminPage() {
                   onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
                   rows="3"
                   placeholder="Internal notes..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="mt-8 flex justify-end gap-4">
                 <button
                   type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500"
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setShowAddModal(false)
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:scale-105 transition-all"
                 >
-                  Update Lead
+                  {showEditModal ? 'Update Lead' : 'Add Lead'}
                 </button>
               </div>
             </form>
@@ -945,176 +977,106 @@ export default function CRMAdminPage() {
         </div>
       )}
 
-      {/* Add Lead Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Add New Lead</h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-500"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); handleAddLead(); }} className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.name || ''}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={editForm.email || ''}
-                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={editForm.phone || ''}
-                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.company || ''}
-                    onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Service
-                  </label>
-                  <select
-                    value={editForm.service || ''}
-                    onChange={(e) => setEditForm({ ...editForm, service: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="Web Development">Web Development</option>
-                    <option value="App Development">App Development</option>
-                    <option value="SEO Optimization">SEO Optimization</option>
-                    <option value="Digital Marketing">Digital Marketing</option>
-                    <option value="E-commerce">E-commerce</option>
-                    <option value="Consulting">Consulting</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Budget
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.budget || ''}
-                    onChange={(e) => setEditForm({ ...editForm, budget: e.target.value })}
-                    placeholder="e.g., $5,000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Timeline
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.timeline || ''}
-                    onChange={(e) => setEditForm({ ...editForm, timeline: e.target.value })}
-                    placeholder="e.g., 2 weeks"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Follow-up Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editForm.follow_up_date || ''}
-                    onChange={(e) => setEditForm({ ...editForm, follow_up_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
-                </label>
-                <textarea
-                  value={editForm.message || ''}
-                  onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
-                </label>
-                <textarea
-                  value={editForm.notes || ''}
-                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                  rows="3"
-                  placeholder="Internal notes..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="mt-8 flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-                >
-                  Add Lead
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <style jsx>{`
+        .floating-orb {
+          border-radius: 50%;
+          filter: blur(60px);
+          animation: float 8s ease-in-out infinite;
+          position: absolute;
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-30px) scale(1.1); }
+        }
+      `}</style>
     </div>
   )
-}
+}text-red-300 text-sm text-center">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading || loginAttempts >= 5 || !password.trim()}
+              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
+                isLoading || loginAttempts >= 5 || !password.trim()
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-5 h-5" />
+                  Access CRM
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
+            <p className="text-gray-400 text-xs text-center">
+              🔒 Secure area. All access attempts are logged.
+            </p>
+          </div>
+        </div>
+
+        <style jsx>{`
+          .floating-orb {
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 8s ease-in-out infinite;
+            position: absolute;
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      {/* Navigation */}
+      <nav className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-8">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                Codastra CRM
+              </h1>
+              <div className="hidden md:flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span>System Online</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-300">Welcome, Admin</div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500/20 text-red-300 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-all"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-blue-400/30 transition-all hover:-translate-y-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400">Total Leads</p>
+                <p className="
