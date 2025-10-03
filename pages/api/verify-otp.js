@@ -1,8 +1,7 @@
 // pages/api/verify-otp.js
-// This API endpoint verifies the OTP entered by the user
+// This API endpoint verifies the OTP for viralspark.connect@gmail.com
 
 // In-memory OTP storage (shared with send-otp.js)
-// Note: In production, use Redis or a database for better persistence
 const otpStore = new Map()
 
 export default async function handler(req, res) {
@@ -35,13 +34,14 @@ export default async function handler(req, res) {
     }
 
     const normalizedEmail = email.toLowerCase().trim()
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'viralspark.connect@gmail.com'
 
-    // Validate that only admin email can access
-    if (normalizedEmail !== 'codastra.conect@gmail.com') {
+    // Validate that only Viral Spark admin email can access
+    if (normalizedEmail !== ADMIN_EMAIL.toLowerCase()) {
       console.log('❌ Unauthorized email verification attempt:', normalizedEmail)
       return res.status(403).json({
         success: false,
-        error: 'Access denied. Only authorized admin email can login.'
+        error: 'Access denied. Only authorized Viral Spark admin email can login.'
       })
     }
 
@@ -87,17 +87,18 @@ export default async function handler(req, res) {
       // ✅ OTP is correct - delete it and allow login
       otpStore.delete(normalizedEmail)
       
-      console.log('✅ OTP verified successfully for:', normalizedEmail)
+      console.log('✅ OTP verified successfully for Viral Spark admin:', normalizedEmail)
 
       // Log successful login for security audit
       const loginLog = {
         email: normalizedEmail,
+        service: 'Viral Spark Admin CRM',
         timestamp: new Date().toISOString(),
         ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'Unknown',
         userAgent: req.headers['user-agent'] || 'Unknown'
       }
 
-      console.log('🔐 Successful login:', loginLog)
+      console.log('🔐 Successful Viral Spark login:', loginLog)
 
       return res.status(200).json({
         success: true,
