@@ -1,10 +1,9 @@
 // pages/api/send-otp.js
-// This API endpoint sends OTP to the admin email using EmailJS
+// This API endpoint sends OTP to viralspark.connect@gmail.com using Viral Spark EmailJS
 
 import emailjs from '@emailjs/browser'
 
 // In-memory OTP storage (for demo - use Redis/Database in production)
-// This stores OTPs temporarily with email as key
 const otpStore = new Map()
 
 export default async function handler(req, res) {
@@ -37,13 +36,14 @@ export default async function handler(req, res) {
     }
 
     const normalizedEmail = email.toLowerCase().trim()
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'viralspark.connect@gmail.com'
 
-    // Security: Only allow specific admin email
-    if (normalizedEmail !== 'codastra.conect@gmail.com') {
+    // Security: Only allow Viral Spark admin email
+    if (normalizedEmail !== ADMIN_EMAIL.toLowerCase()) {
       console.log('❌ Unauthorized email attempt:', normalizedEmail)
       return res.status(403).json({
         success: false,
-        error: 'Access denied. Only authorized admin email can login.'
+        error: 'Access denied. Only authorized Viral Spark admin email can login.'
       })
     }
 
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log('🔑 Generated OTP for', normalizedEmail, ':', otp) // Remove in production for security
+    console.log('🔑 Generated OTP for', normalizedEmail, ':', otp)
 
     // Get current date/time for email
     const now = new Date()
@@ -87,41 +87,47 @@ export default async function handler(req, res) {
                    req.connection.remoteAddress || 
                    'Unknown'
 
-    // Send OTP via EmailJS
+    // Send OTP via Viral Spark EmailJS
     try {
-      const emailJSServiceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_5dpu0tn'
-      const emailJSTemplateId = process.env.NEXT_PUBLIC_EMAILJS_OTP_TEMPLATE_ID || 'template_otp_login'
-      const emailJSPublicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'AlryU3umMzVGedPYh'
+      const emailJSServiceId = process.env.NEXT_PUBLIC_VIRAL_SPARK_SERVICE_ID
+      const emailJSTemplateId = process.env.NEXT_PUBLIC_VIRAL_SPARK_OTP_TEMPLATE_ID
+      const emailJSPublicKey = process.env.NEXT_PUBLIC_VIRAL_SPARK_PUBLIC_KEY
+
+      // Validate that all credentials are present
+      if (!emailJSServiceId || !emailJSTemplateId || !emailJSPublicKey) {
+        throw new Error('Viral Spark EmailJS credentials not configured properly')
+      }
 
       await emailjs.send(
         emailJSServiceId,
         emailJSTemplateId,
         {
           to_email: normalizedEmail,
-          to_name: 'Codastra Admin',
+          to_name: 'Viral Spark Admin',
           otp_code: otp,
           validity_minutes: '5',
           timestamp: formattedTime,
-          ip_address: userIP
+          ip_address: userIP,
+          service_name: 'Codastra Leads CRM',
+          from_name: 'Codastra Security'
         },
         emailJSPublicKey
       )
 
-      console.log('✅ OTP email sent successfully to', normalizedEmail)
+      console.log('✅ OTP email sent successfully via Viral Spark to', normalizedEmail)
 
       return res.status(200).json({
         success: true,
-        message: 'OTP sent successfully to your email',
+        message: 'OTP sent successfully to your Viral Spark email',
         expiresIn: 300, // 5 minutes in seconds
         email: normalizedEmail,
         timestamp: now.toISOString()
       })
 
     } catch (emailError) {
-      console.error('❌ EmailJS error:', emailError)
+      console.error('❌ Viral Spark EmailJS error:', emailError)
       
       // For development: Still return success with OTP in console
-      // Remove this in production!
       if (process.env.NODE_ENV === 'development') {
         console.log('⚠️ EMAIL FAILED - OTP for development:', otp)
         return res.status(200).json({
@@ -133,7 +139,7 @@ export default async function handler(req, res) {
       }
       
       // In production, fail if email doesn't send
-      throw new Error('Failed to send OTP email')
+      throw new Error('Failed to send OTP email via Viral Spark')
     }
 
   } catch (error) {
