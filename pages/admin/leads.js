@@ -136,7 +136,7 @@ export default function CRMAdminPage() {
     const authTimestamp = localStorage.getItem('crm_auth_timestamp')
     const authEmail = localStorage.getItem('crm_auth_email')
     
-    if (auth === 'true' && authTimestamp && authEmail === 'codastra.conect@gmail.com') {
+    if (auth === 'true' && authTimestamp && authEmail === 'viralspark.connect@gmail.com') {
       const authTime = parseInt(authTimestamp)
       const now = Date.now()
       const twentyFourHours = 24 * 60 * 60 * 1000
@@ -171,7 +171,7 @@ export default function CRMAdminPage() {
     setError('')
     setSuccess('')
 
-    if (email.toLowerCase().trim() !== 'codastra.conect@gmail.com') {
+    if (email.toLowerCase().trim() !== 'viralspark.connect@gmail.com') {
       setError('Access denied. Only authorized admin email can login.')
       setIsLoading(false)
       return
@@ -387,7 +387,7 @@ export default function CRMAdminPage() {
                   <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
-                    placeholder="codastra.conect@gmail.com"
+                    placeholder="viralspark.connect@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendOTP(e)}
@@ -398,7 +398,7 @@ export default function CRMAdminPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Only <span className="text-blue-400 font-semibold">codastra.conect@gmail.com</span> can access
+                  Only <span className="text-blue-400 font-semibold">viralspark.connect@gmail.com</span> can access
                 </p>
               </div>
 
