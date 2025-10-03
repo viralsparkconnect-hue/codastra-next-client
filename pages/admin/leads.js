@@ -7,16 +7,9 @@ const Lock = ({ className }) => (
   </svg>
 )
 
-const Eye = ({ className }) => (
+const Mail = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-  </svg>
-)
-
-const EyeOff = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
 )
 
@@ -26,69 +19,45 @@ const Shield = ({ className }) => (
   </svg>
 )
 
+const Key = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+  </svg>
+)
+
+const CheckCircle = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const AlertCircle = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const Send = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+  </svg>
+)
+
+const ArrowLeft = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+)
+
 const Users = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 )
 
-const Search = ({ className }) => (
+const TrendingUp = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
-)
-
-const Download = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-  </svg>
-)
-
-const Edit = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-  </svg>
-)
-
-const Trash = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-  </svg>
-)
-
-const Plus = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m-7-7h14" />
-  </svg>
-)
-
-const X = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-)
-
-const Calendar = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-)
-
-const Phone = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-  </svg>
-)
-
-const Mail = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-  </svg>
-)
-
-const Building = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
   </svg>
 )
 
@@ -104,26 +73,52 @@ const Refresh = ({ className }) => (
   </svg>
 )
 
+const Download = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  </svg>
+)
+
+const Phone = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+  </svg>
+)
+
+const Star = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+  </svg>
+)
+
+const Clock = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const Briefcase = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v10a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0H8" />
+  </svg>
+)
+
 export default function CRMAdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loginAttempts, setLoginAttempts] = useState(0)
+  const [step, setStep] = useState('email')
+  const [email, setEmail] = useState('')
+  const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [leads, setLeads] = useState([])
-  const [filteredLeads, setFilteredLeads] = useState([])
-  const [stats, setStats] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
-  const [serviceFilter, setServiceFilter] = useState('All')
-  const [selectedLead, setSelectedLead] = useState(null)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [editForm, setEditForm] = useState({})
-  const [uploadStatus, setUploadStatus] = useState('')
+  const [success, setSuccess] = useState('')
+  const [resendTimer, setResendTimer] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  
+  // Dashboard state
+  const [leads, setLeads] = useState([])
+  const [stats, setStats] = useState({})
+  const [loadingLeads, setLoadingLeads] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState('')
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -137,19 +132,22 @@ export default function CRMAdminPage() {
   }, [])
 
   useEffect(() => {
-    const auth = localStorage.getItem('dashboard_auth')
-    const authTimestamp = localStorage.getItem('dashboard_auth_timestamp')
+    const auth = localStorage.getItem('crm_auth')
+    const authTimestamp = localStorage.getItem('crm_auth_timestamp')
+    const authEmail = localStorage.getItem('crm_auth_email')
     
-    if (auth === 'true' && authTimestamp) {
+    if (auth === 'true' && authTimestamp && authEmail === 'codastra.conect@gmail.com') {
       const authTime = parseInt(authTimestamp)
       const now = Date.now()
       const twentyFourHours = 24 * 60 * 60 * 1000
       
       if (now - authTime < twentyFourHours) {
         setIsAuthenticated(true)
+        setEmail(authEmail)
       } else {
-        localStorage.removeItem('dashboard_auth')
-        localStorage.removeItem('dashboard_auth_timestamp')
+        localStorage.removeItem('crm_auth')
+        localStorage.removeItem('crm_auth_timestamp')
+        localStorage.removeItem('crm_auth_email')
       }
     }
   }, [])
@@ -161,64 +159,135 @@ export default function CRMAdminPage() {
   }, [isAuthenticated])
 
   useEffect(() => {
-    let filtered = leads
-
-    if (searchTerm) {
-      filtered = filtered.filter(lead =>
-        (lead.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (lead.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (lead.company || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (lead.phone || '').includes(searchTerm)
-      )
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
+      return () => clearTimeout(timer)
     }
+  }, [resendTimer])
 
-    if (statusFilter !== 'All') {
-      filtered = filtered.filter(lead => lead.status === statusFilter)
-    }
-
-    if (serviceFilter !== 'All') {
-      filtered = filtered.filter(lead => lead.service === serviceFilter)
-    }
-
-    setFilteredLeads(filtered)
-  }, [leads, searchTerm, statusFilter, serviceFilter])
-
-  const handleLogin = async (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    setSuccess('')
 
-    if (loginAttempts >= 5) {
-      setError('Too many failed attempts. Please wait 5 minutes.')
+    if (email.toLowerCase().trim() !== 'codastra.conect@gmail.com') {
+      setError('Access denied. Only authorized admin email can login.')
       setIsLoading(false)
       return
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim() })
+      })
 
-    if (password === 'codastra2024') {
-      setIsAuthenticated(true)
-      localStorage.setItem('dashboard_auth', 'true')
-      localStorage.setItem('dashboard_auth_timestamp', Date.now().toString())
-      setError('')
-      setLoginAttempts(0)
-    } else {
-      setError('Incorrect password. Please try again.')
-      setLoginAttempts(prev => prev + 1)
-      setPassword('')
+      const result = await response.json()
+
+      if (result.success) {
+        setStep('otp')
+        setSuccess('OTP sent! Check your email.')
+        setResendTimer(60)
+      } else {
+        throw new Error(result.error || 'Failed to send OTP')
+      }
+    } catch (error) {
+      setError('Failed to send OTP. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
+
+    if (otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP')
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: email.toLowerCase().trim(), 
+          otp: otp.trim() 
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setIsAuthenticated(true)
+        localStorage.setItem('crm_auth', 'true')
+        localStorage.setItem('crm_auth_timestamp', Date.now().toString())
+        localStorage.setItem('crm_auth_email', email.toLowerCase().trim())
+        setSuccess('Login successful!')
+      } else {
+        throw new Error(result.error || 'Invalid OTP')
+      }
+    } catch (error) {
+      setError(error.message || 'Invalid OTP. Please try again.')
+      setOtp('')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendOTP = async () => {
+    if (resendTimer > 0) return
     
-    setIsLoading(false)
+    setError('')
+    setSuccess('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim() })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSuccess('New OTP sent to your email!')
+        setResendTimer(60)
+      } else {
+        throw new Error(result.error || 'Failed to resend OTP')
+      }
+    } catch (error) {
+      setError('Failed to resend OTP. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleLogout = () => {
     setIsAuthenticated(false)
-    localStorage.removeItem('dashboard_auth')
-    localStorage.removeItem('dashboard_auth_timestamp')
+    localStorage.removeItem('crm_auth')
+    localStorage.removeItem('crm_auth_timestamp')
+    localStorage.removeItem('crm_auth_email')
+    setEmail('')
+    setOtp('')
+    setStep('email')
+  }
+
+  const handleBackToEmail = () => {
+    setStep('email')
+    setOtp('')
+    setError('')
+    setSuccess('')
   }
 
   const loadLeads = async () => {
-    setLoading(true)
+    setLoadingLeads(true)
     try {
       const response = await fetch('/api/get-leads')
       const data = await response.json()
@@ -226,144 +295,17 @@ export default function CRMAdminPage() {
       if (data.success && data.leads) {
         setLeads(data.leads || [])
         setStats(data.stats || {})
-      } else {
-        throw new Error(data.error || 'Failed to fetch leads')
       }
     } catch (error) {
       console.error('Error loading leads:', error)
-      setUploadStatus('⚠ Using demo data - Connect Google Sheets for live data')
-      
-      const dummyData = [
-        {
-          id: 1,
-          name: "Alice Johnson",
-          email: "alice@example.com",
-          phone: "123-456-7890",
-          service: "Web Development",
-          message: "Looking for a modern website.",
-          source: "Demo Data",
-          status: "New",
-          timestamp: new Date().toISOString(),
-          budget: "$5,000",
-          timeline: "2 weeks",
-          company: "Alice Co.",
-          lead_score: 8,
-          follow_up_date: "2024-01-15",
-          notes: "High priority"
-        }
-      ]
-
-      setLeads(dummyData)
-      setStats({ total: 1, newLeads: 1, contacted: 0, qualified: 0, closed: 0, averageScore: 8 })
-      setTimeout(() => setUploadStatus(''), 5000)
+      setUploadStatus('⚠ Error loading leads')
     } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleEditLead = (lead) => {
-    setSelectedLead(lead)
-    setEditForm(lead)
-    setShowEditModal(true)
-  }
-
-  const handleUpdateLead = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/update-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm)
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        const updatedLeads = leads.map(lead =>
-          lead.id === selectedLead.id ? { ...lead, ...editForm } : lead
-        )
-        setLeads(updatedLeads)
-        setShowEditModal(false)
-        setSelectedLead(null)
-        setEditForm({})
-        setUploadStatus('✓ Lead updated successfully!')
-        setTimeout(() => setUploadStatus(''), 3000)
-      } else {
-        throw new Error(result.error || 'Failed to update lead')
-      }
-    } catch (error) {
-      console.error('Error updating lead:', error)
-      setUploadStatus('✗ Error: ' + error.message)
-      setTimeout(() => setUploadStatus(''), 5000)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDeleteLead = async (leadId) => {
-    if (!window.confirm('Delete this lead? This action cannot be undone.')) return
-
-    try {
-      setLoading(true)
-      const response = await fetch('/api/delete-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId })
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        setLeads(leads.filter(lead => lead.id !== leadId))
-        setUploadStatus('✓ Lead deleted successfully!')
-        setTimeout(() => setUploadStatus(''), 3000)
-      } else {
-        throw new Error(result.error || 'Failed to delete lead')
-      }
-    } catch (error) {
-      console.error('Error deleting lead:', error)
-      setUploadStatus('✗ Error: ' + error.message)
-      setTimeout(() => setUploadStatus(''), 5000)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAddLead = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/save-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...editForm,
-          source: 'CRM Manual Entry',
-          timestamp: new Date().toISOString()
-        })
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        await loadLeads()
-        setShowAddModal(false)
-        setEditForm({})
-        setUploadStatus('✓ Lead added successfully!')
-        setTimeout(() => setUploadStatus(''), 3000)
-      } else {
-        throw new Error(result.error || 'Failed to add lead')
-      }
-    } catch (error) {
-      console.error('Error adding lead:', error)
-      setUploadStatus('✗ Error: ' + error.message)
-      setTimeout(() => setUploadStatus(''), 5000)
-    } finally {
-      setLoading(false)
+      setLoadingLeads(false)
     }
   }
 
   const handleDownloadCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Service', 'Status', 'Lead Score', 'Budget', 'Timeline', 'Source', 'Follow-up Date', 'Message', 'Notes', 'Created']
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Service', 'Status', 'Lead Score', 'Budget', 'Message', 'Date']
     
     const csvData = leads.map(lead => [
       lead.name,
@@ -374,11 +316,7 @@ export default function CRMAdminPage() {
       lead.status,
       lead.lead_score,
       lead.budget,
-      lead.timeline,
-      lead.source,
-      lead.follow_up_date,
       `"${(lead.message || '').replace(/"/g, '""')}"`,
-      `"${(lead.notes || '').replace(/"/g, '""')}"`,
       new Date(lead.timestamp).toLocaleString()
     ])
 
@@ -401,8 +339,7 @@ export default function CRMAdminPage() {
       'New': 'bg-blue-500/20 text-blue-300 border-blue-400/30',
       'Contacted': 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
       'Qualified': 'bg-green-500/20 text-green-300 border-green-400/30',
-      'Closed': 'bg-gray-500/20 text-gray-300 border-gray-400/30',
-      'Lost': 'bg-red-500/20 text-red-300 border-red-400/30'
+      'Closed': 'bg-gray-500/20 text-gray-300 border-gray-400/30'
     }
     return colors[status] || colors['New']
   }
@@ -412,8 +349,6 @@ export default function CRMAdminPage() {
     if (score >= 6) return 'text-yellow-400'
     return 'text-red-400'
   }
-
-  const uniqueServices = [...new Set(leads.map(lead => lead.service).filter(Boolean))]
 
   if (!isAuthenticated) {
     return (
@@ -435,71 +370,169 @@ export default function CRMAdminPage() {
               <Shield className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
-              CRM Admin
+              Codastra CRM
             </h2>
-            <p className="text-gray-400">Secure access to lead management</p>
+            <p className="text-gray-400">
+              {step === 'email' ? 'Secure OTP Login' : 'Enter Verification Code'}
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Dashboard Password
-              </label>
+          {step === 'email' && (
+            <div className="space-y-6">
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter admin password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full pl-12 pr-12 py-4 bg-white/5 border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:border-transparent transition-all ${
-                    error ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-blue-500'
-                  }`}
-                  required
-                  disabled={isLoading || loginAttempts >= 5}
-                />
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Admin Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="codastra.conect@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendOTP(e)}
+                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:border-transparent transition-all ${
+                      error ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-blue-500'
+                    }`}
+                    disabled={isLoading}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Only <span className="text-blue-400 font-semibold">codastra.conect@gmail.com</span> can access
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-300 text-sm">{error}</p>
+                </div>
+              )}
+
+              {success && (
+                <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <p className="text-green-300 text-sm">{success}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleSendOTP}
+                disabled={isLoading || !email.trim()}
+                className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
+                  isLoading || !email.trim()
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg hover:shadow-blue-500/50'
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    Send OTP
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {step === 'otp' && (
+            <div className="space-y-6">
+              <button
+                onClick={handleBackToEmail}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm">Change email</span>
+              </button>
+
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Enter 6-Digit OTP
+                </label>
+                <div className="relative">
+                  <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="000000"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onKeyPress={(e) => e.key === 'Enter' && otp.length === 6 && handleVerifyOTP(e)}
+                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:border-transparent transition-all text-center text-2xl tracking-widest font-mono ${
+                      error ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-blue-500'
+                    }`}
+                    disabled={isLoading}
+                    maxLength={6}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  OTP sent to <span className="text-blue-400">{email}</span>
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-300 text-sm">{error}</p>
+                </div>
+              )}
+
+              {success && (
+                <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <p className="text-green-300 text-sm">{success}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleVerifyOTP}
+                disabled={isLoading || otp.length !== 6}
+                className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
+                  isLoading || otp.length !== 6
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg hover:shadow-blue-500/50'
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-5 h-5" />
+                    Verify & Login
+                  </>
+                )}
+              </button>
+
+              <div className="text-center">
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                  onClick={handleResendOTP}
+                  disabled={resendTimer > 0 || isLoading}
+                  className={`text-sm ${
+                    resendTimer > 0 || isLoading
+                      ? 'text-gray-500 cursor-not-allowed'
+                      : 'text-blue-400 hover:text-blue-300'
+                  } transition-colors`}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
                 </button>
               </div>
             </div>
-
-            {error && (
-              <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
-                <p className="text-red-300 text-sm text-center">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || loginAttempts >= 5 || !password.trim()}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
-                isLoading || loginAttempts >= 5 || !password.trim()
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:scale-[1.02] shadow-lg'
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  Access CRM
-                </>
-              )}
-            </button>
-          </form>
+          )}
 
           <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-            <p className="text-gray-400 text-xs text-center">
-              🔒 Secure area. All access attempts are logged.
+            <div className="flex items-center justify-center gap-2 text-gray-400 text-xs">
+              <Shield className="w-4 h-4 text-blue-400" />
+              <span>Secured with OTP Email Verification</span>
+            </div>
+            <p className="text-gray-500 text-xs text-center mt-2">
+              All access attempts are logged and monitored
             </p>
           </div>
         </div>
@@ -522,7 +555,7 @@ export default function CRMAdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <nav className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -542,9 +575,12 @@ export default function CRMAdminPage() {
                 className="p-2 text-gray-400 hover:text-white transition-colors"
                 title="Refresh leads"
               >
-                <Refresh className="w-5 h-5" />
+                <Refresh className={`w-5 h-5 ${loadingLeads ? 'animate-spin' : ''}`} />
               </button>
-              <div className="text-sm text-gray-300">Welcome, Admin</div>
+              <div className="text-sm text-gray-300 hidden sm:flex items-center gap-2">
+                <Mail className="w-4 h-4 text-blue-400" />
+                {email}
+              </div>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-500/20 text-red-300 border border-red-400/30 rounded-lg hover:bg-red-500/30 transition-all"
@@ -583,12 +619,10 @@ export default function CRMAdminPage() {
           <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-green-400/30 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-400">Qualified</p>
-                <p className="text-3xl font-bold text-green-400">{stats.qualified || 0}</p>
+                <p className="text-sm font-medium text-gray-400">This Week</p>
+                <p className="text-3xl font-bold text-green-400">{stats.recentCount || 0}</p>
               </div>
-              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                <Shield className="w-6 h-6 text-green-400" />
-              </div>
+              <TrendingUp className="w-10 h-10 text-green-400" />
             </div>
           </div>
 
@@ -596,7 +630,7 @@ export default function CRMAdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-400">Avg Score</p>
-                <p className="text-3xl font-bold text-purple-400">{stats.averageScore || 0}</p>
+                <p className="text-3xl font-bold text-purple-400">{stats.averageScore || '0.0'}</p>
               </div>
               <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-purple-400" />
@@ -606,76 +640,16 @@ export default function CRMAdminPage() {
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search leads..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-                />
-              </div>
-              
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="All">All Status</option>
-                <option value="New">New</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Qualified">Qualified</option>
-                <option value="Closed">Closed</option>
-                <option value="Lost">Lost</option>
-              </select>
-
-              <select
-                value={serviceFilter}
-                onChange={(e) => setServiceFilter(e.target.value)}
-                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="All">All Services</option>
-                {uniqueServices.map(service => (
-                  <option key={service} value={service}>{service}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleDownloadCSV}
-                className="px-4 py-2 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setEditForm({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    service: 'Web Development',
-                    message: '',
-                    company: '',
-                    budget: '',
-                    timeline: '',
-                    source: 'Manual Entry',
-                    follow_up_date: '',
-                    notes: ''
-                  })
-                  setShowAddModal(true)
-                }}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Add Lead</span>
-              </button>
-            </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-xl font-semibold text-white">Lead Management</h2>
+            <button
+              onClick={handleDownloadCSV}
+              disabled={leads.length === 0}
+              className="px-4 py-2 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
           </div>
 
           {uploadStatus && (
@@ -686,16 +660,16 @@ export default function CRMAdminPage() {
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
-          {loading ? (
+          {loadingLeads ? (
             <div className="p-12 text-center">
               <div className="w-8 h-8 border-4 border-white/20 border-t-blue-400 rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-400">Loading leads...</p>
             </div>
-          ) : filteredLeads.length === 0 ? (
+          ) : leads.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No leads found</h3>
-              <p className="text-gray-400">Try adjusting your filters or add a new lead.</p>
+              <p className="text-gray-400">Leads will appear here once customers start contacting you.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -707,21 +681,16 @@ export default function CRMAdminPage() {
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Service</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Score</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Budget</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredLeads.map((lead) => (
-                    <tr key={lead.id} className="hover:bg-white/5 transition-colors">
+                  {leads.map((lead, idx) => (
+                    <tr key={idx} className="hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-white">{lead.name || 'Anonymous'}</div>
-                          <div className="text-sm text-gray-400 flex items-center gap-1">
-                            <Building className="w-3 h-3" />
-                            {lead.company || 'No company'}
-                          </div>
+                          <div className="text-sm text-gray-400">{lead.company || 'No company'}</div>
                         </div>
                       </td>
                       
@@ -730,99 +699,44 @@ export default function CRMAdminPage() {
                           {lead.email && (
                             <div className="text-sm text-white flex items-center gap-2">
                               <Mail className="w-3 h-3 text-gray-400" />
-                              <a href={`mailto:${lead.email}`} className="hover:text-blue-400">
-                                {lead.email}
-                              </a>
+                              {lead.email}
                             </div>
                           )}
                           {lead.phone && (
                             <div className="text-sm text-gray-400 flex items-center gap-2">
                               <Phone className="w-3 h-3" />
-                              <a href={`tel:${lead.phone}`} className="hover:text-blue-400">
-                                {lead.phone}
-                              </a>
+                              {lead.phone}
                             </div>
                           )}
                         </div>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lead.service || 'General Inquiry'}</div>
-                        <div className="text-sm text-gray-400">{lead.source || 'Unknown'}</div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={lead.status || 'New'}
-                          onChange={async (e) => {
-                            const newStatus = e.target.value
-                            try {
-                              const response = await fetch('/api/update-lead', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ ...lead, status: newStatus })
-                              })
-                              
-                              const result = await response.json()
-                              
-                              if (result.success) {
-                                const updatedLeads = leads.map(l =>
-                                  l.id === lead.id ? { ...l, status: newStatus } : l
-                                )
-                                setLeads(updatedLeads)
-                              }
-                            } catch (error) {
-                              console.error('Error updating status:', error)
-                              alert('Failed to update status')
-                            }
-                          }}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(lead.status || 'New')}`}
-                        >
-                          <option value="New">New</option>
-                          <option value="Contacted">Contacted</option>
-                          <option value="Qualified">Qualified</option>
-                          <option value="Closed">Closed</option>
-                          <option value="Lost">Lost</option>
-                        </select>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`text-sm font-medium ${getScoreColor(lead.lead_score || 0)}`}>
-                          {lead.lead_score || 0}/10
+                        <div className="flex items-center gap-2">
+                          <Briefcase className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm text-gray-300">{lead.service || 'General Inquiry'}</span>
                         </div>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">{lead.budget || 'Not specified'}</div>
-                        <div className="text-sm text-gray-400">{lead.timeline || 'Not specified'}</div>
+                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(lead.status || 'New')}`}>
+                          {lead.status || 'New'}
+                        </span>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-white">
-                          {new Date(lead.timestamp).toLocaleDateString()}
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-400" />
+                          <span className={`font-semibold ${getScoreColor(lead.lead_score || 0)}`}>
+                            {lead.lead_score || 0}/10
+                          </span>
                         </div>
-                        {lead.follow_up_date && (
-                          <div className="text-xs text-blue-400 flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(lead.follow_up_date).toLocaleDateString()}
-                          </div>
-                        )}
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEditLead(lead)}
-                            className="text-blue-400 hover:text-blue-300 p-1 rounded hover:bg-blue-500/20 transition-all"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteLead(lead.id)}
-                            className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/20 transition-all"
-                          >
-                            <Trash className="w-4 h-4" />
-                          </button>
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <Clock className="w-3 h-3" />
+                          {new Date(lead.timestamp || lead.date).toLocaleDateString()}
                         </div>
                       </td>
                     </tr>
@@ -832,194 +746,17 @@ export default function CRMAdminPage() {
             </div>
           )}
         </div>
-      </div>
 
-      {(showEditModal || showAddModal) && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-white">
-                  {showEditModal ? 'Edit Lead' : 'Add New Lead'}
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowEditModal(false)
-                    setShowAddModal(false)
-                  }}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={(e) => { 
-              e.preventDefault()
-              showEditModal ? handleUpdateLead() : handleAddLead()
-            }} className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Name *</label>
-                  <input
-                    type="text"
-                    value={editForm.name || ''}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Email *</label>
-                  <input
-                    type="email"
-                    value={editForm.email || ''}
-                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Phone</label>
-                  <input
-                    type="tel"
-                    value={editForm.phone || ''}
-                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Company</label>
-                  <input
-                    type="text"
-                    value={editForm.company || ''}
-                    onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Service</label>
-                  <select
-                    value={editForm.service || ''}
-                    onChange={(e) => setEditForm({ ...editForm, service: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Web Development">Web Development</option>
-                    <option value="App Development">App Development</option>
-                    <option value="SEO Optimization">SEO Optimization</option>
-                    <option value="Digital Marketing">Digital Marketing</option>
-                    <option value="E-commerce">E-commerce</option>
-                    <option value="Consulting">Consulting</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
-                  <select
-                    value={editForm.status || 'New'}
-                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="New">New</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Qualified">Qualified</option>
-                    <option value="Closed">Closed</option>
-                    <option value="Lost">Lost</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Budget</label>
-                  <input
-                    type="text"
-                    value={editForm.budget || ''}
-                    onChange={(e) => setEditForm({ ...editForm, budget: e.target.value })}
-                    placeholder="e.g., $5,000"
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Timeline</label>
-                  <input
-                    type="text"
-                    value={editForm.timeline || ''}
-                    onChange={(e) => setEditForm({ ...editForm, timeline: e.target.value })}
-                    placeholder="e.g., 2 weeks"
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Follow-up Date</label>
-                  <input
-                    type="date"
-                    value={editForm.follow_up_date || ''}
-                    onChange={(e) => setEditForm({ ...editForm, follow_up_date: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Lead Score (1-10)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={editForm.lead_score || ''}
-                    onChange={(e) => setEditForm({ ...editForm, lead_score: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Message</label>
-                <textarea
-                  value={editForm.message || ''}
-                  onChange={(e) => setEditForm({ ...editForm, message: e.target.value })}
-                  rows="3"
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Notes</label>
-                <textarea
-                  value={editForm.notes || ''}
-                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                  rows="3"
-                  placeholder="Internal notes..."
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="mt-8 flex justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEditModal(false)
-                    setShowAddModal(false)
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:scale-105 transition-all"
-                >
-                  {showEditModal ? 'Update Lead' : 'Add Lead'}
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>
+            Powered by <span className="text-blue-400 font-semibold">Codastra</span> CRM System
+          </p>
+          <p className="mt-1 flex items-center justify-center gap-2">
+            <Shield className="w-4 h-4 text-green-400" />
+            Secured with OTP Authentication
+          </p>
         </div>
-      )}
+      </div>
 
       <style jsx>{`
         .floating-orb {
