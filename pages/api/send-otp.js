@@ -1,20 +1,19 @@
-// pages/api/send-otp.js - ENHANCED DEBUG VERSION
-// This API endpoint sends OTP to viralspark.connect@gmail.com using Viral Spark EmailJS
+// pages/api/send-otp.js - FIXED VERSION with shared OTP storage
 
-// In-memory OTP storage (for demo - use Redis/Database in production)
-const otpStore = new Map()
+// ✅ Use global storage to share OTP data between API routes
+if (!global.otpStore) {
+  global.otpStore = new Map()
+}
 
 export default async function handler(req, res) {
   console.log('\n🔍 ===== OTP REQUEST RECEIVED =====')
   console.log('Method:', req.method)
   console.log('Body:', req.body)
   
-  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
-  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     console.log('✅ OPTIONS request handled')
     return res.status(200).end()
@@ -31,7 +30,6 @@ export default async function handler(req, res) {
   try {
     const { email } = req.body
 
-    // Validate email is provided
     if (!email) {
       console.log('❌ Email missing in request body')
       return res.status(400).json({
@@ -48,12 +46,11 @@ export default async function handler(req, res) {
     console.log('  Expected:', ADMIN_EMAIL)
     console.log('  Match:', normalizedEmail === ADMIN_EMAIL)
 
-    // Security: Only allow Viral Spark admin email
     if (normalizedEmail !== ADMIN_EMAIL) {
       console.log('❌ Unauthorized email attempt:', normalizedEmail)
       return res.status(403).json({
         success: false,
-        error: 'Access denied. Only authorized Viral Spark admin email can login.'
+        error: 'Access denied. Only authorized admin email can login.'
       })
     }
 
@@ -61,8 +58,8 @@ export default async function handler(req, res) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
     const timestamp = Date.now()
 
-    // Store OTP with metadata
-    otpStore.set(normalizedEmail, {
+    // ✅ Store OTP in global storage (shared between API routes)
+    global.otpStore.set(normalizedEmail, {
       otp: otp,
       timestamp: timestamp,
       attempts: 0,
@@ -70,15 +67,12 @@ export default async function handler(req, res) {
     })
 
     console.log('🔑 OTP Generated:', otp)
-    console.log('💾 OTP Stored in memory for:', normalizedEmail)
+    console.log('💾 OTP Stored in global.otpStore for:', normalizedEmail)
+    console.log('📊 Current OTP store size:', global.otpStore.size)
 
-    // Clean up old OTPs (older than 10 minutes)
-    const cleanedCount = cleanupExpiredOTPs()
-    if (cleanedCount > 0) {
-      console.log('🧹 Cleaned up', cleanedCount, 'expired OTP(s)')
-    }
+    // Clean up old OTPs
+    cleanupExpiredOTPs()
 
-    // Get current date/time for email
     const now = new Date()
     const formattedTime = now.toLocaleString('en-US', {
       year: 'numeric',
@@ -90,7 +84,6 @@ export default async function handler(req, res) {
       timeZoneName: 'short'
     })
 
-    // Get user IP for security logging
     const userIP = req.headers['x-forwarded-for'] || 
                    req.headers['x-real-ip'] || 
                    req.connection.remoteAddress || 
@@ -100,7 +93,7 @@ export default async function handler(req, res) {
     console.log('  IP:', userIP)
     console.log('  Time:', formattedTime)
 
-    // Send OTP via EmailJS using REST API (server-side compatible)
+    // Try to send OTP via EmailJS
     try {
       const emailJSServiceId = process.env.NEXT_PUBLIC_VIRAL_SPARK_SERVICE_ID
       const emailJSTemplateId = process.env.NEXT_PUBLIC_VIRAL_SPARK_OTP_TEMPLATE_ID
@@ -113,10 +106,8 @@ export default async function handler(req, res) {
       console.log('  Public Key:', emailJSPublicKey ? '✅ ' + emailJSPublicKey.substring(0, 10) + '...' : '❌ Missing')
       console.log('  Private Key:', emailJSPrivateKey ? '✅ ' + emailJSPrivateKey.substring(0, 10) + '...' : '❌ Missing')
 
-      // Validate that all credentials are present
       if (!emailJSServiceId || !emailJSTemplateId || !emailJSPublicKey || !emailJSPrivateKey) {
-        console.error('❌ Missing EmailJS credentials!')
-        throw new Error('Viral Spark EmailJS credentials not configured properly. Check your .env.local file.')
+        throw new Error('EmailJS credentials not configured')
       }
 
       const emailPayload = {
@@ -126,21 +117,18 @@ export default async function handler(req, res) {
         accessToken: emailJSPrivateKey,
         template_params: {
           to_email: normalizedEmail,
-          to_name: 'Viral Spark Admin',
+          to_name: 'Admin',
           otp_code: otp,
           validity_minutes: '5',
           timestamp: formattedTime,
           ip_address: userIP,
-          service_name: 'Codastra Leads CRM',
+          service_name: 'Codastra CRM',
           from_name: 'Codastra Security'
         }
       }
 
       console.log('\n📤 Sending Email via EmailJS REST API...')
-      console.log('  Endpoint: https://api.emailjs.com/api/v1.0/email/send')
-      console.log('  To:', normalizedEmail)
 
-      // Use EmailJS REST API for server-side sending
       const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
         headers: {
@@ -153,56 +141,50 @@ export default async function handler(req, res) {
 
       if (!emailResponse.ok) {
         const errorText = await emailResponse.text()
-        console.error('❌ EmailJS API error response:', errorText)
-        throw new Error(`EmailJS API error: ${emailResponse.status} - ${errorText}`)
+        console.error('❌ EmailJS error:', errorText)
+        throw new Error(`EmailJS API error: ${emailResponse.status}`)
       }
 
       const emailResult = await emailResponse.text()
-      console.log('✅ EmailJS Response:', emailResult)
-      console.log('✅ OTP email sent successfully via Viral Spark to', normalizedEmail)
+      console.log('✅ Email sent successfully:', emailResult)
 
       return res.status(200).json({
         success: true,
-        message: 'OTP sent successfully to your Viral Spark email',
-        expiresIn: 300, // 5 minutes in seconds
+        message: 'OTP sent successfully to your email',
+        expiresIn: 300,
         email: normalizedEmail,
         timestamp: now.toISOString()
       })
 
     } catch (emailError) {
-      console.error('\n❌ EMAIL SENDING ERROR:')
-      console.error('  Error Type:', emailError.name)
-      console.error('  Error Message:', emailError.message)
-      console.error('  Stack:', emailError.stack)
+      console.error('\n❌ EMAIL SENDING ERROR:', emailError.message)
       
-      // For development: Still return success with OTP in console
-      if (process.env.NODE_ENV === 'development') {
-        console.log('\n⚠️  DEVELOPMENT MODE - Email failed but OTP generated')
-        console.log('🔑 USE THIS OTP FOR TESTING:', otp)
-        console.log('⏰ Valid for 5 minutes')
-        
-        return res.status(200).json({
-          success: true,
-          message: 'OTP generated (email service unavailable - check server console for OTP)',
-          developmentMode: true,
-          developmentOtp: otp, // Only visible in development
-          expiresIn: 300,
-          warning: 'Email service failed. OTP logged to server console.'
-        })
-      }
+      // ✅ Development fallback - show OTP in console
+      console.log('\n⚠️  EMAIL FAILED - USING CONSOLE OTP')
+      console.log('═══════════════════════════════════════')
+      console.log('🔑 YOUR OTP CODE:', otp)
+      console.log('📧 For email:', normalizedEmail)
+      console.log('⏰ Valid for 5 minutes')
+      console.log('═══════════════════════════════════════\n')
       
-      // In production, fail if email doesn't send
-      throw new Error('Failed to send OTP email via Viral Spark: ' + emailError.message)
+      return res.status(200).json({
+        success: true,
+        message: 'OTP generated (Email service unavailable - check server console)',
+        developmentMode: true,
+        expiresIn: 300,
+        warning: 'Email failed. OTP shown in server console.',
+        // ⚠️ Only show OTP in response for development
+        ...(process.env.NODE_ENV === 'development' && { otp: otp })
+      })
     }
 
   } catch (error) {
-    console.error('\n❌ FATAL ERROR in send-otp API:')
-    console.error('  Error:', error.message)
-    console.error('  Stack:', error.stack)
+    console.error('\n❌ FATAL ERROR:', error.message)
+    console.error('Stack:', error.stack)
     
     return res.status(500).json({
       success: false,
-      error: 'Failed to send OTP',
+      error: 'Failed to process OTP request',
       details: error.message,
       timestamp: new Date().toISOString()
     })
@@ -211,30 +193,31 @@ export default async function handler(req, res) {
   }
 }
 
-// Helper function to clean up expired OTPs
 function cleanupExpiredOTPs() {
+  if (!global.otpStore) return 0
+  
   const now = Date.now()
   const tenMinutes = 10 * 60 * 1000
   let cleanedCount = 0
   
-  for (const [key, value] of otpStore.entries()) {
+  for (const [key, value] of global.otpStore.entries()) {
     if (now - value.timestamp > tenMinutes) {
-      otpStore.delete(key)
+      global.otpStore.delete(key)
       cleanedCount++
     }
+  }
+  
+  if (cleanedCount > 0) {
+    console.log('🧹 Cleaned', cleanedCount, 'expired OTP(s)')
   }
   
   return cleanedCount
 }
 
-// Periodic cleanup of expired OTPs (runs every 10 minutes)
-if (typeof global.otpCleanupInterval === 'undefined') {
+// Periodic cleanup
+if (!global.otpCleanupInterval) {
   global.otpCleanupInterval = setInterval(() => {
-    const cleanedCount = cleanupExpiredOTPs()
-    if (cleanedCount > 0) {
-      console.log(`🧹 Periodic cleanup: Removed ${cleanedCount} expired OTP(s)`)
-    }
-  }, 10 * 60 * 1000) // Run every 10 minutes
-  
+    cleanupExpiredOTPs()
+  }, 10 * 60 * 1000)
   console.log('✅ OTP cleanup interval started')
 }
