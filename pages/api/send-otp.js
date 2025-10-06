@@ -1,7 +1,5 @@
-// pages/api/send-otp.js
+// pages/api/send-otp.js - FIXED VERSION
 // This API endpoint sends OTP to viralspark.connect@gmail.com using Viral Spark EmailJS
-
-import emailjs from '@emailjs/browser'
 
 // In-memory OTP storage (for demo - use Redis/Database in production)
 const otpStore = new Map()
@@ -87,32 +85,53 @@ export default async function handler(req, res) {
                    req.connection.remoteAddress || 
                    'Unknown'
 
-    // Send OTP via Viral Spark EmailJS
+    // Send OTP via EmailJS using REST API (server-side compatible)
     try {
       const emailJSServiceId = process.env.NEXT_PUBLIC_VIRAL_SPARK_SERVICE_ID
       const emailJSTemplateId = process.env.NEXT_PUBLIC_VIRAL_SPARK_OTP_TEMPLATE_ID
       const emailJSPublicKey = process.env.NEXT_PUBLIC_VIRAL_SPARK_PUBLIC_KEY
+      const emailJSPrivateKey = process.env.VIRAL_SPARK_PRIVATE_KEY
 
       // Validate that all credentials are present
-      if (!emailJSServiceId || !emailJSTemplateId || !emailJSPublicKey) {
+      if (!emailJSServiceId || !emailJSTemplateId || !emailJSPublicKey || !emailJSPrivateKey) {
+        console.error('Missing EmailJS credentials:', {
+          serviceId: !!emailJSServiceId,
+          templateId: !!emailJSTemplateId,
+          publicKey: !!emailJSPublicKey,
+          privateKey: !!emailJSPrivateKey
+        })
         throw new Error('Viral Spark EmailJS credentials not configured properly')
       }
 
-      await emailjs.send(
-        emailJSServiceId,
-        emailJSTemplateId,
-        {
-          to_email: normalizedEmail,
-          to_name: 'Viral Spark Admin',
-          otp_code: otp,
-          validity_minutes: '5',
-          timestamp: formattedTime,
-          ip_address: userIP,
-          service_name: 'Codastra Leads CRM',
-          from_name: 'Codastra Security'
+      // Use EmailJS REST API for server-side sending
+      const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        emailJSPublicKey
-      )
+        body: JSON.stringify({
+          service_id: emailJSServiceId,
+          template_id: emailJSTemplateId,
+          user_id: emailJSPublicKey,
+          accessToken: emailJSPrivateKey,
+          template_params: {
+            to_email: normalizedEmail,
+            to_name: 'Viral Spark Admin',
+            otp_code: otp,
+            validity_minutes: '5',
+            timestamp: formattedTime,
+            ip_address: userIP,
+            service_name: 'Codastra Leads CRM',
+            from_name: 'Codastra Security'
+          }
+        })
+      })
+
+      if (!emailResponse.ok) {
+        const errorText = await emailResponse.text()
+        console.error('❌ EmailJS API error:', emailResponse.status, errorText)
+        throw new Error(`EmailJS API error: ${emailResponse.status} - ${errorText}`)
+      }
 
       console.log('✅ OTP email sent successfully via Viral Spark to', normalizedEmail)
 
@@ -133,7 +152,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
           success: true,
           message: 'OTP generated (email service unavailable - check console)',
-          otp: otp, // Only for development
+          developmentOtp: otp, // Only visible in development
           expiresIn: 300
         })
       }
