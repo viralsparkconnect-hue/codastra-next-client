@@ -44,8 +44,8 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-400">
               <li className="flex items-center gap-2">
                 <Mail size={18} className="text-blue-400" />
-                <a href="mailto:codastra.conect@gmail.com" className="hover:text-blue-400 transition">
-                  codastra.conect@gmail.com
+                <a href="mailto:mimohsin313@gmail.com" className="hover:text-blue-400 transition">
+                  mimohsin313@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
