@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Code, Smartphone, Megaphone, Search, Brush, Globe, ArrowRight, Check, Star, Users, Clock, TrendingUp, Shield, Zap } from 'lucide-react'
+import { Code, Smartphone, Megaphone, Search, Brush, Globe, ArrowRight, Check, Star, Users, Clock, TrendingUp, Shield, Zap, Monitor } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
@@ -9,9 +9,36 @@ export default function Services() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [hoveredService, setHoveredService] = useState(null)
 
-  const categories = ['All', 'Development', 'Marketing', 'Design', 'Infrastructure']
+  const categories = ['All', 'Infrastructure', 'Development', 'Marketing', 'Design']
 
   const services = [
+    // ✅ NEW #1 FEATURED SERVICE
+    {
+      icon: Monitor,
+      title: 'IT Support & Desktop Services',
+      category: 'Infrastructure',
+      desc: 'Complete remote & on-site IT support — antivirus setup, firewall audits, OS repairs, data recovery, and full system health checks for homes and businesses.',
+      price: 'Starting at $49/session',
+      timeline: 'Same Day',
+      features: [
+        'Antivirus Installation & Malware Removal',
+        'Firewall Setup, Audit & Configuration',
+        'Windows / macOS Installation & Repair',
+        'Software Installation & License Management',
+        'Remote Desktop Support (TeamViewer/AnyDesk)',
+        'Data Backup & Disaster Recovery',
+        'Network & Wi-Fi Troubleshooting',
+        'PC / Laptop Performance Optimization',
+        'Driver Updates & Hardware Diagnostics',
+        'Security Vulnerability Scan & Patching',
+        'Email, Outlook & Office 365 Setup',
+        'Annual IT Maintenance Plans'
+      ],
+      popular: true,
+      rating: 4.9,
+      clients: 320,
+      gradient: 'from-emerald-500 to-cyan-600'
+    },
     {
       icon: Code,
       title: 'Web Development',
@@ -33,7 +60,7 @@ export default function Services() {
       price: 'Starting at $4,999',
       timeline: '4-12 weeks',
       features: ['iOS & Android', 'React Native', 'Native Performance', 'App Store Submission', 'Push Notifications', 'Offline Support'],
-      popular: true,
+      popular: false,
       rating: 4.8,
       clients: 89,
       gradient: 'from-purple-500 to-pink-600'
@@ -92,11 +119,19 @@ export default function Services() {
     }
   ]
 
-  const filteredServices = selectedCategory === 'All' 
-    ? services 
+  const filteredServices = selectedCategory === 'All'
+    ? services
     : services.filter(service => service.category === selectedCategory)
 
   const testimonials = [
+    {
+      name: 'Rajesh Kumar',
+      company: 'Small Business Owner',
+      service: 'IT Support & Desktop',
+      text: 'Got a virus on my laptop right before a client meeting. Codastra\'s team fixed it remotely in under an hour. Lifesavers!',
+      rating: 5,
+      avatar: '👨‍💼'
+    },
     {
       name: 'Sarah Johnson',
       company: 'TechStartup Inc.',
@@ -113,14 +148,6 @@ export default function Services() {
       rating: 5,
       avatar: '👨‍💻'
     },
-    {
-      name: 'Lisa Rodriguez',
-      company: 'Local Business',
-      service: 'Digital Marketing',
-      text: 'The marketing campaign generated 5x more leads than our previous efforts. Highly recommended!',
-      rating: 5,
-      avatar: '👩‍🎨'
-    }
   ]
 
   const stats = [
@@ -128,6 +155,16 @@ export default function Services() {
     { icon: Star, number: '4.9', label: 'Average Rating', color: 'text-yellow-400' },
     { icon: Clock, number: '98%', label: 'On-Time Delivery', color: 'text-green-400' },
     { icon: TrendingUp, number: '250%', label: 'Average ROI', color: 'text-purple-400' },
+  ]
+
+  // IT Support sub-features for the featured card hero block
+  const itHighlights = [
+    { icon: '🛡️', label: 'Antivirus & Malware' },
+    { icon: '🔥', label: 'Firewall Audits' },
+    { icon: '💾', label: 'Data Recovery' },
+    { icon: '🖥️', label: 'OS Repair' },
+    { icon: '📡', label: 'Network Fix' },
+    { icon: '⚡', label: 'Speed Boost' },
   ]
 
   return (
@@ -138,7 +175,7 @@ export default function Services() {
       <section className="pt-32 pb-20 px-4 text-center relative overflow-hidden">
         <div className="floating-orb w-32 h-32 bg-blue-500/20 top-20 left-10"></div>
         <div className="floating-orb w-48 h-48 bg-purple-500/15 top-40 right-20"></div>
-        
+
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h1
             className="text-5xl md:text-7xl font-bold mb-6"
@@ -154,9 +191,9 @@ export default function Services() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            From concept to deployment, we offer comprehensive digital solutions that drive real business results
+            From concept to deployment — and keeping your systems running — we offer comprehensive digital solutions that drive real business results
           </motion.p>
-          
+
           {/* Trust Indicators */}
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto"
@@ -171,6 +208,118 @@ export default function Services() {
                 <div className="text-gray-400 text-sm">{label}</div>
               </div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ✅ FEATURED IT SUPPORT HERO BANNER */}
+      <section className="px-4 mb-12">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-900/30 via-gray-800/60 to-cyan-900/30 backdrop-blur-sm p-8 md:p-12 shadow-2xl shadow-emerald-500/10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Glow blobs */}
+            <div className="absolute -top-16 -left-16 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+
+            {/* #1 badge */}
+            <div className="absolute top-6 right-6">
+              <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                ⭐ #1 Service
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+              {/* Left: Text */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center shadow-lg">
+                    <Monitor className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-emerald-400 text-sm font-semibold uppercase tracking-widest">Most Requested</p>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">IT Support &amp; Desktop Services</h2>
+                  </div>
+                </div>
+
+                <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                  Whether your PC is running slow, infected with malware, or you need a complete IT setup for your office — our certified technicians are available <span className="text-emerald-400 font-semibold">same day</span>, remotely or on-site.
+                </p>
+
+                {/* Highlight pills */}
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {itHighlights.map(({ icon, label }, i) => (
+                    <span key={i} className="flex items-center gap-2 px-4 py-2 bg-emerald-900/40 border border-emerald-500/30 rounded-full text-emerald-300 text-sm font-medium">
+                      <span>{icon}</span>
+                      {label}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link href="/contact">
+                    <motion.button
+                      className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-600 text-white rounded-full font-bold text-lg hover:from-emerald-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-emerald-500/40 flex items-center gap-2 group"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      Book a Session
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
+                  </Link>
+                  <a
+                    href="https://wa.me/919834683297"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 border-2 border-emerald-500/50 text-emerald-300 rounded-full font-semibold hover:border-emerald-400 hover:text-emerald-200 transition-all flex items-center justify-center gap-2"
+                  >
+                    💬 WhatsApp Us
+                  </a>
+                </div>
+              </div>
+
+              {/* Right: Feature checklist */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  'Antivirus Installation & Malware Removal',
+                  'Firewall Setup, Audit & Configuration',
+                  'Windows / macOS Installation & Repair',
+                  'Software Installation & License Mgmt',
+                  'Remote Desktop Support',
+                  'Data Backup & Disaster Recovery',
+                  'Network & Wi-Fi Troubleshooting',
+                  'PC Performance Optimization',
+                  'Driver Updates & Hardware Diagnostics',
+                  'Security Vulnerability Scan & Patching',
+                  'Email, Outlook & Office 365 Setup',
+                  'Annual IT Maintenance Plans',
+                ].map((feat, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                    <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom stats strip */}
+            <div className="relative z-10 mt-10 pt-6 border-t border-emerald-500/20 flex flex-wrap justify-around gap-6 text-center">
+              {[
+                { val: '320+', label: 'Clients Helped' },
+                { val: 'Same Day', label: 'Response Time' },
+                { val: '4.9 ★', label: 'Avg Rating' },
+                { val: 'Remote & On-site', label: 'Support Modes' },
+                { val: '$49', label: 'Starting Price' },
+              ].map(({ val, label }, i) => (
+                <div key={i}>
+                  <div className="text-xl font-bold text-emerald-400">{val}</div>
+                  <div className="text-gray-400 text-xs mt-1">{label}</div>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -201,7 +350,7 @@ export default function Services() {
       {/* Services Grid */}
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             layout
           >
@@ -214,8 +363,8 @@ export default function Services() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 className={`relative p-8 rounded-3xl transition-all duration-500 cursor-pointer group ${
-                  service.popular 
-                    ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20' 
+                  service.popular
+                    ? 'bg-gradient-to-br from-emerald-900/30 to-cyan-900/30 border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
                     : 'bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 hover:border-gray-600/70'
                 } hover:scale-[1.02] hover:-translate-y-2`}
                 onMouseEnter={() => setHoveredService(i)}
@@ -223,8 +372,8 @@ export default function Services() {
               >
                 {service.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                      Most Popular
+                    <span className="bg-gradient-to-r from-emerald-500 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                      ⭐ Most Popular
                     </span>
                   </div>
                 )}
@@ -362,7 +511,7 @@ export default function Services() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[ 
+            {[
               { step: '01', title: 'Discovery', desc: 'We understand your needs and goals', icon: Search },
               { step: '02', title: 'Planning', desc: 'Create a detailed project roadmap', icon: Shield },
               { step: '03', title: 'Development', desc: 'Build your solution with precision', icon: Code },
@@ -410,7 +559,7 @@ export default function Services() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact">
-                <motion.button 
+                <motion.button
                   className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -440,7 +589,7 @@ export default function Services() {
           filter: blur(40px);
           animation: float 6s ease-in-out infinite;
         }
-        
+
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(180deg); }
