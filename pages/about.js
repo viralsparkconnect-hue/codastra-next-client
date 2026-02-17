@@ -11,7 +11,7 @@ export default function About() {
 
   const team = [
     { 
-      name: 'Amol Patil', 
+      name: 'MD Mohsin Iqbal', 
       role: 'CEO & Founder',
       bio: 'Visionary leader with MCA and 5+ years of international sales experience. Leading digital transformation.',
       skills: ['Strategy', 'Leadership', 'International Sales', 'Business Development'],
@@ -20,7 +20,7 @@ export default function About() {
       gradient: 'from-blue-500 to-blue-700'
     },
     { 
-      name: 'Pratik Rajput', 
+      name: 'Alex', 
       role: 'Co-Founder & CMO',
       bio: 'BE Mechanical engineer with 5+ years in international sales. Expert in global market strategy.', 
       skills: ['Marketing', 'International Sales', 'Strategy', 'Client Relations'],
@@ -29,7 +29,7 @@ export default function About() {
       gradient: 'from-purple-500 to-pink-600'
     },
     { 
-      name: 'Shubham Suryavanshi', 
+      name: 'Peter', 
       role: 'CTO',
       bio: 'Full-stack development expert leading complete coding production and architecture.',
       skills: ['Full-Stack Development', 'System Architecture', 'Team Leadership', 'Production Management'],
@@ -38,7 +38,7 @@ export default function About() {
       gradient: 'from-green-500 to-teal-600'
     },
     { 
-      name: 'Harsh Shekhawat', 
+      name: 'Sharleen', 
       role: 'CRM Specialist',
       bio: 'Software engineering graduate with 3+ years experience in CRM systems and client management.',
       skills: ['CRM Systems', 'Software Engineering', 'Client Management', 'Data Analytics'],
