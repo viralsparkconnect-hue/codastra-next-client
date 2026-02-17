@@ -45,7 +45,7 @@ export default function Contact() {
     {
       icon: Phone,
       title: 'Call India',
-      info: '+91 98346 83297',
+      info: '+91 7709333640',
       desc: 'Mon-Fri from 9am to 6pm IST',
       color: 'from-green-500 to-green-700',
       action: () => window.location.href = 'tel:+919834683297'
@@ -53,7 +53,7 @@ export default function Contact() {
     {
       icon: MessageSquare,
       title: 'WhatsApp',
-      info: '+91 98346 83297',
+      info: '+91 7709333640',
       desc: 'Chat with us on WhatsApp',
       color: 'from-emerald-500 to-emerald-700',
       action: () => window.open('https://wa.me/919834683297', '_blank')
@@ -69,7 +69,7 @@ export default function Contact() {
     {
       icon: MapPin,
       title: 'Visit Us',
-      info: 'Nashik, Maharashtra, India',
+      info: 'Jalgaon, Maharashtra, India',
       desc: 'Come say hello at our office',
       color: 'from-orange-500 to-orange-700',
       action: () => window.open('https://maps.google.com/?q=Nashik+Maharashtra+India', '_blank')
@@ -87,10 +87,10 @@ export default function Contact() {
   const offices = [
     {
       id: 'main',
-      city: 'Nashik',
+      city: 'Jalgaon',
       address: 'Maharashtra, India',
-      phone: '+91 98346 83297',
-      whatsapp: '+91 98346 83297',
+      phone: '+91 7709333640',
+      whatsapp: '+91 7709333640',
       email: 'codastra.conect@gmail.com',
       timezone: 'IST (GMT+5:30)',
       team: 50,
@@ -111,8 +111,8 @@ export default function Contact() {
       id: 'remote',
       city: 'Remote Services',
       address: 'Global Remote Support',
-      phone: '+91 98346 83297',
-      whatsapp: '+91 98346 83297',
+      phone: '+91 7709333640',
+      whatsapp: '+91 7709333640',
       email: 'remote@codastra.com',
       timezone: 'Multiple Timezones',
       team: 50,
