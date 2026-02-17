@@ -11,7 +11,7 @@ export default function About() {
 
   const team = [
     { 
-      name: 'MD Mohsin Iqbal', 
+      name: 'Mohammad Mohsin iqbal', 
       role: 'CEO & Founder',
       bio: 'Visionary leader with MCA and 5+ years of international sales experience. Leading digital transformation.',
       skills: ['Strategy', 'Leadership', 'International Sales', 'Business Development'],
