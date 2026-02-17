@@ -368,14 +368,14 @@ export default function ContactForm() {
         {/* Quick contact options */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
           <button 
-            onClick={() => window.open('https://wa.me/919834683297', '_blank')}
+            onClick={() => window.open('https://wa.me/+917709333640', '_blank')}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 text-sm"
           >
             <MessageSquare className="w-4 h-4" />
             WhatsApp Us
           </button>
           <button 
-            onClick={() => window.location.href = 'tel:+919834683297'}
+            onClick={() => window.location.href = 'tel:+917709333640'}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 text-sm"
           >
             <Phone className="w-4 h-4" />
@@ -668,7 +668,7 @@ export default function ContactForm() {
         <div className="flex justify-center gap-4">
           <button 
             type="button"
-            onClick={() => window.open('https://wa.me/919834683297', '_blank')}
+            onClick={() => window.open('https://wa.me/+917709333640', '_blank')}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-300 text-sm"
           >
             <MessageSquare className="w-4 h-4" />
@@ -676,7 +676,7 @@ export default function ContactForm() {
           </button>
           <button 
             type="button"
-            onClick={() => window.location.href = 'tel:+919834683297'}
+            onClick={() => window.location.href = 'tel:+917709333640'}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 text-sm"
           >
             <Phone className="w-4 h-4" />
